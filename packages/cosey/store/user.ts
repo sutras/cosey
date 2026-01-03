@@ -1,4 +1,4 @@
-import { ref, shallowRef } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 import { type RouteRecordRaw } from 'vue-router';
 import { defineStore, type StoreGeneric } from 'pinia';
 import { getAllDynamicRoutes, router } from '../router';
@@ -42,8 +42,8 @@ export const useUserStore = defineStore('cosey-user', () => {
   const dynamicRoutes = shallowRef<any[]>([]);
   // 当前登录用户的信息
   const userInfo = ref<UserInfo>();
-  // 是否已获取用户信息
-  const requestedUserInfo = ref(false);
+  // 是否已初始化数据
+  const initialized = ref(false);
 
   /**
    * 登录获取用户 token
@@ -132,7 +132,6 @@ export const useUserStore = defineStore('cosey-user', () => {
   const flush = async (lastPath?: string) => {
     persist.remove(TOKEN_NAME);
     userInfo.value = undefined;
-    requestedUserInfo.value = false;
     await router.push({
       path: routerConfig!.loginPath,
       query: {
@@ -143,6 +142,7 @@ export const useUserStore = defineStore('cosey-user', () => {
       router.removeRoute(route.name!);
     });
     dynamicRoutes.value = [];
+    initialized.value = false;
   };
 
   /**
@@ -153,15 +153,25 @@ export const useUserStore = defineStore('cosey-user', () => {
     await flush(lastPath);
   };
 
+  /**
+   * 初始化网站数据
+   */
+  const initializeData = async () => {
+    if (!initialized.value) {
+      await getUserInfo();
+      await setAuthorization();
+      await addDynamicRoutes();
+      initialized.value = true;
+    }
+  };
+
   return {
     dynamicRoutes,
     userInfo,
-    requestedUserInfo,
+    initialized: computed(() => initialized.value),
     login,
-    getUserInfo,
+    initializeData,
     changePassword,
-    setAuthorization,
-    addDynamicRoutes,
     logout,
   };
 });

@@ -47,7 +47,7 @@ export function defineRoutes(route: RouteRecordRaw | RouteRecordRaw[]) {
  */
 export const mergeRouteModules = (modules: Record<string, unknown>) => {
   return Object.keys(modules).reduce((result, key) => {
-    const module = (modules[key] as Record<string, unknown>).default as RouteRecordRaw[];
+    const module = ((modules[key] as Record<string, unknown>).default as RouteRecordRaw[]) || [];
     return result.concat(module);
   }, [] as RouteRecordRaw[]);
 };

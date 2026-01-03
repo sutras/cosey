@@ -83,7 +83,7 @@ const logout = () => {
     text: t('co.auth.loggingOut'),
   });
 
-  userStore.logout().finally(() => {
+  userStore.logout(router.currentRoute.value.fullPath).finally(() => {
     fullscreenLoading.value = false;
     loading.close();
   });
