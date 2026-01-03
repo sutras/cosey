@@ -50,12 +50,15 @@ async function bootstrap() {
     api: {
       upload: commonApi.singleUpload,
       login: authApi.login,
-      getUserInfo: authApi.getUserInfo,
       changePassword: authApi.changePassword,
     },
-    defineAuthority({ permissions = [] }) {
+    async initializeData({ setUserInfo, setRoutes }) {
+      const userInfo = await authApi.getUserInfo();
+      setUserInfo(userInfo);
+      setRoutes([]);
+
       const { can, rules } = new AbilityBuilder(createMongoAbility);
-      permissions.forEach(({ action, subject }: any) => {
+      userInfo.permissions.forEach(({ action, subject }: any) => {
         can(action, subject);
       });
       ability.update(rules);

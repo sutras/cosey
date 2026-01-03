@@ -1,7 +1,7 @@
 import { computed, ref, shallowRef } from 'vue';
 import { type RouteRecordRaw } from 'vue-router';
 import { defineStore, type StoreGeneric } from 'pinia';
-import { getAllDynamicRoutes, router } from '../router';
+import { defineRoutes, getAllDynamicRoutes, router } from '../router';
 import { TOKEN_NAME } from '../constant';
 /**
  * 用于解决ts错误提示：
@@ -15,31 +15,30 @@ import { pinia } from './pinia';
 import { globalConfig } from '../config';
 
 export interface UserInfo {
-  id?: number;
-  username?: string;
   nickname: string;
   avatar: string;
   [key: PropertyKey]: any;
 }
 
 export const useUserStore = defineStore('cosey-user', () => {
-  const { router: routerConfig, api: apiConfig, filterRoute, defineAuthority } = globalConfig;
+  const {
+    router: routerConfig,
+    api: apiConfig,
+    filterRoute,
+    initializeData: _initializeData,
+  } = globalConfig;
 
   if (!apiConfig?.login) {
     warningOnce(!!apiConfig?.login, 'The "login" api is required.');
   }
-
-  if (!apiConfig?.getUserInfo) {
-    warningOnce(!!apiConfig?.getUserInfo, 'The "getUserInfo" api is required.');
-  }
-
   const loginApi = apiConfig?.login;
-  const getUserInfoApi = apiConfig?.getUserInfo;
   const changePasswordApi = apiConfig?.changePassword;
   const logoutApi = apiConfig?.logout;
 
   // 当前动态添加的路由
   const dynamicRoutes = shallowRef<any[]>([]);
+  // 远程动态路由
+  const remoteDynamicRoutes = shallowRef<any[]>([]);
   // 当前登录用户的信息
   const userInfo = ref<UserInfo>();
   // 是否已初始化数据
@@ -54,40 +53,6 @@ export const useUserStore = defineStore('cosey-user', () => {
       persist.set(TOKEN_NAME, token);
       router.push((router.currentRoute.value.query.redirect as string) || routerConfig!.homePath);
     });
-  };
-
-  /**
-   * 获取用户信息
-   * 会在获取 token 后跳转路由前获取
-   */
-  const getUserInfo = async () => {
-    return getUserInfoApi?.().then((res: any) => {
-      const nickname = res.nickname;
-      const avatar = res.avatar;
-      userInfo.value = {
-        ...res,
-        nickname,
-        avatar,
-      };
-
-      return userInfo.value;
-    });
-  };
-
-  /**
-   * 修改密码
-   */
-  const changePassword = async (data: any) => {
-    await changePasswordApi?.(data).then(() => {
-      router.back();
-    });
-  };
-
-  /**
-   * 设置权限
-   */
-  const setAuthorization = async () => {
-    return defineAuthority(userInfo.value!);
   };
 
   const mapRoute = (routes: RouteRecordRaw[]): RouteRecordRaw[] => {
@@ -112,10 +77,10 @@ export const useUserStore = defineStore('cosey-user', () => {
   };
 
   /**
-   * 在获取用户信息后添加动态路由
+   * 获取用户信息、设置权限后，添加动态路由
    */
   const addDynamicRoutes = async () => {
-    const filteredRoutes = filterRoutes(getAllDynamicRoutes());
+    const filteredRoutes = filterRoutes([...getAllDynamicRoutes(), ...remoteDynamicRoutes.value]);
 
     router.removeRoute(NOT_FOUND_ROUTE_NAME);
     filteredRoutes.forEach((route) => {
@@ -127,22 +92,54 @@ export const useUserStore = defineStore('cosey-user', () => {
   };
 
   /**
+   * 初始化用户相关数据
+   */
+  const initializeData = async () => {
+    const setUserInfo = (_userInfo: UserInfo) => {
+      userInfo.value = _userInfo;
+    };
+
+    const setRoutes = (route: RouteRecordRaw | RouteRecordRaw[]) => {
+      remoteDynamicRoutes.value = defineRoutes(route);
+    };
+
+    if (!initialized.value) {
+      await _initializeData({
+        setUserInfo,
+        setRoutes,
+      });
+      await addDynamicRoutes();
+      initialized.value = true;
+    }
+  };
+
+  /**
+   * 修改密码
+   */
+  const changePassword = async (data: any) => {
+    await changePasswordApi?.(data).then(() => {
+      router.back();
+    });
+  };
+
+  /**
    * 退出登录时清空用户信息
    */
   const flush = async (lastPath?: string) => {
     persist.remove(TOKEN_NAME);
     userInfo.value = undefined;
+    dynamicRoutes.value.forEach((route) => {
+      router.removeRoute(route.name!);
+    });
+    dynamicRoutes.value = [];
+    remoteDynamicRoutes.value = [];
+    initialized.value = false;
     await router.push({
       path: routerConfig!.loginPath,
       query: {
         redirect: lastPath,
       },
     });
-    dynamicRoutes.value.forEach((route) => {
-      router.removeRoute(route.name!);
-    });
-    dynamicRoutes.value = [];
-    initialized.value = false;
   };
 
   /**
@@ -151,18 +148,6 @@ export const useUserStore = defineStore('cosey-user', () => {
   const logout = async (lastPath?: string) => {
     await logoutApi?.();
     await flush(lastPath);
-  };
-
-  /**
-   * 初始化网站数据
-   */
-  const initializeData = async () => {
-    if (!initialized.value) {
-      await getUserInfo();
-      await setAuthorization();
-      await addDynamicRoutes();
-      initialized.value = true;
-    }
   };
 
   return {

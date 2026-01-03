@@ -13,7 +13,14 @@ export default {
   },
 
   getUserInfo: () => {
-    return http.get(Api.UserInfo);
+    return http.get<{
+      id: number;
+      username: string;
+      nickname: string;
+      avatar: string;
+      superAdmin: boolean;
+      permissions: any[];
+    }>(Api.UserInfo);
   },
 
   changePassword: (data: any) => {

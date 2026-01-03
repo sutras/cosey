@@ -22,11 +22,6 @@ export const defaultApiConfig = {
   login: null as ((data: any, config?: AxiosRequestConfig) => Promise<string>) | null,
 
   /**
-   * 获取用户详情
-   */
-  getUserInfo: null as ((config?: AxiosRequestConfig) => Promise<any>) | null,
-
-  /**
    * 修改密码
    */
   changePassword: null as ((data: any, config?: AxiosRequestConfig) => Promise<any>) | null,

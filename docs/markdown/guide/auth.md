@@ -14,10 +14,10 @@ Cosey 封装了认证流程：
 
 ```
         token
-1.登录 --------> 2.初始化数据（获取用户信息、授权、添加路由）-> 3.跳转到首页
+1.登录 --------> 2.初始化数据（获取用户信息、授权、添加动态路由登）-> 3.跳转到首页
 ```
 
-可以看到，登录和用户信息接口是基础且必须的，需要在 `launch` 函数配置项 `api` 进行配置：
+可以看到，登录接口是基础且必须的，需要在 `launch` 函数配置项 `api` 进行配置；而初始化回调通常也要定义，至少要用于设置用户昵称和头像：
 
 ```ts [main.ts]
 import { launch } from 'cosey';
@@ -26,13 +26,16 @@ import authApi from '@/api/auth';
 launch(app, {
   api: {
     login: authApi.login,
-    getUserInfo: authApi.getUserInfo,
+  },
+  async initializeData({ setUserInfo }) {
+    const userInfo = await authApi.getUserInfo();
+    setUserInfo(userInfo);
   },
 });
 ```
 
 - 登录接口必须返回一个 `token` 字符串；
-- 用户信息接口至少要返回 `avatar` 和 `nickname` 字段数据，以便用于展示，如果名称不一致，需要进行转换。
+- `setUserInfo` 至少要设置 `avatar` 和 `nickname` 字段数据，以便用于展示。
 - 如果没有用户信息接口，仅通过登录接口获取用户信息，在这种情况下，可以将登录时获取的用户信息保存到本地缓存，在 getUserInfo 中再读取本地缓存的值来返回。
 
 ### 修改密码
@@ -65,15 +68,7 @@ launch(app, {
 
 ### 权限配置
 
-`launch` 函数提供了配置项 `defineAuthority` 用于定义权限信息，此函数会在上面的认证流程步骤3调用，接收登录用户信息，具体权限处理全凭开发者， Cosey 并不关心。
-
-```ts
-launch(app, {
-  defineAuthority(userInfo) {
-    // userInfo
-  },
-});
-```
+可在 `initializeData` 回调中获取用户权限信息并设置权限，具体权限处理全凭开发者，Cosey 并不关心细节。
 
 ### 路由过滤
 
@@ -90,8 +85,6 @@ launch(app, {
 ```
 
 同样，Cosey 并不关心具体判断逻辑。
-
-`defineAuthority` 和 `filterRoute` 配置项就是 Cosey 对外进行权限管理的全部了。
 
 ## casl
 
@@ -121,8 +114,10 @@ app.provide(ABILITY_TOKEN, ability);
 import { AbilityBuilder, createMongoAbility } from '@casl/ability';
 
 launch(app, {
-  defineAuthority({ permissions = [] }) {
+  async initializeData() {
     // 假设 permissions 是包含在用户信息的权限列表
+    const { permissions } = await authApi.getUserInfo();
+
     const { can, rules } = new AbilityBuilder(createMongoAbility);
     permissions.forEach(({ action, subject }: any) => {
       can(action, subject);

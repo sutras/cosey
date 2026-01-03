@@ -13,6 +13,7 @@ import { type RouteRecordRaw } from 'vue-router';
 import { type CoseyRouterOptions } from '../router';
 import { launchLocale } from '../locale';
 import { launchPersist } from '../persist';
+import { type UserInfo } from '../store';
 
 export interface LayoutComponents {
   base?: string | Component;
@@ -59,7 +60,10 @@ type FilterRouteHandler = (
   route: RouteRecordRaw,
 ) => RouteRecordRaw | void | boolean | undefined | null;
 
-type DefineAuthorityHandler = (userInfo: Record<any, any>) => void | Promise<void>;
+type InitializeDataHandler = (handlers: {
+  setUserInfo: (userInfo: UserInfo) => void;
+  setRoutes: (route: RouteRecordRaw | RouteRecordRaw[]) => void;
+}) => void | Promise<void>;
 
 export type CoseyOptions = {
   router?: CoseyRouterOptions & RouterConfig;
@@ -67,8 +71,8 @@ export type CoseyOptions = {
   layout?: LayoutConfig;
   site?: SiteConfig;
   api?: ApiConfig;
+  initializeData?: InitializeDataHandler;
   filterRoute?: FilterRouteHandler;
-  defineAuthority?: DefineAuthorityHandler;
   components?: LayoutComponents;
   slots?: LayoutSlots;
   persist?: PersistConfig;
@@ -81,8 +85,8 @@ export interface GlobalConfig {
   layout: RequiredLayoutConfig;
   site: RequiredSiteConfig;
   api: RequiredApiConfig;
+  initializeData: NonNullable<CoseyOptions['initializeData']>;
   filterRoute: NonNullable<CoseyOptions['filterRoute']>;
-  defineAuthority: NonNullable<CoseyOptions['defineAuthority']>;
   components: NonNullable<CoseyOptions['components']>;
   slots: NonNullable<CoseyOptions['slots']>;
 }
@@ -98,8 +102,8 @@ export function launchGlobalConfig(app: App, options: CoseyOptions) {
     layout = {},
     site = {},
     api = {},
+    initializeData = () => void 0,
     filterRoute = () => true,
-    defineAuthority = () => void 0,
     components = {},
     slots = {},
     persist = {},
@@ -112,8 +116,8 @@ export function launchGlobalConfig(app: App, options: CoseyOptions) {
     layout: defaultsDeep(layout, defaultLayoutConfig),
     site: defaultsDeep(site, defaultSiteConfig),
     api: defaultsDeep(api, defaultApiConfig),
+    initializeData,
     filterRoute,
-    defineAuthority,
     components,
     slots,
   };

@@ -71,7 +71,6 @@ export default {
       },
       api: {
         login: () => Promise.resolve(''),
-        getUserInfo: () => Promise.resolve({}),
         upload: commonApi.singleUpload,
       },
     });
