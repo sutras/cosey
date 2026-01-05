@@ -1,4 +1,4 @@
-import { uuid } from '../utils';
+import { auid } from '../utils';
 import { type RouteRecordRaw } from 'vue-router';
 
 /**
@@ -10,7 +10,7 @@ export function defineRoute(route: RouteRecordRaw) {
 
     const newRoute = {
       ...route,
-      name: route.name || uuid(),
+      name: route.name || auid(),
       meta: {
         ...meta,
         closable: meta.closable ?? true,

@@ -28,7 +28,7 @@ import {
 import { DndSort, DndSortItem } from '../dnd-sort';
 import { TransitionGroup as InternalTransitionGroup } from '../transition-group';
 import {
-  uuid,
+  auid,
   createMergedExpose,
   isNumber,
   isString,
@@ -87,7 +87,7 @@ watch(
     props.modelValue.forEach((row) => {
       let key = mapRowKey.get(row);
       if (!key) {
-        key = uuid();
+        key = auid();
       }
       newMapRowKey.set(row, key);
     });

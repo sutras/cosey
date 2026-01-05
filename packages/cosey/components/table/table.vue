@@ -140,14 +140,14 @@
             :expand-row-keys="innerExpandRowKeys"
             :show-summary="false"
             :summary-method="undefined"
-            style="width: 100%"
+            :style="{ width: '100%' }"
             height="100%"
             max-height="none"
           >
-            <template v-for="column of renderedColumns" :key="column.prop || column.property">
+            <template v-for="column in renderedColumns" :key="column.prop || column.property">
               <TableColumn v-bind="column" :internal-slot="$slots" />
             </template>
-            <template v-for="name of passedElSlotsName" :key="name" #[name]="slotProps">
+            <template v-for="name in passedElSlotsName" :key="name" #[name]="slotProps">
               <slot :name="name" v-bind="slotProps"></slot>
             </template>
             <teleport :to="`.${tableId} .el-table__inner-wrapper`" defer>
@@ -255,7 +255,7 @@ import {
   isFunction,
   isNullish,
   isObject,
-  uniqid,
+  auid,
   walkTree,
 } from '../../utils';
 import { useConfig, useComponentConfig } from '../config-provider';
@@ -290,7 +290,7 @@ const eventObject = tableEmitOnEvents.reduce(
 
 const { t } = useLocale();
 
-const tableId = uniqid();
+const tableId = auid();
 
 const { prefixCls } = useComponentConfig('table');
 

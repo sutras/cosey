@@ -18,7 +18,7 @@ import { TransitionGroup as InternalTransitionGroup } from '../../transition-gro
 import { type TableColumnProps } from '../table-column/table-column.api';
 import Item from './item.vue';
 import { watch } from 'vue';
-import { uuid, arrayMove } from '../../../utils';
+import { auid, arrayMove } from '../../../utils';
 import { useComponentConfig } from '../../config-provider';
 import { type CheckableNode } from '../../../hooks';
 
@@ -44,7 +44,7 @@ watch(
     props.nodeList.forEach((node) => {
       let key = mapTargetKey.get(node);
       if (!key) {
-        key = uuid();
+        key = auid();
       }
       newMapTargetKey.set(node, key);
     });

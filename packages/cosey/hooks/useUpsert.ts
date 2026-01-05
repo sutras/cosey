@@ -1,4 +1,4 @@
-import { deepAssign, uuid } from '../utils';
+import { deepAssign, auid } from '../utils';
 import { ElMessage } from 'element-plus';
 import { cloneDeep, pick } from 'lodash-es';
 import {
@@ -139,7 +139,7 @@ export function useUpsert<
   let editParams: any[] = [];
 
   // form
-  const formRefKey = uuid();
+  const formRefKey = auid();
 
   const formRef = useTemplateRef(formRefKey);
 

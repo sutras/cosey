@@ -12,7 +12,7 @@ import {
   filterEmptyFormValue,
   isFunction,
   isObject,
-  uniqid,
+  auid,
 } from '../../utils';
 import { useFetch, useProps } from '../../hooks';
 import TableQuery from '../table/table-query/table-query';
@@ -152,7 +152,7 @@ export default defineComponent({
     const { getLabel, getValue, getKey } = useProps(props);
 
     // loading
-    const popperId = uniqid();
+    const popperId = auid();
 
     const events = bulkBindEvents(remoteSelectEmits, emit);
 
