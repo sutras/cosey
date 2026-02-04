@@ -1,4 +1,12 @@
-## 0.0.0 (2025-12-23)
+## 0.0.0 (2026-02-04)
+
+## <small>0.10.25 (2026-02-04)</small>
+
+- refactor: 统一使用initializeData回调代替用户信息接口配置和权限回调 ([39152eb](https://github.com/sutras/cosey/commit/39152eb))
+- refactor: 降低uuid碰撞率 ([937ec0e](https://github.com/sutras/cosey/commit/937ec0e))
+- refactor(table-action): 添加分隔符 ([27a042f](https://github.com/sutras/cosey/commit/27a042f))
+- perf: 优化认证流程 ([343fdb3](https://github.com/sutras/cosey/commit/343fdb3))
+- build: changelog ([efd6ec5](https://github.com/sutras/cosey/commit/efd6ec5))
 
 ## <small>0.10.21 (2025-12-23)</small>
 

@@ -1,6 +1,6 @@
 {
   "name": "cosey",
-  "version": "0.10.23",
+  "version": "0.10.25",
   "description": "基于 Vue3 + vite 的后台管理系统框架",
   "type": "module",
   "main": "index.ts",

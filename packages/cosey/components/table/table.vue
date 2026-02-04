@@ -210,6 +210,7 @@ import {
   computed,
   CSSProperties,
   mergeProps,
+  nextTick,
   onBeforeUnmount,
   onMounted,
   ref,
@@ -338,7 +339,7 @@ const onSortChange = ({
     : null;
 
   page.value = 1;
-  execute();
+  validateExecute();
 };
 
 // props
@@ -493,15 +494,24 @@ const { isFetching, execute } = useFetch(
         elTableRef.value?.setScrollTop(0);
       }
     },
-    onFinally() {
-      reloading.value = false;
+    onError(err) {
+      console.error(err);
     },
   },
 );
 
+const validateExecute = async () => {
+  if (props.formProps && tableQueryRef.value) {
+    await tableQueryRef.value.validate();
+    await execute();
+  } else {
+    await execute();
+  }
+};
+
 onMounted(() => {
   if (props.immediate && props.api) {
-    execute();
+    validateExecute();
   }
 });
 
@@ -588,7 +598,7 @@ const onPageSizeChange = () => {
 };
 
 const onPageChange = () => {
-  execute();
+  validateExecute();
 };
 
 const getPagination = () => {
@@ -625,7 +635,9 @@ const reloading = ref(false);
 const reload = () => {
   if (!isFetching.value) {
     reloading.value = true;
-    execute();
+    validateExecute().finally(() => {
+      reloading.value = false;
+    });
   }
 };
 
@@ -691,8 +703,11 @@ const onSubmit = async () => {
 
 const onReset = async () => {
   if (!isFetching.value) {
+    // 等待表单状态重置
+    await nextTick();
+
     page.value = 1;
-    await execute();
+    await validateExecute();
   }
 };
 
