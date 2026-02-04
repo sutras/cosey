@@ -1,6 +1,6 @@
 import { computed, defineComponent, ref, unref } from 'vue';
 import { omit } from 'lodash-es';
-import { ElButton, ElPopconfirm } from 'element-plus';
+import { ElButton, ElDropdown, ElDropdownItem, ElDropdownMenu, ElPopconfirm } from 'element-plus';
 import {
   type TableActionItemProps,
   defaultTableActionItemProps,
@@ -31,14 +31,18 @@ export default defineComponent({
     });
 
     const buttonProps = computed(() => {
-      return omit(unref(mergedProps), ['icon', 'visible', 'hidden', 'popconfirm', 'label']);
+      return omit(unref(mergedProps), [
+        'icon',
+        'appendIcon',
+        'visible',
+        'hidden',
+        'popconfirm',
+        'label',
+        'dropdown',
+      ]);
     });
 
     const loading = ref(false);
-
-    const mergedVisible = computed(() => {
-      return unref(mergedProps).hidden ? false : unref(mergedProps).visible;
-    });
 
     const onConfirm = async (e: MouseEvent, confirm: (e: MouseEvent) => void) => {
       loading.value = true;
@@ -56,24 +60,32 @@ export default defineComponent({
       cancel(e);
     };
 
-    return () => {
-      if (!mergedVisible.value) return;
+    const renderButton = () => {
+      return (
+        <ElButton {...buttonProps.value} style="margin: 0">
+          {unref(mergedProps).icon && (
+            <Icon
+              name={unref(mergedProps).icon}
+              style={{ marginInlineEnd: token.value.marginXXS + 'px' }}
+            />
+          )}
+          {unref(mergedProps).label}
+          {unref(mergedProps).appendIcon && (
+            <Icon
+              name={unref(mergedProps).appendIcon}
+              style={{ marginInlineStart: token.value.marginXXS + 'px' }}
+            />
+          )}
+        </ElButton>
+      );
+    };
 
+    return () => {
       if (unref(mergedProps).popconfirm) {
         return (
           <ElPopconfirm {...unref(mergedProps).popconfirm}>
             {{
-              reference: () => (
-                <ElButton {...buttonProps.value} style="margin: 0">
-                  {unref(mergedProps).icon && (
-                    <Icon
-                      name={unref(mergedProps).icon}
-                      style={{ marginInlineEnd: token.value.marginXXS + 'px' }}
-                    />
-                  )}
-                  {unref(mergedProps).label}
-                </ElButton>
-              ),
+              reference: () => renderButton(),
               actions: ({ confirm, cancel }: any) => {
                 return (
                   <>
@@ -96,17 +108,42 @@ export default defineComponent({
         );
       }
 
-      return (
-        <ElButton {...buttonProps.value} style="margin: 0">
-          {unref(mergedProps).icon && (
-            <Icon
-              name={unref(mergedProps).icon}
-              style={{ marginInlineEnd: token.value.marginXXS + 'px' }}
-            />
-          )}
-          {unref(mergedProps).label}
-        </ElButton>
-      );
+      if (unref(mergedProps).dropdown && unref(mergedProps).dropdown!.length > 0) {
+        return (
+          <ElDropdown trigger="click">
+            {{
+              default: () => renderButton(),
+              dropdown: () => (
+                <ElDropdownMenu>
+                  {unref(mergedProps)
+                    .dropdown?.filter((item) => item.visible ?? true)
+                    .map(({ label, icon, appendIcon, onClick, ...rest }) => {
+                      return (
+                        <ElDropdownItem {...omit(rest, ['visible', 'onClick'])} onClick={onClick}>
+                          {icon && (
+                            <Icon
+                              name={icon}
+                              style={{ marginInlineEnd: token.value.marginXXS + 'px' }}
+                            />
+                          )}
+                          {label}
+                          {appendIcon && (
+                            <Icon
+                              name={appendIcon}
+                              style={{ marginInlineStart: token.value.marginXXS + 'px' }}
+                            />
+                          )}
+                        </ElDropdownItem>
+                      );
+                    })}
+                </ElDropdownMenu>
+              ),
+            }}
+          </ElDropdown>
+        );
+      }
+
+      return renderButton();
     };
   },
 });

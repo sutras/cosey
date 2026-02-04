@@ -12,8 +12,13 @@ export default getSimpleStyleHook('CoTableAction', (token) => {
       [`${componentCls}-row`]: {
         display: 'flex',
         flexWrap: 'wrap',
-        columnGap: token.sizeXXS,
+        alignItems: 'center',
+        columnGap: token.sizeXS,
         rowGap: token.sizeXXS,
+
+        '&.is-divider': {
+          columnGap: 0,
+        },
       },
     },
   };

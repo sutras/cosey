@@ -1,4 +1,4 @@
-import { type ExtractPropTypes, type PropType } from 'vue';
+import { type ExtractPublicPropTypes, type PropType } from 'vue';
 import { type TableActionItemProps } from './item.api';
 
 type TableActionItemAtom =
@@ -13,10 +13,19 @@ export const tableActionProps = {
     type: Array as PropType<TableActionItemAtom[] | TableActionItemAtom[][]>,
     default: () => [],
   },
+  divider: {
+    type: Boolean,
+    default: undefined,
+  },
 };
 
-export type TableActionProps = ExtractPropTypes<typeof tableActionProps>;
+export type TableActionProps = ExtractPublicPropTypes<typeof tableActionProps>;
 
 export interface TableActionConfig {
   itemProps?: TableActionItemProps;
+  divider?: boolean;
 }
+
+export const defaultTableActionProps: TableActionProps = {
+  divider: true,
+};
