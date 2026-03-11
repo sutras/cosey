@@ -109,6 +109,9 @@ export function downloadAttachment(
 
     if (contentDisposition) {
       filename = contentDisposition.split('filename=')[1].trim().replace(/"/g, '');
+      if (filename) {
+        filename = decodeURIComponent(filename);
+      }
     }
   }
 
