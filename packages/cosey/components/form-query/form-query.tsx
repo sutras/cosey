@@ -116,6 +116,10 @@ export default defineComponent({
     };
 
     const ButtonsTemplate = () => {
+      if (props.hideButtons || (props.hideReset && props.hideSubmit)) {
+        return null;
+      }
+
       return (
         <FormItem
           class={`${prefixCls.value}-form-item-buttons`}
