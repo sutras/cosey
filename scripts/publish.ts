@@ -1,17 +1,47 @@
 import path from 'node:path';
 import child_process from 'node:child_process';
+import consola from 'consola';
 
 import { distDir } from './utils/const';
-import { flow, selectPackage, type Steps } from './utils/flow';
+import { selectPackage } from './utils/flow';
 
 let pkgName = '';
 let pkgDistDir = '';
 
 const npmRegistry = 'https://registry.npmjs.org/';
 
+async function checkLogin() {
+  return new Promise((resolve, reject) => {
+    child_process.exec(`npm whoami --registry ${npmRegistry} -ws=false`, (error, stdout) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(stdout);
+      }
+    });
+  });
+}
+
+async function login() {
+  return new Promise<void>((resolve, reject) => {
+    const child = child_process.spawn(`npm`, ['login', '--registry', npmRegistry, '-ws=false'], {
+      shell: true,
+      stdio: 'inherit',
+    });
+
+    child.on('exit', (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`npm login process exited with code ${code}`));
+      }
+    });
+  });
+}
+
 async function doPublish() {
-  return new Promise(() => {
-    child_process.spawn(
+  return new Promise<void>((resolve, reject) => {
+    const child = child_process.spawn(
       `npm`,
       ['publish', '--access', 'public', '--registry', npmRegistry, '-ws=false'],
       {
@@ -20,6 +50,14 @@ async function doPublish() {
         shell: true,
       },
     );
+
+    child.on('exit', (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`npm publish process exited with code ${code}`));
+      }
+    });
   });
 }
 
@@ -27,9 +65,31 @@ async function publish() {
   pkgName = await selectPackage();
   pkgDistDir = path.resolve(distDir, pkgName);
 
-  const steps: Steps = [[doPublish, `发布 npm 包`]];
+  try {
+    consola.start('检查npm登录状态');
+    await checkLogin();
+    consola.success('已登录npm');
+  } catch {
+    consola.info('请先登录npm');
 
-  await flow(steps);
+    try {
+      await login();
+      consola.success('登录成功');
+    } catch (error) {
+      consola.error('登录失败', error);
+      process.exit(1);
+    }
+  }
+
+  consola.start('正在发布');
+
+  try {
+    await doPublish();
+    consola.success('发布成功');
+  } catch (error) {
+    consola.error('发布失败', error);
+    process.exit(1);
+  }
 }
 
 publish();
