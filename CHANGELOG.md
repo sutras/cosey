@@ -1,4 +1,12 @@
-## 0.0.0 (2026-02-04)
+## 0.0.0 (2026-04-03)
+
+## <small>0.10.28 (2026-04-03)</small>
+
+- build: changelog ([0ac25fd](https://github.com/sutras/cosey/commit/0ac25fd))
+- build: 改进发布脚本 ([52212dc](https://github.com/sutras/cosey/commit/52212dc))
+- feat: 新增葡萄牙语 ([9668457](https://github.com/sutras/cosey/commit/9668457))
+- fix: 下载文件转码 ([2c68e97](https://github.com/sutras/cosey/commit/2c68e97))
+- fix(form-query): 隐藏按钮 ([0c066d8](https://github.com/sutras/cosey/commit/0c066d8))
 
 ## <small>0.10.25 (2026-02-04)</small>
 
