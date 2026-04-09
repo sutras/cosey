@@ -57,7 +57,62 @@ getPosts().then((data) => {
 ## 终止请求
 
 ```ts
-getPosts.abort();
+import { http } from 'cosey';
+
+const getInfo = (signal) => {
+  return http.get('getUserInfo', {
+    signal,
+  });
+};
+
+const controller = new AbortController();
+
+getInfo(controller.signal);
+
+controller.abort();
+```
+
+## Refresh Token
+
+cosey 支持双 token 认证，当 access token 过期后，可以使用 refresh token 来更新。
+
+需要配置 `refreshToken` 用于获取刷新后的 access token；并且需要配置 `isAccessTokenExpired` 来区分 401 类型；
+
+如果是 access token 过期，则会使用 refresh token 刷新 token；如果是 refresh token 过期则去到登录页。
+
+```ts
+import { persist } from 'cosey';
+
+launch(app, {
+  api: {
+    login: async (data: any) => {
+      const { accessToken, refreshToken } = await http.post('/auth/login', data);
+
+      // 保存初始登录的 refresh token
+      persist.set(REFRESH_TOKEN, refreshToken);
+
+      // 返回 access token
+      return accessToken;
+    },
+
+    refreshToken: async () => {
+      const { accessToken, refreshToken } = await http.post('/auth/refresh-token', {
+        refreshToken: persist.get('REFRESH_TOKEN'),
+      });
+
+      // 保存刷新后的 refresh token
+      persist.set('REFRESH_TOKEN', refreshToken);
+
+      // 返回 access token
+      return accessToken;
+    },
+
+    isAccessTokenExpired: (response: AxiosResponse<any, any>) => {
+      // 根据响应数据判断是否为 access token 过期（401 可能为 access token 过期或者 refresh token 过期）
+      return response.data.data.type === 'accessToken';
+    },
+  },
+});
 ```
 
 ## 接口配置

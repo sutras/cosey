@@ -1,7 +1,7 @@
 import { RequestInterceptor } from '@cosey/request-interceptor';
 import { db } from '../db';
 import { Result } from '../utils/Result';
-import { jwt } from '../utils/jwt';
+import { generateTokens, jwt } from '../utils/jwt';
 import { PermissionRow } from '../db/models/permission';
 import { omit } from 'lodash-es';
 
@@ -20,11 +20,43 @@ export default function register(interceptor: RequestInterceptor) {
         return res.json(Result.error(401, '账号或密码不正确'));
       }
 
-      return res.json(
-        Result.success({
-          token: jwt.sign({ username: row.username, sub: row.id }, jwt.secret),
-        }),
-      );
+      return res.json(Result.success(generateTokens(row.id, row.username)));
+    },
+    {
+      skipAuth: true,
+    },
+  );
+
+  interceptor.post(
+    `${prefix}/refresh-token`,
+    async ({ req, res }) => {
+      try {
+        const verifyResult = jwt.verify(req.body.refreshToken);
+
+        if (verifyResult instanceof Error) {
+          throw new Error();
+        }
+
+        if (verifyResult.type !== 'refresh') {
+          throw new Error();
+        }
+
+        const row = await db.admins.get({
+          id: verifyResult.sub,
+        });
+
+        if (!row) {
+          throw new Error();
+        }
+
+        return res.json(Result.success(generateTokens(row.id, row.username)));
+      } catch {
+        return res.json(
+          Result.error(401, 'Invalid token', {
+            type: 'refreshToken',
+          }),
+        );
+      }
     },
     {
       skipAuth: true,

@@ -216,3 +216,9 @@ interface UserInfo {
 - 类型：`(lastPath?: string) => Promise<void>`
 
 退出操作。
+
+#### flush
+
+- 类型：`(lastPath?: string) => Promise<void>`
+
+清除用户认证的相关数据，并跳转到登录页。

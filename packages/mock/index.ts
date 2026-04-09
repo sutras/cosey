@@ -33,35 +33,47 @@ export function createMock(
 
     // 添加拦截守卫，处理身份验证
     interceptor.addGuard(async ({ req, res, payload }) => {
-      if (options.skipAuth) {
+      try {
+        if (options.skipAuth) {
+          return true;
+        }
+
+        if (payload?.skipAuth) {
+          return true;
+        }
+
+        const token = req.get('Authorization');
+
+        if (!token) {
+          throw new Error('No token provided');
+        }
+
+        const verifyResult = jwt.verify(token);
+
+        if (verifyResult instanceof Error) {
+          throw new Error(verifyResult.message);
+        }
+
+        if (verifyResult.type !== 'access') {
+          throw new Error();
+        }
+
+        const row = await db.admins.get({
+          id: verifyResult.sub,
+        });
+
+        const rest = omit(row!, 'password');
+
+        req.payload.user = rest;
+
         return true;
+      } catch {
+        return res.json(
+          Result.error(401, 'Invalid token', {
+            type: 'accessToken',
+          }),
+        );
       }
-
-      if (payload?.skipAuth) {
-        return true;
-      }
-
-      const token = req.get('Authorization');
-
-      if (!token) {
-        return res.json(Result.error(401));
-      }
-
-      const verifyResult = jwt.verify(token.replace('Bearer ', ''), jwt.secret);
-
-      if (verifyResult instanceof Error) {
-        return res.json(Result.error(401, verifyResult.message));
-      }
-
-      const row = await db.admins.get({
-        id: verifyResult.sub,
-      });
-
-      const rest = omit(row!, 'password');
-
-      req.payload.user = rest;
-
-      return true;
     });
 
     // 记录拦截的请求

@@ -2,20 +2,14 @@ import { AxiosInstance, type AxiosRequestConfig } from 'axios';
 import { type HttpConfig } from '../config/http';
 
 export class Http {
-  axiosFactory: (httpConfig?: HttpConfig) => AxiosInstance;
+  axiosFactory: () => AxiosInstance;
   axiosIns: AxiosInstance | null = null;
   controller: AbortController;
   config: AxiosRequestConfig | null = null;
 
-  constructor(axiosFactory: (httpConfig?: HttpConfig) => AxiosInstance) {
+  constructor(axiosFactory: () => AxiosInstance) {
     this.axiosFactory = axiosFactory;
     this.controller = new AbortController();
-  }
-
-  abort() {
-    if (this.config?.signal === this.controller.signal) {
-      this.controller.abort();
-    }
   }
 
   _request<T = any, D = any>(
@@ -24,12 +18,8 @@ export class Http {
     },
     httpConfig?: HttpConfig,
   ) {
-    if (!config.signal) {
-      config.signal = this.controller.signal;
-    }
-
     if (!this.axiosIns) {
-      this.axiosIns = this.axiosFactory(httpConfig);
+      this.axiosIns = this.axiosFactory();
     }
 
     config.coseyHttpConfig = httpConfig;

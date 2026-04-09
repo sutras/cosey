@@ -195,7 +195,6 @@ export interface SeedToken extends PresetColorType {
   opacityImage: number;
 
   //  ----------   motion   ---------- //
-  // TODO: 缺一个懂 motion 的人来收敛 Motion 相关的 Token
 
   /**
    * @nameZH 动画时长变化单位

@@ -51,6 +51,8 @@ async function bootstrap() {
       upload: commonApi.singleUpload,
       login: authApi.login,
       changePassword: authApi.changePassword,
+      refreshToken: authApi.refreshToken,
+      isAccessTokenExpired: authApi.isAccessTokenExpired,
     },
     async initializeData({ setUserInfo, setRoutes }) {
       const userInfo = await authApi.getUserInfo();

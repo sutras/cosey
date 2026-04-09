@@ -61,7 +61,7 @@ export const defaultHttpConfig = {
     unauthorized: 401,
 
     /**
-     * 没权限状态码
+     * 无权限状态码
      */
     forbidden: 403,
   },

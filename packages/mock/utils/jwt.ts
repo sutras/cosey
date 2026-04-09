@@ -6,7 +6,6 @@ import CryptoJS from 'crypto-js';
 export const jwt = {
   sign(
     payload: object,
-    secret: string,
     options?: {
       expiresIn: number;
     },
@@ -31,18 +30,18 @@ export const jwt = {
 
     const beforeSign = encodedHeader + '.' + encodedPayload;
 
-    const signature = CryptoJS.enc.Base64url.stringify(CryptoJS.HmacSHA256(beforeSign, secret));
+    const signature = CryptoJS.enc.Base64url.stringify(CryptoJS.HmacSHA256(beforeSign, jwt.secret));
 
     return beforeSign + '.' + signature;
   },
 
-  verify(token: string, secret: string) {
-    const [encodedHeader, encodedPayload, signature] = token.split('.');
+  verify(token: string) {
+    const [encodedHeader, encodedPayload, signature] = token.replace('Bearer ', '').split('.');
 
     const beforeSign = encodedHeader + '.' + encodedPayload;
 
     const matchingSignature = CryptoJS.enc.Base64url.stringify(
-      CryptoJS.HmacSHA256(beforeSign, secret),
+      CryptoJS.HmacSHA256(beforeSign, jwt.secret),
     );
 
     if (signature !== matchingSignature) {
@@ -60,3 +59,31 @@ export const jwt = {
 
   secret: '123456',
 };
+
+export function generateTokens(userId: number, username: string) {
+  const payload = { username, sub: userId };
+
+  const accessToken = jwt.sign(
+    {
+      ...payload,
+      type: 'access',
+    },
+    {
+      expiresIn: 60 * 30, // 30 minutes
+    },
+  );
+  const refreshToken = jwt.sign(
+    {
+      ...payload,
+      type: 'refresh',
+    },
+    {
+      expiresIn: 60 * 60 * 24 * 7, // 7 days
+    },
+  );
+
+  return {
+    accessToken,
+    refreshToken,
+  };
+}

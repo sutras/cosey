@@ -145,8 +145,15 @@ export const useUserStore = defineStore('cosey-user', () => {
   /**
    * 退出登录
    */
-  const logout = async (lastPath?: string) => {
-    await logoutApi?.();
+  const logout = async (lastPath?: string, flushOnly?: boolean) => {
+    try {
+      if (!flushOnly) {
+        await logoutApi?.();
+      }
+    } catch {
+      void 0;
+    }
+
     await flush(lastPath);
   };
 
@@ -158,6 +165,7 @@ export const useUserStore = defineStore('cosey-user', () => {
     initializeData,
     changePassword,
     logout,
+    flush,
   };
 });
 

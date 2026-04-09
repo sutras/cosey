@@ -13,14 +13,14 @@ export class Result {
     };
   }
 
-  static error(code: StatusCode, message?: string | ValidateFunction) {
+  static error(code: StatusCode, message?: string | ValidateFunction, data?: any) {
     return {
       code,
       message:
         typeof message === 'function'
           ? message.errors?.[0].message
           : message || mapStatusCodeMessage[code],
-      data: null,
+      data: data || null,
     };
   }
 }
