@@ -1,4 +1,13 @@
-## 0.0.0 (2026-04-03)
+## 0.0.0 (2026-04-14)
+
+## <small>0.11.1 (2026-04-14)</small>
+
+- feat: 暴露 table-query组件 ([289da55](https://github.com/sutras/cosey/commit/289da55))
+
+## 0.11.0 (2026-04-09)
+
+- feat: 支持双token ([97ab8d0](https://github.com/sutras/cosey/commit/97ab8d0))
+- build: changelog ([780c4e0](https://github.com/sutras/cosey/commit/780c4e0))
 
 ## <small>0.10.28 (2026-04-03)</small>
 
