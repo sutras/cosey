@@ -45,6 +45,7 @@ export * from './style';
 export * from './svg-icon';
 export * from './table';
 export * from './table-action';
+export * from './table/table-query';
 export * from './theme';
 export * from './toggle';
 export * from './transition';

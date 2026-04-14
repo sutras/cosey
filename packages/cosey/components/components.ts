@@ -44,6 +44,7 @@ import { SvgaCard } from './svga-card';
 import { SvgaViewer } from './svga-viewer';
 import { Table } from './table';
 import { TableAction } from './table-action';
+import { TableQuery } from './table/table-query';
 import { Toggle } from './toggle';
 import { Transition } from './transition';
 import { TransitionGroup } from './transition-group';
@@ -105,6 +106,7 @@ declare module 'vue' {
     CoSvgaViewer: typeof SvgaViewer;
     CoTable: typeof Table;
     CoTableAction: typeof TableAction;
+    CoTableQuery: typeof TableQuery;
     CoToggle: typeof Toggle;
     CoTransition: typeof Transition;
     CoTransitionGroup: typeof TransitionGroup;
@@ -167,6 +169,7 @@ export {
   SvgaViewer,
   Table,
   TableAction,
+  TableQuery,
   Toggle,
   Transition,
   TransitionGroup,
