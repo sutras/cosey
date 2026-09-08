@@ -311,30 +311,42 @@
    * Code
    * -------------------------------------------------------------------------- */
 
-  code:not(.demo code):not(pre code) {
-    font-size: var(--vp-code-font-size);
-    color: var(--vp-code-color);
-    border-radius: 4px;
-    padding: 3px 6px;
-    background-color: var(--vp-code-bg);
-    transition:
-      color 0.25s,
-      background-color 0.5s;
+  /* inline code */
+  :not(pre, h1, h2, h3, h4, h5, h6) > code {
+    &:not(.demo *) {
+      font-size: var(--vp-code-font-size);
+      color: var(--vp-code-color);
+    }
   }
 
-  a code:not(.demo code) {
-    color: var(--vp-code-link-color);
+  :not(pre) > code {
+    &:not(.demo *) {
+      border-radius: 4px;
+      padding: 3px 6px;
+      background-color: var(--vp-code-bg);
+      transition:
+        color 0.25s,
+        background-color 0.5s;
+    }
   }
 
-  a:hover code:not(.demo code) {
-    color: var(--vp-code-link-hover-color);
+  a > code {
+    &:not(.demo *) {
+      color: var(--vp-code-link-color);
+    }
   }
 
-  h1,
-  h2,
-  h3,
-  h4 {
-    & > code:not(.demo code) {
+  a:hover > code {
+    &:not(.demo *) {
+      color: var(--vp-code-link-hover-color);
+    }
+  }
+
+  h1 > code,
+  h2 > code,
+  h3 > code,
+  h4 > code {
+    &:not(.demo *) {
       font-size: 0.9em;
     }
   }

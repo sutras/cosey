@@ -93,12 +93,12 @@
     padding-left: 16px;
   }
 
-  code:not(pre > code) {
+  code {
     font-size: 85%;
     padding-block: 2px;
     padding-inline: 4px;
     border-radius: css-var(border-radius-small);
-    background-color: css-var(fill-color-light);
+    background-color: #f0f0f0;
   }
 
   kbd {
@@ -115,28 +115,7 @@
 
   pre {
     position: relative;
-    padding: css-var(padding);
     overflow: hidden;
-    font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
-    font-size: 13px;
-    line-height: 1.5;
-    border-radius: css-var(border-radius-base);
-    color: #000;
-    background-color: css-var(fill-color-extra-light);
-
-    .dark & {
-      color: #fff;
-    }
-
-    code {
-      font-family: inherit;
-      font-size: inherit;
-      line-height: inherit;
-      white-space: inherit;
-      background: none;
-      padding: 0;
-      border-radius: 0;
-    }
 
     select {
       position: absolute;
@@ -148,7 +127,6 @@
       color: css-var(text-color-primary);
       border-radius: css-var(border-radius-base);
       font-size: css-var(font-size-extra-small);
-      font-family: css-var(font-family);
     }
 
     > div {

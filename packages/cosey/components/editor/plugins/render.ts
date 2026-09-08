@@ -40,34 +40,19 @@ const renderLeaf = ({ leaf, attributes, children }: RenderLeafProps) => {
     size,
     color,
     background,
-    // Shiki token decorations
-    tokenColor,
-    tokenFontStyle,
-    tokenBgColor,
     ...rest
   } = leaf;
 
   const style: CSSProperties = {
-    fontWeight: bold || (tokenFontStyle as number & 2) ? 'bold' : undefined,
-    fontStyle: italic || (tokenFontStyle as number & 1) ? 'italic' : undefined,
-    textDecoration: strikethrough
-      ? 'line-through'
-      : (tokenFontStyle as number & 4)
-        ? 'underline'
-        : underline
-          ? 'underline'
-          : undefined,
+    fontWeight: bold ? 'bold' : undefined,
+    fontStyle: italic ? 'italic' : undefined,
+    borderBottom: underline ? '1px solid black' : undefined,
+    textDecoration: strikethrough ? 'line-through' : undefined,
     fontFamily: font ? font : undefined,
     fontSize: size ? size : undefined,
-    color: color ? color : (tokenColor as string) || undefined,
-    background: background ? background : (tokenBgColor as string) || undefined,
+    color: color ? color : undefined,
+    background: background ? background : undefined,
   };
-
-  // If underline is from user formatting (not token), use borderBottom
-  if (underline && !(tokenFontStyle as number & 4) && !strikethrough) {
-    style.textDecoration = undefined;
-    style.borderBottom = '1px solid black';
-  }
 
   void text;
 

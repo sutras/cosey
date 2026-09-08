@@ -30,8 +30,8 @@ export default defineComponent({
 
     return () => {
       return (
-        <pre>
-          <code>
+        <pre class={`language-${language.value}`}>
+          <code class={`language-${language.value}`}>
             <select value={language.value} contenteditable={false} onChange={onChange}>
               {languageOptions.map((option) => (
                 <option value={option.value}>{option.label}</option>

@@ -7,6 +7,7 @@ import path from 'node:path';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath } from 'node:url';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -22,11 +23,15 @@ export default defineConfig(({ command }) => {
         svgoOptions: isBuild,
         symbolId: 'icon-[dir]-[name]',
       }),
+      visualizer(),
     ],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
+    },
+    optimizeDeps: {
+      exclude: ['cosey'],
     },
     server: {
       proxy: {

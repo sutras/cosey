@@ -1,8 +1,6 @@
-import { computed, defineComponent, ref, onMounted } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { ElScrollbar } from 'element-plus';
-import { highlightCode, highlightProps, highlightSlots } from './highlight.api';
-import { onHighlighterReady } from '../../utils/shiki';
-import { useColorScheme } from '../../hooks';
+import { Prism, highlightProps, highlightSlots } from './highlight.api';
 import { Copy } from '../copy';
 import { createBem } from '../../utils';
 
@@ -12,21 +10,25 @@ export default defineComponent({
   slots: highlightSlots,
   setup(props) {
     const bem = createBem('highlight');
-    const { appliedColorScheme } = useColorScheme();
-    const ready = ref(false);
-    onMounted(() => onHighlighterReady(() => (ready.value = true)));
 
-    const highlightedHtml = computed(() => {
-      void ready.value;
-      void appliedColorScheme.value; // re-evaluate on shiki ready or theme toggle
-      return highlightCode(props.code || '', props.lang);
-    });
+    const highlightedCode = computed(() =>
+      Prism.highlight(
+        props.code || '',
+        Prism.languages[props.lang] || Prism.languages['text'],
+        props.lang,
+      ),
+    );
 
     return () => {
       return (
         <div class={bem.b()}>
-          <ElScrollbar class={bem.e('scroll')} maxHeight={props.maxHeight}>
-            <div innerHTML={highlightedHtml.value}></div>
+          <ElScrollbar
+            tag="pre"
+            class={bem.e('scroll')}
+            view-class={`language-${props.lang}`}
+            maxHeight={props.maxHeight}
+          >
+            <code class={`language-${props.lang}`} innerHTML={highlightedCode.value}></code>
           </ElScrollbar>
           <div class={bem.e('copy')}>
             <Copy text={props.code} />

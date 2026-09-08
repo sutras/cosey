@@ -1,16 +1,10 @@
+import Prism from 'prismjs';
+
 import { h } from 'vue';
 import { type RenderElementProps, toRawWeakMap, useInheritRef } from 'slate-vue3';
 import { Editor, Element, Node, NodeEntry, Path, Range, Text } from 'slate-vue3/core';
 import { CodeBlockElement, ParagraphElement } from '../types';
 import ContentCodeBlock from '../contents/content-code-block';
-import {
-  tokenizeCodeSync,
-  getCurrentTheme,
-  onHighlighterReady,
-  LANGUAGES,
-  type HighlightLanguage,
-  type ThemedToken,
-} from '../../../utils/shiki';
 import { Hotkeys } from './keyboard';
 import {
   getRangePosition,
@@ -20,7 +14,24 @@ import {
   RangePosition,
 } from '../utils';
 
-export const languageOptions = LANGUAGES.map(({ id, label }) => ({ value: id, label }));
+export const languageOptions = [
+  { value: 'text', label: 'PlainText' },
+  { value: 'css', label: 'CSS' },
+  { value: 'less', label: 'Less' },
+  { value: 'scss', label: 'Scss' },
+  { value: 'html', label: 'HTML' },
+  { value: 'javascript', label: 'JavaScript' },
+  { value: 'jsx', label: 'JSX' },
+  { value: 'typescript', label: 'TypeScript' },
+  { value: 'tsx', label: 'TSX' },
+  { value: 'json', label: 'JSON' },
+  { value: 'markdown', label: 'Markdown' },
+  { value: 'php', label: 'PHP' },
+  { value: 'bash', label: 'Bash' },
+  { value: 'java', label: 'Java' },
+  { value: 'python', label: 'Python' },
+  { value: 'sql', label: 'SQL' },
+];
 
 declare module 'slate-vue3/core' {
   interface BaseEditor {
@@ -48,24 +59,114 @@ function formatCodeBlock(editor: Editor) {
     );
   } else {
     editor.wrapNodes(
-      { type: 'code-block', language: 'text', children: [] },
+      { type: 'code-block', language: 'plain', children: [] },
       { match: isNormalBlock },
     );
     editor.setNodes({ type: 'code-line' }, { match: isNormalBlock });
   }
 }
 
-/** Cache keyed by language + text content. */
-const tokenCache = new Map<string, ThemedToken[][]>();
+type PrismToken = Prism.Token;
+type Token = {
+  types: string[];
+  content: string;
+  empty?: boolean;
+};
 
-function getCacheKey(language: string, text: string): string {
-  return `${getCurrentTheme()}::${language}::${text}`;
-}
+const newlineRe = /\r\n|\r|\n/;
 
-/**
- * Build decorations from shiki tokens for all code blocks in the editor.
- * All languages are preloaded at module init, so tokenization is always synchronous.
- */
+// Empty lines need to contain a single empty token, denoted with { empty: true }
+const normalizeEmptyLines = (line: Token[]) => {
+  if (line.length === 0) {
+    line.push({
+      types: ['plain'],
+      content: '\n',
+      empty: true,
+    });
+  } else if (line.length === 1 && line[0].content === '') {
+    line[0].content = '\n';
+    line[0].empty = true;
+  }
+};
+
+const appendTypes = (types: string[], add: string[] | string): string[] => {
+  const typesSize = types.length;
+  if (typesSize > 0 && types[typesSize - 1] === add) {
+    return types;
+  }
+
+  return types.concat(add);
+};
+
+const normalizeTokens = (tokens: Array<PrismToken | string>): Token[][] => {
+  const typeArrStack: string[][] = [[]];
+  const tokenArrStack = [tokens];
+  const tokenArrIndexStack = [0];
+  const tokenArrSizeStack = [tokens.length];
+
+  let i = 0;
+  let stackIndex = 0;
+  let currentLine: { types: string[]; content: string }[] = [];
+
+  const acc = [currentLine];
+
+  while (stackIndex > -1) {
+    while ((i = tokenArrIndexStack[stackIndex]++) < tokenArrSizeStack[stackIndex]) {
+      let content: any;
+      let types = typeArrStack[stackIndex];
+
+      const tokenArr = tokenArrStack[stackIndex];
+      const token = tokenArr[i];
+
+      // Determine content and append type to types if necessary
+      if (typeof token === 'string') {
+        types = stackIndex > 0 ? types : ['plain'];
+        content = token;
+      } else {
+        types = appendTypes(types, token.type);
+        if (token.alias) {
+          types = appendTypes(types, token.alias);
+        }
+
+        content = token.content;
+      }
+
+      // If token.content is an array, increase the stack depth and repeat this while-loop
+      if (typeof content !== 'string') {
+        stackIndex++;
+        typeArrStack.push(types);
+        tokenArrStack.push(content);
+        tokenArrIndexStack.push(0);
+        tokenArrSizeStack.push(content.length);
+        continue;
+      }
+
+      // Split by newlines
+      const splitByNewlines = content.split(newlineRe);
+      const newlineCount = splitByNewlines.length;
+
+      currentLine.push({ types, content: splitByNewlines[0] });
+
+      // Create a new line for each string on a new line
+      for (let i = 1; i < newlineCount; i++) {
+        normalizeEmptyLines(currentLine);
+        acc.push((currentLine = []));
+        currentLine.push({ types, content: splitByNewlines[i] });
+      }
+    }
+
+    // Decreate the stack depth
+    stackIndex--;
+    typeArrStack.pop();
+    tokenArrStack.pop();
+    tokenArrIndexStack.pop();
+    tokenArrSizeStack.pop();
+  }
+
+  normalizeEmptyLines(currentLine);
+  return acc;
+};
+
 function node2Decorations(editor: Editor) {
   const decorationsMap = new toRawWeakMap<Node, Range[]>();
   const blockEntries = editor.nodes({
@@ -75,58 +176,37 @@ function node2Decorations(editor: Editor) {
   });
 
   Array.from(blockEntries).forEach(([block, blockPath]: NodeEntry<CodeBlockElement>) => {
-    const blockChildren = Array.from(Node.children(editor, blockPath));
     const text = block.children.map((line) => Node.string(line)).join('\n');
-    const cacheKey = getCacheKey(block.language, text);
+    const tokens = Prism.tokenize(text, Prism.languages[block.language]);
+    // make tokens flat and grouped by line
+    normalizeTokens(tokens).forEach((tokens, index) => {
+      const element = block.children[index];
 
-    let tokens: ThemedToken[][] | null | undefined = tokenCache.get(cacheKey);
-    if (!tokens) {
-      tokens = tokenizeCodeSync(text, block.language as HighlightLanguage);
-      if (tokens) tokenCache.set(cacheKey, tokens);
-    }
+      if (!decorationsMap.has(element)) {
+        decorationsMap.set(element, []);
+      }
 
-    if (tokens) {
-      applyTokensToDecorations(tokens, blockPath, blockChildren, decorationsMap);
-    }
+      let start = 0;
+      tokens.forEach((token) => {
+        const length = token.content.length;
+        if (!length) {
+          return;
+        }
+        const end = start + length;
+        const path = [...blockPath, index, 0];
+        const range: Range = {
+          anchor: { path, offset: start },
+          focus: { path, offset: end },
+          token: true,
+          ...Object.fromEntries(token.types.map((type) => [type, true])),
+        };
+        decorationsMap.get(element).push(range);
+        start = end;
+      });
+    });
   });
 
   return decorationsMap;
-}
-
-/** Convert shiki ThemedToken[][] into Slate Range decorations for a single code block. */
-function applyTokensToDecorations(
-  lineTokens: ThemedToken[][],
-  blockPath: Path,
-  blockChildren: NodeEntry<Node>[],
-  decorationsMap: toRawWeakMap<Node, Range[]>,
-) {
-  lineTokens.forEach((tokens, lineIndex) => {
-    if (lineIndex >= blockChildren.length) return;
-
-    const [element] = blockChildren[lineIndex];
-    if (!decorationsMap.has(element)) {
-      decorationsMap.set(element, []);
-    }
-
-    const ranges = decorationsMap.get(element)!;
-    let offset = 0;
-
-    tokens.forEach((token) => {
-      const length = token.content.length;
-      if (!length) return;
-
-      ranges.push({
-        anchor: { path: [...blockPath, lineIndex, 0], offset },
-        focus: { path: [...blockPath, lineIndex, 0], offset: offset + length },
-        token: true,
-        tokenColor: token.color,
-        tokenBgColor: token.bgColor,
-        tokenFontStyle: token.fontStyle,
-      } as Range);
-
-      offset += length;
-    });
-  });
 }
 
 function decorate(editor: Editor, nodeList: Node[]) {
@@ -373,10 +453,6 @@ export function withCodeBlock(editor: Editor) {
   editor.isCodeBlockActive = () => {
     return isCodeBlockActive(editor);
   };
-
-  // Once shiki finishes loading all languages, trigger a re-render
-  // so any code blocks that were rendered before shiki was ready get highlighted.
-  onHighlighterReady(() => editor.onChange());
 
   return editor;
 }

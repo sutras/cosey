@@ -1,5 +1,30 @@
 import type { ExtractPropTypes, ExtractPublicPropTypes, PropType, SlotsType } from 'vue';
-import { getHighlighter, getCurrentTheme, type ShikiLangId } from '../../utils/shiki';
+
+import Prism from 'prismjs';
+import 'prismjs';
+import 'prismjs/components/prism-scss';
+import 'prismjs/components/prism-sass';
+import 'prismjs/components/prism-less';
+
+import 'prismjs/components/prism-jsx';
+import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-tsx';
+
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-json5';
+
+import 'prismjs/components/prism-markdown';
+
+import 'prismjs/components/prism-bash';
+
+import 'prismjs/components/prism-nginx';
+
+import 'prismjs/components/prism-markup-templating';
+import 'prismjs/components/prism-php';
+import 'prismjs/components/prism-java';
+import 'prismjs/components/prism-sql';
+
+export { Prism };
 
 type LangText = 'plain' | 'plaintext' | 'text' | 'txt';
 type LangXml = 'markup' | 'html' | 'mathml' | 'svg' | 'xml' | 'ssml' | 'atom' | 'rss';
@@ -24,50 +49,6 @@ type Lang =
   | 'java'
   | 'sql'
   | LangPython;
-
-const LANG_ALIAS_MAP: Record<string, ShikiLangId> = {
-  plain: 'text',
-  plaintext: 'text',
-  txt: 'text',
-  markup: 'html',
-  mathml: 'html',
-  svg: 'html',
-  xml: 'html',
-  ssml: 'html',
-  atom: 'html',
-  rss: 'html',
-  js: 'javascript',
-  ts: 'typescript',
-  md: 'markdown',
-  sh: 'bash',
-  shell: 'bash',
-  py: 'python',
-  sass: 'scss',
-  clike: 'c',
-};
-
-export function highlightCode(code: string, lang: string): string {
-  if (!code) return '';
-  const shikiLang = LANG_ALIAS_MAP[lang] || lang;
-  if (shikiLang === 'text') return escapeHtml(code);
-
-  const hl = getHighlighter();
-  if (!hl) return escapeHtml(code);
-
-  try {
-    return hl.codeToHtml(code, { lang: shikiLang as any, theme: getCurrentTheme() });
-  } catch {
-    return escapeHtml(code);
-  }
-}
-
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
 
 export const highlightProps = {
   code: {

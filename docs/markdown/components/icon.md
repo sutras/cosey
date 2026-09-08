@@ -20,7 +20,7 @@ Cosey 中所有展示图标的地方都会使用 Icon 组件，包括标签栏�
 import { icons as epIcons } from '@iconify-json/ep';
 import { addIconifyIcon } from 'cosey/components';
 
-addIconifyIcon('ep', carbonIcons);
+addIconifyIcon('ep', epIcons);
 ```
 
 使用：
