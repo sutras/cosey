@@ -12,7 +12,7 @@
             {
               hidden: cannot('update', 'rbac_role'),
               label: t('rbac.permission'),
-              icon: 'carbon:rule-draft',
+              icon: 'bi bi-clipboard2-check',
               onClick: () => {
                 permissionsUpsert.edit(row);
               },
@@ -20,7 +20,7 @@
             {
               hidden: cannot('update', 'rbac_role'),
               label: t('common.edit'),
-              icon: 'carbon:edit',
+              icon: 'bi bi-pencil-square',
               onClick: () => {
                 roleUpsert.edit(row);
               },
@@ -28,7 +28,7 @@
             {
               hidden: cannot('delete', 'rbac_role'),
               label: t('common.delete'),
-              icon: 'carbon:trash-can',
+              icon: 'bi bi-trash3',
               type: 'danger',
               popconfirm: {
                 title: t('common.confirmDelete'),

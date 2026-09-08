@@ -55,24 +55,24 @@ const columns = ref<
   {
     label: 'analysis.totalRechargeCNY',
     prop: 'total_money',
-    icon: 'carbon:money',
+    icon: 'bi bi-cash-coin',
     type: 'currency',
     precision: 2,
   },
   {
     label: 'analysis.totalUsers',
     prop: 'total_user',
-    icon: 'carbon:user-multiple',
+    icon: 'bi bi-people',
   },
   {
     label: 'analysis.verifiedUsers',
     prop: 'total_verified_user',
-    icon: 'carbon:user-identification',
+    icon: 'bi bi-person-vcard',
   },
   {
     label: 'analysis.registeredDevices',
     prop: 'total_device',
-    icon: 'carbon:devices',
+    icon: 'bi bi-display',
   },
 ]);
 

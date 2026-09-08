@@ -12,7 +12,7 @@
             {
               hidden: cannot('read', 'system_enum_item'),
               label: t('enum.enumItem'),
-              icon: 'carbon:list',
+              icon: 'bi bi-list-ul',
               onClick: () => {
                 enumItemsRef?.open(row.id);
               },
@@ -20,7 +20,7 @@
             {
               hidden: cannot('update', 'system_enum'),
               label: t('common.edit'),
-              icon: 'carbon:edit',
+              icon: 'bi bi-pencil-square',
               onClick: () => {
                 upsert.edit(row);
               },
@@ -28,7 +28,7 @@
             {
               hidden: cannot('delete', 'system_enum'),
               label: t('common.delete'),
-              icon: 'carbon:trash-can',
+              icon: 'bi bi-trash3',
               type: 'danger',
               popconfirm: {
                 title: t('common.confirmDelete'),

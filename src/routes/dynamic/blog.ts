@@ -6,7 +6,7 @@ export default defineRoutes({
   component: LayoutBase,
   meta: {
     title: 'post.blog',
-    icon: 'carbon:blog',
+    icon: 'bi bi-journal-richtext',
     authority: (ability) =>
       ability.can('read', 'blog_type') ||
       ability.can('read', 'blog_post') ||
@@ -19,7 +19,7 @@ export default defineRoutes({
       component: () => import('@/views/blog/post-types/index.vue'),
       meta: {
         title: 'post.categories',
-        icon: 'carbon:category',
+        icon: 'bi bi-tags',
         authority: (ability) => ability.can('read', 'blog_type'),
       },
     },
@@ -29,7 +29,7 @@ export default defineRoutes({
       component: () => import('@/views/blog/posts/index.vue'),
       meta: {
         title: 'post.articles',
-        icon: 'carbon:document',
+        icon: 'bi bi-file-earmark-text',
         authority: (ability) => ability.can('read', 'blog_post'),
       },
     },
@@ -39,7 +39,7 @@ export default defineRoutes({
       component: () => import('@/views/blog/post-comments/index.vue'),
       meta: {
         title: 'post.comments',
-        icon: 'carbon:chat',
+        icon: 'bi bi-chat-dots',
         authority: (ability) => ability.can('read', 'blog_comment'),
       },
     },

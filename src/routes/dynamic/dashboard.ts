@@ -9,7 +9,7 @@ export default defineRoutes({
   component: LayoutBase,
   meta: {
     title: 'dashboard.dashboard',
-    icon: 'carbon:dashboard',
+    icon: 'bi bi-speedometer2',
     order: -10,
     authority: (ability) => ability.can('read', 'analysis') || ability.can('read', 'workspace'),
   },
@@ -20,7 +20,7 @@ export default defineRoutes({
       component: () => import('@/views/dashboard/workspace.vue'),
       meta: {
         title: 'dashboard.workspace',
-        icon: 'carbon:workspace',
+        icon: 'bi bi-window-sidebar',
         closable: false,
         authority: (ability) => ability.can('read', 'workspace'),
       },
@@ -31,7 +31,7 @@ export default defineRoutes({
       component: () => import('@/views/dashboard/analysis/index.vue'),
       meta: {
         title: 'dashboard.analytics',
-        icon: 'carbon:analytics',
+        icon: 'bi bi-bar-chart-line',
         authority: (ability) => ability.can('read', 'analysis'),
       },
     },

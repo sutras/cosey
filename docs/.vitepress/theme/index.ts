@@ -14,6 +14,7 @@ import { App, Component } from 'vue';
 import Layout from '@/components/layout/layout.vue';
 
 import 'virtual:svg-icons-register';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 // import 'virtual:ssr-style.css';
 
@@ -21,14 +22,14 @@ import { launch } from 'cosey';
 
 import { createMock } from '@cosey/mock';
 
-import { icons as carbonIcons } from '@iconify-json/carbon';
+import { icons as epIcons } from '@iconify-json/ep';
 import { addIconifyIcon } from 'cosey/components';
 
 import 'virtual:group-icons.css';
 import commonApi from '@/api/common';
 import { createMemoryHistory } from 'vue-router';
 
-addIconifyIcon('carbon', carbonIcons);
+addIconifyIcon('ep', epIcons);
 
 function getComponentName(key: string) {
   return key.split('/').pop()!.split('.')[0];

@@ -3,7 +3,7 @@
     <co-card class="relative">
       <div class="flex">
         <el-avatar :size="80" class="flex-none" :src="userStore.userInfo?.avatar">
-          <co-icon name="carbon:user" />
+          <co-icon name="bi bi-person" />
         </el-avatar>
         <div class="ms-4">
           <div class="text-lg font-bold">

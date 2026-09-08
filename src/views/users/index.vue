@@ -26,7 +26,7 @@
             {
               hidden: cannot('update', 'user'),
               label: t('common.edit'),
-              icon: 'carbon:edit',
+              icon: 'bi bi-pencil-square',
               onClick: () => {
                 upsert.edit(row);
               },
@@ -34,7 +34,7 @@
             {
               hidden: cannot('delete', 'user'),
               label: t('common.delete'),
-              icon: 'carbon:trash-can',
+              icon: 'bi bi-trash3',
               type: 'danger',
               popconfirm: {
                 title: t('common.confirmDelete'),

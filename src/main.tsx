@@ -15,16 +15,13 @@ import LoginTips from '@/components/login-tips.vue';
 import { i18nConfig } from '@/locale';
 
 import 'virtual:svg-icons-register';
-import { icons as carbonIcons } from '@iconify-json/carbon';
-import { addIconifyIcon } from 'cosey/components';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import { createMock } from '@cosey/mock';
 import { createWebHashHistory } from 'vue-router';
 
 import '@/styles/index.scss';
 import '@/styles/tailwind.css';
-
-addIconifyIcon('carbon', carbonIcons);
 
 async function bootstrap() {
   const app = createApp(App);

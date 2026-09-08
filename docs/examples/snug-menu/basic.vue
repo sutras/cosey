@@ -18,17 +18,17 @@ import { ref } from 'vue';
 const menus = [
   {
     name: 'users',
-    icon: 'carbon:user-admin',
+    icon: 'bi bi-person-gear',
     title: '用户管理',
   },
   {
     name: 'roles',
-    icon: 'carbon:user-role',
+    icon: 'bi bi-person-badge',
     title: '角色管理',
   },
   {
     name: 'permissions',
-    icon: 'carbon:rule-locked',
+    icon: 'bi bi-lock',
     title: '权限管理',
   },
 ];

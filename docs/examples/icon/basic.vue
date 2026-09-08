@@ -1,4 +1,4 @@
 <template>
-  <co-icon name="carbon:user" />
-  <co-icon name="carbon:shopping-cart-plus" />
+  <co-icon name="ep:user" />
+  <co-icon name="ep:shopping-cart" />
 </template>

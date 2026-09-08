@@ -12,7 +12,7 @@
             {
               hidden: cannot('read', 'blog_comment'),
               label: t('post.comment'),
-              icon: 'carbon:chat',
+              icon: 'bi bi-chat-dots',
               onClick: () => {
                 postComments?.open(row.id);
               },
@@ -20,7 +20,7 @@
             {
               hidden: cannot('update', 'blog_post'),
               label: t('common.edit'),
-              icon: 'carbon:edit',
+              icon: 'bi bi-pencil-square',
               onClick: () => {
                 upsert.edit(row);
               },
@@ -28,7 +28,7 @@
             {
               hidden: cannot('delete', 'blog_post'),
               label: t('common.delete'),
-              icon: 'carbon:trash-can',
+              icon: 'bi bi-trash3',
               type: 'danger',
               popconfirm: {
                 title: t('common.confirmDelete'),

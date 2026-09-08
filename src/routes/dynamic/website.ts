@@ -5,14 +5,14 @@ export default defineRoutes({
   component: LayoutBase,
   meta: {
     title: 'website.externalPages',
-    icon: 'carbon:application-web',
+    icon: 'bi bi-window',
   },
   children: [
     {
       path: 'link',
       meta: {
         title: 'website.externalLinks',
-        icon: 'carbon:launch',
+        icon: 'bi bi-box-arrow-up-right',
         type: 'group',
       },
       children: [
@@ -38,7 +38,7 @@ export default defineRoutes({
       path: 'iframe',
       meta: {
         title: 'website.embedded',
-        icon: 'carbon:ibm-consulting-advantage-application',
+        icon: 'bi bi-app-indicator',
       },
       children: [
         {

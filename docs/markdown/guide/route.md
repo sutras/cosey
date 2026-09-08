@@ -46,7 +46,7 @@ export default defineRoutes({
       component: () => import('@/views/users/index.vue'),
       meta: {
         title: '用户管理',
-        icon: 'carbon:user',
+        icon: 'bi bi-person',
       },
     },
   ],
@@ -68,7 +68,7 @@ export default defineRoutes({
   component: LayoutBase,
   meta: {
     title: '博客管理',
-    icon: 'carbon:blog',
+    icon: 'bi bi-journal-richtext',
   },
   children: [
     {
@@ -77,7 +77,7 @@ export default defineRoutes({
       component: () => import('@/views/blog/posts/index.vue'),
       meta: {
         title: '文章管理',
-        icon: 'carbon:document',
+        icon: 'bi bi-file-earmark-text',
       },
     },
   ],

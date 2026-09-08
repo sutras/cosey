@@ -37,7 +37,8 @@
   },
   "dependencies": {
     "@cosey/mock": "^0.1.6",
-    "@iconify-json/carbon": "^1.2.8",
+    "@iconify-json/ep": "^1.2.4",
+    "bootstrap-icons": "^1.13.1",
     "cosey": "workspace:^",
     "element-plus": "^2.14.3",
     "pinia": "^3.0.2",

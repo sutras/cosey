@@ -8,7 +8,7 @@
       <co-copy :text="decodedSource" />
 
       <el-button link @click="onToggle">
-        <co-icon name="carbon:code" />
+        <co-icon name="bi bi-code" />
       </el-button>
     </div>
 
@@ -19,7 +19,7 @@
     <el-collapse-transition>
       <div v-show="show" class="demo-fold">
         <el-button link class="demo-fold-button" @click="onHide">
-          <co-icon name="carbon:code-hide" size="lg" />
+          <co-icon name="bi bi-code-slash" size="lg" />
           <span class="demo-fold-text">隐藏源代码</span>
         </el-button>
       </div>

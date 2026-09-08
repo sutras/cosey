@@ -6,7 +6,7 @@ export default defineRoutes({
   component: LayoutBase,
   meta: {
     title: 'rbac.accessControl',
-    icon: 'carbon:user-access',
+    icon: 'bi bi-shield-lock',
     order: 100,
     authority: (ability) =>
       ability.can('read', 'rbac_user') ||
@@ -20,7 +20,7 @@ export default defineRoutes({
       component: () => import('@/views/rbac/admins/index.vue'),
       meta: {
         title: 'rbac.accounts',
-        icon: 'carbon:user-admin',
+        icon: 'bi bi-person-gear',
         authority: (ability) => ability.can('read', 'rbac_user'),
       },
     },
@@ -30,7 +30,7 @@ export default defineRoutes({
       component: () => import('@/views/rbac/roles/index.vue'),
       meta: {
         title: 'rbac.roles',
-        icon: 'carbon:user-role',
+        icon: 'bi bi-person-badge',
         authority: (ability) => ability.can('read', 'rbac_role'),
       },
     },
@@ -40,7 +40,7 @@ export default defineRoutes({
       component: () => import('@/views/rbac/permissions/index.vue'),
       meta: {
         title: 'rbac.permissions',
-        icon: 'carbon:rule',
+        icon: 'bi bi-check2-square',
         authority: (ability) => ability.can('read', 'rbac_permission'),
       },
     },

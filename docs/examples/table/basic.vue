@@ -8,14 +8,14 @@
         :actions="[
           {
             label: '编辑',
-            icon: 'carbon:edit',
+            icon: 'bi bi-pencil-square',
             onClick: () => {
               onEdit(row);
             },
           },
           {
             label: '删除',
-            icon: 'carbon:trash-can',
+            icon: 'bi bi-trash3',
             type: 'danger',
             popconfirm: {
               title: '确定删除？',

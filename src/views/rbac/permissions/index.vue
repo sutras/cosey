@@ -16,7 +16,7 @@
             {
               hidden: cannot('update', 'rbac_permission'),
               label: t('common.edit'),
-              icon: 'carbon:edit',
+              icon: 'bi bi-pencil-square',
               onClick: () => {
                 upsert.edit(row);
               },
@@ -24,7 +24,7 @@
             {
               hidden: cannot('delete', 'rbac_permission'),
               label: t('common.delete'),
-              icon: 'carbon:trash-can',
+              icon: 'bi bi-trash3',
               type: 'danger',
               popconfirm: {
                 title: t('common.confirmDelete'),

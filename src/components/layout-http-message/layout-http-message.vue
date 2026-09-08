@@ -1,7 +1,7 @@
 <template>
   <div v-if="httpMessageManager">
     <el-button link size="large" @click="open = !open">
-      <Icon name="carbon:wifi" size="xl" />
+      <Icon name="bi bi-wifi" size="xl" />
     </el-button>
 
     <el-drawer

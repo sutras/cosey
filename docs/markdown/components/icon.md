@@ -8,9 +8,7 @@ Cosey 中所有展示图标的地方都会使用 Icon 组件，包括标签栏�
 
 ### iconify
 
-通过 `create-cosey` 包创建的项目，默认会安装 [carbon](https://icones.js.org/collection/carbon) 图标集，其包含2000+的图标基本能满足需求了。
-
-当然，也可以安装其他 iconify 图标集，例如，下面演示如何安装 element-plus 官方图标集。
+下面演示如何安装 element-plus 官方图标集。
 
 先安装 `@iconify-json/ep`。
 

@@ -58,7 +58,7 @@
                     />
                   </el-space>
                   <el-button class="absolute end-1 top-1" link type="danger" @click="remove(index)">
-                    <co-icon name="carbon:trash-can" size="lg" />
+                    <co-icon name="bi bi-trash3" size="lg" />
                   </el-button>
                 </el-card>
               </co-dnd-sort-item>
@@ -66,7 +66,7 @@
           </co-dnd-sort>
 
           <el-button plain class="w-full" @click="() => add()">
-            <co-icon name="carbon:add-large" class="me-1" />
+            <co-icon name="bi bi-plus-lg" class="me-1" />
             新增
           </el-button>
         </div>

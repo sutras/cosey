@@ -13,7 +13,7 @@ export default defineRoutes({
       component: () => import('@/views/users/index.vue'),
       meta: {
         title: 'user.userManagement',
-        icon: 'carbon:user',
+        icon: 'bi bi-person',
         order: -1,
         authority: (ability) => ability.can('read', 'user'),
       },

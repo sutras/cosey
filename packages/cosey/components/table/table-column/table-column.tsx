@@ -82,7 +82,7 @@ const TableColumn = defineComponent({
     const renderTooltip = () => (
       <>
         <ElTooltip content={mergedProps.value.tooltip} placement="top">
-          <Icon name="carbon:help" style={{ marginInlineStart: getCssVar('margin-xxs') }} />
+          <Icon name="co:help" style={{ marginInlineStart: getCssVar('margin-xxs') }} />
         </ElTooltip>
       </>
     );

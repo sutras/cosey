@@ -7,7 +7,7 @@
             {
               hidden: cannot('update', 'blog_comment'),
               label: t('common.edit'),
-              icon: 'carbon:edit',
+              icon: 'bi bi-pencil-square',
               onClick: () => {
                 upsert.edit(row);
               },
@@ -15,7 +15,7 @@
             {
               hidden: cannot('delete', 'blog_comment'),
               label: t('common.delete'),
-              icon: 'carbon:trash-can',
+              icon: 'bi bi-trash3',
               type: 'danger',
               popconfirm: {
                 title: t('common.confirmDelete'),

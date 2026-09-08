@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-button link size="large" @click="open = !open">
-      <Icon name="carbon:settings" size="xl" />
+      <Icon name="bi bi-gear" size="xl" />
     </el-button>
   </div>
 
