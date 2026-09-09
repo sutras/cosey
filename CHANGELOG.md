@@ -1,4 +1,11 @@
-## 0.0.0 (2026-08-27)
+## 0.0.0 (2026-09-09)
+
+## <small>1.0.7 (2026-09-09)</small>
+
+- chore: 富文本对齐优化 ([1aa46d6](https://github.com/sutras/cosey/commit/1aa46d6))
+- docs: 移除 carbon ([7a0286f](https://github.com/sutras/cosey/commit/7a0286f))
+- refactor: 使用 prismjs 代替 shiki ([4fea6ac](https://github.com/sutras/cosey/commit/4fea6ac))
+- build: changelog ([5eeb886](https://github.com/sutras/cosey/commit/5eeb886))
 
 ## <small>1.0.5 (2026-08-27)</small>
 
