@@ -7,7 +7,7 @@ declare module 'slate-vue3/core' {
   }
 }
 
-export type FormatAlign = 'left' | 'center' | 'right' | 'justify';
+export type FormatAlign = 'start' | 'end' | 'left' | 'center' | 'right' | 'justify';
 
 function formatAlign(editor: Editor, value: string) {
   toggleBlockAttr(editor, 'align', value);

@@ -330,8 +330,10 @@ function deserialize(node: Node, markAttributes = {}): DeserializeResult {
       if (style['padding-left']) {
         attributes.indent = parseFloat(style['padding-left'] as string) / INDENT_DELTA;
       }
-      if (style['text-align']) {
-        attributes.align = style['text-align'] as FormatAlign;
+
+      const textAlign = style['text-align'];
+      if (textAlign && textAlign !== 'start' && textAlign !== 'left') {
+        attributes.align = textAlign as FormatAlign;
       }
       return jsx('element', { type: tagToElementTypeMap[tagName], ...attributes }, children);
     }
