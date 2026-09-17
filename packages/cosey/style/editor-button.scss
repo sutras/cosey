@@ -33,7 +33,16 @@
   @include e(group) {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
+    height: fit-content;
     gap: 2px;
+  }
+
+  @include e(group-list) {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: css-var(size-lg);
+    row-gap: css-var(size-xxs);
   }
 
   @include e(select) {

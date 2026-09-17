@@ -1,14 +1,12 @@
 import { computed, defineComponent, reactive, ref } from 'vue';
 import { ElButton } from 'element-plus';
-import { useEditor } from 'slate-vue3';
 import { Icon } from '../../icon';
 import Button from '../button';
 import { chooseFiles } from '../../../utils';
 import { FormDialog } from '../../form-dialog';
 import { Form, FormItem } from '../../form';
 import { useLocale } from '../../../hooks';
-import { type ImageElement } from '../types';
-import { getPointingOptions, isPointingAt } from '../utils';
+import { useEditor } from '../pm/context';
 
 export default defineComponent({
   name: 'CoEditorFormatImage',
@@ -17,7 +15,25 @@ export default defineComponent({
 
     const editor = useEditor();
 
-    const isActive = computed(() => isPointingAt(editor, 'image'));
+    const visible = ref(false);
+
+    const actionType = ref<'update' | 'insert'>('insert');
+
+    const isActive = computed(() => {
+      void editor.version.value;
+      return editor.isImageActive();
+    });
+
+    const model = reactive({
+      url: '',
+      width: '',
+      height: '',
+    });
+
+    const title = computed(
+      () =>
+        `${actionType.value === 'update' ? t('co.editor.edit') : t('co.editor.insert')}${t('co.editor.image')}`,
+    );
 
     const onSelect = () => {
       visible.value = false;
@@ -33,59 +49,36 @@ export default defineComponent({
     };
 
     const onClick = () => {
-      if (!editor.selection) return;
+      const attrs = editor.getImageAttrs();
 
-      const nodes = editor.nodes<ImageElement>(getPointingOptions(editor, 'image'));
-      const { done, value } = nodes.next();
-
-      if (done) {
+      if (attrs) {
+        Object.assign(model, {
+          url: attrs.src || '',
+          width: attrs.width ?? '',
+          height: attrs.height ?? '',
+        });
+        actionType.value = 'update';
+      } else {
         Object.assign(model, {
           url: '',
           width: '',
           height: '',
         });
         actionType.value = 'insert';
-      } else {
-        const [node] = value;
-        Object.assign(model, {
-          url: node.url,
-          width: node.width,
-          height: node.height,
-        });
-        actionType.value = 'update';
       }
 
       visible.value = true;
     };
 
-    // form
-    const visible = ref(false);
-
-    const actionType = ref<'update' | 'insert'>('insert');
-
-    const title = computed(
-      () =>
-        `${actionType.value === 'update' ? t('co.editor.edit') : t('co.editor.insert')}${t('co.editor.image')}`,
-    );
-
-    const model = reactive({
-      url: '',
-      width: '',
-      height: '',
-    });
-
     const onSubmit = () => {
-      if (!editor.selection) return;
-
       if (!model.url.trim()) return;
 
       if (actionType.value === 'update') {
-        editor.setNodes(
-          {
-            ...model,
-          },
-          getPointingOptions(editor, 'image'),
-        );
+        editor.updateImage({
+          src: model.url,
+          width: model.width || null,
+          height: model.height || null,
+        });
       } else {
         editor.insertImage(model.url, undefined, model.width, model.height);
       }

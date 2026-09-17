@@ -1,13 +1,20 @@
 import { defineComponent } from 'vue';
 import { createBem } from '../../../utils';
+import { useLocale } from '../../../hooks';
 
 export default defineComponent({
   name: 'CoEditorContentPlaceholder',
-  setup(_props, { slots }) {
+  props: {
+    visible: { type: Boolean, default: true },
+    text: { type: String },
+  },
+  setup(props) {
     const bem = createBem('editor-content-placeholder');
+    const { t } = useLocale();
 
     return () => {
-      return <div class={bem.b()}>{slots.default?.()}</div>;
+      if (!props.visible) return null;
+      return <div class={bem.b()}>{props.text || t('co.common.pleaseInput')}</div>;
     };
   },
 });

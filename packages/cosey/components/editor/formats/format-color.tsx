@@ -1,7 +1,7 @@
 import { defineComponent, ref } from 'vue';
-import { useEditor } from 'slate-vue3';
 import ButtonSplit from '../button-split';
 import ColorPicker from './color-picker';
+import { useEditor } from '../pm/context';
 
 export default defineComponent({
   name: 'CoEditorFormatColor',

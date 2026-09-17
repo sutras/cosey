@@ -1,7 +1,7 @@
-import { computed, defineComponent, PropType } from 'vue';
-import { useEditor } from 'slate-vue3';
+import { computed, defineComponent, type PropType } from 'vue';
 import { Icon } from '../../icon';
 import Button from '../button';
+import { useEditor } from '../pm/context';
 import { type ListType } from '../types';
 
 export default defineComponent({
@@ -14,7 +14,8 @@ export default defineComponent({
     const editor = useEditor();
 
     const isListActive = computed(() => {
-      return editor.getListTypeAtStartPoint() === props.format;
+      void editor.version.value;
+      return editor.getListType() === props.format;
     });
 
     const onClick = () => {

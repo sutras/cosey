@@ -1,65 +1,75 @@
-import { computed, defineComponent } from 'vue';
-import { useEditor, useElement } from 'slate-vue3';
-import { Range } from 'slate-vue3/core';
-import { DOMEditor } from 'slate-vue3/dom';
+import { defineComponent, type PropType } from 'vue';
+import { type Node as PMNode } from 'prosemirror-model';
+import { NodeSelection } from 'prosemirror-state';
+import { type EditorView } from 'prosemirror-view';
 import { createBem } from '../../../utils';
 import Resize from './resize';
+import { ref } from 'vue';
 
 export default defineComponent({
   name: 'CoEditorContentVideo',
   props: {
-    url: {
-      type: String,
-    },
-    width: {
-      type: [String, Number],
-      default: 300,
-    },
-    height: {
-      type: [String, Number],
+    node: { type: Object as PropType<PMNode>, required: true },
+    view: { type: Object as PropType<EditorView>, required: true },
+    getPos: { type: Function as PropType<() => number | undefined>, required: true },
+    selected: { type: Boolean },
+    registerEl: {
+      type: Function as PropType<(el: HTMLElement | null) => void>,
+      required: true,
     },
   },
-  setup(props, { slots }) {
+  setup(props) {
     const bem = createBem('editor-content-video');
 
-    const editor = useEditor();
+    const select = () => {
+      const pos = props.getPos();
+      if (pos == null) return;
 
-    const element = useElement();
-
-    const isActive = computed(() => {
-      return !!(
-        editor.selection &&
-        Range.isCollapsed(editor.selection) &&
-        Range.surrounds(editor.range(DOMEditor.findPath(editor, element.value)), editor.selection)
+      props.view.dispatch(
+        props.view.state.tr.setSelection(NodeSelection.create(props.view.state.doc, pos)),
       );
-    });
-
-    const onClick = () => {
-      editor.select(DOMEditor.findPath(editor, element.value));
+      props.view.focus();
     };
 
-    // resize
+    const videoRef = ref<HTMLVideoElement | null>(null);
+
     const onResize = ({ width, height }: { width: number; height: number }) => {
-      editor.setNodes(
-        {
-          width,
-          height,
-        },
-        {
-          at: DOMEditor.findPath(editor, element.value),
-        },
-      );
+      if (videoRef.value) {
+        videoRef.value.width = width;
+        videoRef.value.height = height;
+      }
+    };
+
+    const onResizeEnd = ({ width, height }: { width: number; height: number }) => {
+      const pos = props.getPos();
+      if (pos == null) return;
+      const tr = props.view.state.tr.setNodeMarkup(pos, undefined, {
+        ...props.node.attrs,
+        width,
+        height,
+      });
+      tr.setSelection(NodeSelection.create(tr.doc, pos));
+      props.view.dispatch(tr);
     };
 
     return () => {
       return (
-        <div class={[bem.b(), bem.is('active', isActive.value)]} onClick={onClick}>
-          <div class={bem.e('wrapper')}>
-            <video src={props.url} width={props.width} height={props.height} controls />
-            <Resize visible={isActive.value} onResize={onResize} />
-          </div>
-          {slots.default?.()}
-        </div>
+        <span
+          ref={(el) => props.registerEl(el as HTMLElement | null)}
+          class={[bem.b(), bem.is('active', props.selected)]}
+          onClick={select}
+        >
+          <span class={bem.e('wrapper')}>
+            <video
+              ref={(el) => (videoRef.value = el as HTMLVideoElement | null)}
+              src={props.node.attrs.src ?? undefined}
+              width={props.node.attrs.width ?? 300}
+              height={props.node.attrs.height ?? undefined}
+              controls
+            />
+            <Resize visible={props.selected} onResize={onResize} onResizeEnd={onResizeEnd} />
+          </span>
+        </span>
       );
     };
   },

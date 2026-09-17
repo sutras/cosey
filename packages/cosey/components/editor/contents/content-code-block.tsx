@@ -1,43 +1,76 @@
-import { defineComponent, useModel } from 'vue';
-import { useEditor, useElement } from 'slate-vue3';
-import { DOMEditor } from 'slate-vue3/dom';
+import { defineComponent, type PropType } from 'vue';
+import { type Node as PMNode } from 'prosemirror-model';
+import { type EditorView } from 'prosemirror-view';
 import { isString } from '../../../utils';
-import { languageOptions } from '../plugins/code-block';
+
+export const languageOptions = [
+  { value: 'text', label: 'PlainText' },
+  { value: 'css', label: 'CSS' },
+  { value: 'less', label: 'Less' },
+  { value: 'scss', label: 'Scss' },
+  { value: 'html', label: 'HTML' },
+  { value: 'javascript', label: 'JavaScript' },
+  { value: 'jsx', label: 'JSX' },
+  { value: 'typescript', label: 'TypeScript' },
+  { value: 'tsx', label: 'TSX' },
+  { value: 'json', label: 'JSON' },
+  { value: 'markdown', label: 'Markdown' },
+  { value: 'php', label: 'PHP' },
+  { value: 'bash', label: 'Bash' },
+  { value: 'java', label: 'Java' },
+  { value: 'python', label: 'Python' },
+  { value: 'sql', label: 'SQL' },
+];
 
 export default defineComponent({
   name: 'CoEditorContentCodeBlock',
   props: {
-    language: {
-      type: String,
-      default: 'text',
+    node: { type: Object as PropType<PMNode>, required: true },
+    view: { type: Object as PropType<EditorView>, required: true },
+    getPos: { type: Function as PropType<() => number | undefined>, required: true },
+    selected: { type: Boolean },
+    registerEl: {
+      type: Function as PropType<(el: HTMLElement | null) => void>,
+      required: true,
+    },
+    registerContent: {
+      type: Function as PropType<(el: HTMLElement | null) => void>,
+      required: true,
     },
   },
   emits: {
     'update:value': (value: string) => isString(value),
   },
-  setup(props, { slots }) {
-    const language = useModel(props, 'language');
-    const editor = useEditor();
+  setup(props) {
+    void props.selected;
+    void props.view;
 
-    const element = useElement();
+    const language = () => (props.node.attrs.language as string) || 'text';
 
-    const onChange = (e: Event) => {
-      language.value = (e.target as HTMLSelectElement).value;
+    const onChange = (event: Event) => {
+      const value = (event.target as HTMLSelectElement).value;
+      const pos = props.getPos();
+      if (pos == null) return;
 
-      const path = DOMEditor.findPath(editor, element.value);
-      editor.setNodes({ language: language.value }, { at: path });
+      props.view.dispatch(
+        props.view.state.tr.setNodeMarkup(pos, undefined, {
+          ...props.node.attrs,
+          language: value,
+        }),
+      );
     };
 
     return () => {
+      const value = language();
       return (
-        <pre class={`language-${language.value}`}>
-          <code class={`language-${language.value}`}>
-            <select value={language.value} contenteditable={false} onChange={onChange}>
+        <pre ref={(el) => props.registerEl(el as HTMLElement | null)} class={`language-${value}`}>
+          <code class={`language-${value}`}>
+            <select value={value} contenteditable={false} onChange={onChange}>
               {languageOptions.map((option) => (
                 <option value={option.value}>{option.label}</option>
               ))}
             </select>
-            <div>{slots.default?.()}</div>
+            <div ref={(el) => props.registerContent(el as HTMLElement | null)}></div>
           </code>
         </pre>
       );

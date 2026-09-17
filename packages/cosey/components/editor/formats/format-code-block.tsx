@@ -1,14 +1,17 @@
 import { computed, defineComponent } from 'vue';
-import { useEditor } from 'slate-vue3';
 import { Icon } from '../../icon';
 import Button from '../button';
+import { useEditor } from '../pm/context';
 
 export default defineComponent({
   name: 'CoEditorFormatCodeBlock',
   setup() {
     const editor = useEditor();
 
-    const isActive = computed(() => editor.isCodeBlockActive());
+    const isActive = computed(() => {
+      void editor.version.value;
+      return editor.isCodeBlockActive();
+    });
 
     const onClick = () => {
       editor.formatCodeBlock();

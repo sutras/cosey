@@ -3,7 +3,7 @@ import Picker from './picker';
 import Button from '../button';
 import { Icon } from '../../icon';
 import { createBem } from '../../../utils';
-import { useEditor } from 'slate-vue3';
+import { useEditor } from '../pm/context';
 
 export default defineComponent({
   name: 'CoEditorFormatTable',

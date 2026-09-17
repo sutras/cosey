@@ -1,5 +1,6 @@
-import { defineComponent, useTemplateRef } from 'vue';
+import { defineComponent, inject, onMounted, useTemplateRef } from 'vue';
 import { createBem } from '../../utils';
+import { pickerContextKey } from './formats/picker.api';
 
 export interface EditorButtonExpose {
   el?: HTMLButtonElement;
@@ -7,7 +8,15 @@ export interface EditorButtonExpose {
 
 export default defineComponent({
   name: 'CoEditorButton',
-  props: { active: { type: Boolean } },
+  props: {
+    active: { type: Boolean },
+    title: { type: String },
+    /**
+     * 作为外层 Picker 的触发器时打开：把自身元素登记给它。
+     * 否则 Picker 会把这个触发器的点击当成「点到弹层外面」，刚打开就自己关掉。
+     */
+    pickerTrigger: { type: Boolean },
+  },
   emits: {
     click: (event: MouseEvent) => event instanceof MouseEvent,
   },
@@ -15,6 +24,14 @@ export default defineComponent({
     const bem = createBem('editor-button');
 
     const buttonRef = useTemplateRef('button');
+
+    const pickerContext = inject(pickerContextKey, null);
+
+    onMounted(() => {
+      if (props.pickerTrigger && pickerContext && buttonRef.value) {
+        pickerContext.triggerTarget.value = buttonRef.value as HTMLElement;
+      }
+    });
 
     expose({
       el: buttonRef,
@@ -25,6 +42,7 @@ export default defineComponent({
         <button
           ref="button"
           type="button"
+          title={props.title}
           class={[bem.b(), bem.is('active', props.active)]}
           onClick={(event) => emit('click', event)}
           onMousedown={(event) => event.preventDefault()}

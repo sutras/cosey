@@ -1,6 +1,6 @@
 import { computed, defineComponent } from 'vue';
-import { useEditor } from 'slate-vue3';
 import Select from './select';
+import { useEditor } from '../pm/context';
 import { useMarkValue } from '../hooks/useMarkValue';
 
 const fonts = [

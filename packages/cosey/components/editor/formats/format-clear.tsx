@@ -1,7 +1,7 @@
 import { defineComponent } from 'vue';
-import { useEditor } from 'slate-vue3';
 import { Icon } from '../../icon';
 import Button from '../button';
+import { useEditor } from '../pm/context';
 
 export default defineComponent({
   name: 'CoEditorFormatClear',
@@ -9,7 +9,7 @@ export default defineComponent({
     const editor = useEditor();
 
     const onClick = () => {
-      editor.clearForamts();
+      editor.clearFormats();
     };
 
     return () => {

@@ -30,21 +30,27 @@
 
   h1 {
     font-size: css-var(font-size-heading-1);
+    line-height: css-var(line-height-heading-1);
   }
   h2 {
     font-size: css-var(font-size-heading-2);
+    line-height: css-var(line-height-heading-2);
   }
   h3 {
     font-size: css-var(font-size-heading-3);
+    line-height: css-var(line-height-heading-3);
   }
   h4 {
     font-size: css-var(font-size-heading-4);
+    line-height: css-var(line-height-heading-4);
   }
   h5 {
     font-size: css-var(font-size-heading-5);
+    line-height: css-var(line-height-heading-5);
   }
   h6 {
     font-size: css-var(font-size-heading-6);
+    line-height: css-var(line-height-heading-6);
   }
 
   table {
@@ -52,7 +58,8 @@
     table-layout: fixed;
     width: 100%;
 
-    td {
+    td,
+    th {
       outline: none;
       border: css-var(border-width) css-var(border-style) css-var(border-color);
       padding-inline: css-var(padding-xs);
@@ -65,6 +72,28 @@
         background-color: css-var(fill-color-light);
       }
     }
+  }
+
+  ul,
+  ol {
+    padding-inline-start: 2em;
+    list-style-position: outside;
+  }
+
+  ul {
+    list-style-type: disc;
+
+    ul {
+      list-style-type: circle;
+
+      ul {
+        list-style-type: square;
+      }
+    }
+  }
+
+  ol {
+    list-style-type: decimal;
   }
 
   a {
@@ -132,6 +161,7 @@
     > div {
       padding: 1rem;
       overflow: auto;
+      white-space: pre;
     }
   }
 }
@@ -144,10 +174,6 @@
   border: 1px solid css-var(border-color);
 
   @include e(toolbar) {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: css-var(size-lg);
-    row-gap: css-var(size-xxs);
     padding-inline: css-var(padding-sm);
     padding-block: css-var(padding-xs);
     border-bottom: 1px solid css-var(border-color);
@@ -188,6 +214,23 @@
     border-radius: css-var(border-radius-base);
     font-size: css-var(font-size-base);
     outline: none;
+
+    // columnResizing 悬停到列边界时会给编辑区挂上这个 class（列宽拖拽光标）
+    &.resize-cursor {
+      cursor: col-resize;
+    }
+
+    // 「不可见的选区」：ProseMirror 给框选（CellSelection 等 visible 为 false 的选区）
+    // 挂上这个 class，但 DOM 选区它照样会写（它的官方样式 prosemirror.css 就是用下面
+    // 两条把这类选区藏起来的，本项目没有引入那个文件，所以在这里补上）：
+    // 单元格框选期间浏览器的原生选文字、以及抬手后 PM 补写的 DOM 选区都不会画出来。
+    &.ProseMirror-hideselection {
+      caret-color: transparent;
+
+      ::selection {
+        background: transparent;
+      }
+    }
 
     @include editor-article;
   }

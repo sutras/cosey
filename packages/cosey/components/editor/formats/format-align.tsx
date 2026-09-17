@@ -1,9 +1,9 @@
-import { defineComponent, PropType } from 'vue';
-import { useEditor } from 'slate-vue3';
+import { defineComponent, type PropType } from 'vue';
 import { Icon } from '../../icon';
 import Button from '../button';
 import { useBlockValueActive } from '../hooks/useBlockValueActive';
-import { type FormatAlign } from '../plugins/align';
+import { useEditor } from '../pm/context';
+import { type FormatAlign } from '../types';
 
 export default defineComponent({
   name: 'CoEditorFormatAlign',

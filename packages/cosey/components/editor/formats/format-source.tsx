@@ -1,9 +1,9 @@
 import { defineComponent, ref } from 'vue';
 import { ElButton, ElDialog, ElInput } from 'element-plus';
-import { useEditor } from 'slate-vue3';
 import { Icon } from '../../icon';
 import Button from '../button';
 import { useLocale } from '../../../hooks';
+import { useEditor } from '../pm/context';
 
 export default defineComponent({
   name: 'CoEditorFormatSource',

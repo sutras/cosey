@@ -36,18 +36,13 @@
           <div
             v-for="(item, index) in searchResult"
             ref="item"
-            :key="item.value"
+            :key="item.name"
             :class="[bem.e('item'), bem.is('active', activeIndex === index)]"
             @mouseenter="onMouseEnter(index)"
             @click="onSelect(item)"
           >
-            <div>{{ item.label }}</div>
-            <Icon
-              v-show="activeIndex === index"
-              name="co:return"
-              size="xl"
-              :class="bem.e('enter')"
-            />
+            <div :class="bem.e('item-title')">{{ item.title }}</div>
+            <div :class="bem.e('item-path')">{{ item.path }}</div>
           </div>
         </template>
       </el-scrollbar>
@@ -94,7 +89,7 @@ defineOptions({
 
 const { t } = useLocale();
 
-const { t: _t } = useI18n();
+const { t: _t, te } = useI18n();
 
 const bem = createBem('layout-search');
 
@@ -105,26 +100,34 @@ const router = useRouter();
 const layoutStore = useLayoutStore();
 
 interface Option {
-  value: string;
-  label: string;
-  menuItem: MenuItem;
+  title: string;
+  path: string;
+  name: string;
 }
 
 const menuOptions = computed(() => {
   const result: Option[] = [];
 
-  function recur(items: MenuItem[], parent?: string) {
+  function recur(items: MenuItem[], parentTitle?: string, parentPath?: string) {
     items.forEach((item) => {
-      const label = parent ? parent + ' > ' + _t(item.title as string) : _t(item.title as string);
+      let title = item.title || '';
+      title = te(title) ? _t(title) : title;
+      const mergedTitle = parentTitle ? parentTitle + ' > ' + title : title;
+
+      let path = item.path || '';
+      const mergedPath =
+        path.startsWith('/') || !parentPath || /^https?:\/\//.test(path)
+          ? path
+          : parentPath + '/' + path;
 
       if (!item.children || item.children.length === 0) {
         result.push({
-          label,
-          value: item.route.name as string,
-          menuItem: item,
+          title: mergedTitle,
+          path: mergedPath,
+          name: item.route.name as string,
         });
       } else {
-        recur(item.children, label);
+        recur(item.children, mergedTitle, mergedPath);
       }
     });
   }
@@ -162,11 +165,11 @@ watch(
 const search = throttle(() => {
   const lowerValue = searchValue.value.trim().toLowerCase();
   searchResult.value = lowerValue
-    ? menuOptions.value.filter(({ menuItem, label, value }) => {
+    ? menuOptions.value.filter(({ title, name, path }) => {
         return (
-          label.toLowerCase().includes(lowerValue) ||
-          menuItem.route.path.toLowerCase().includes(lowerValue) ||
-          value.toLowerCase().includes(lowerValue)
+          title.toLowerCase().includes(lowerValue) ||
+          path.toLowerCase().includes(lowerValue) ||
+          name.toLowerCase().includes(lowerValue)
         );
       })
     : [];
@@ -235,7 +238,7 @@ const onMouseEnter = (index: number) => {
 };
 
 const onSelect = (item: Option) => {
-  router.push({ name: item.value });
+  router.push({ name: item.name });
   open.value = false;
 };
 </script>

@@ -1,13 +1,61 @@
 @use './base/index' as *;
 
 @include b(editor-content-table) {
+  // 表格本体在节点视图里，这一层对应 prosemirror-tables 的 .tableWrapper：
+  // 列被拖宽之后超出容器时由它横向滚动。
+  overflow-x: auto;
+
   @include is(active) {
     outline: 2px solid css-var(color-primary-light-5);
   }
 
+  // 框选多个单元格时不要让浏览器顺手把文字也选上（见 content-table.tsx 的 onTableMousedown）
+  @include is(cell-dragging) {
+    user-select: none;
+  }
+
+  td,
+  th {
+    // 拖拽手柄（.column-resize-handle）是绝对定位在单元格里的，单元格得是定位祖先
+    position: relative;
+    vertical-align: top;
+    box-sizing: border-box;
+  }
+
+  // 没有显式列宽的列留一个下限：table-layout: fixed + width: 100% 时，
+  // 否则窄列上根本落不下拖拽手柄。
+  td:not([data-colwidth]),
+  th:not([data-colwidth]) {
+    min-width: 100px;
+  }
+
+  // 框选（CellSelection）的单元格：叠一层半透明的 primary 色。
+  // 不能用不透明的浅色（dark 主题下 light-9 是深色，会把单元格内容整个盖掉），
+  // 半透明才能既看出选区又看清文字。
+  .selectedCell::after {
+    content: '';
+    position: absolute;
+    z-index: 2;
+    inset: -1px;
+    background: css-var(color-primary);
+    mix-blend-mode: multiply;
+    opacity: 0.25;
+    pointer-events: none;
+  }
+
+  .column-resize-handle {
+    position: absolute;
+    right: -2px;
+    top: 0;
+    bottom: 0;
+    z-index: 20;
+    width: 4px;
+    background-color: css-var(color-primary-light-3);
+    pointer-events: none;
+  }
+
   @include e(toolbar) {
-    display: flex;
-    align-items: center;
-    column-gap: css-var(size-lg);
+    max-width: 406px;
+    width: fit-content;
   }
 }

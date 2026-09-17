@@ -86,7 +86,16 @@ export default defineComponent({
                 ref="content"
                 class={[bem.e('content'), bem.is('nopadding', props.nopadding)]}
                 style={{ maxHeight: props.maxHeight }}
-                onMousedown={(event) => event.preventDefault()}
+                onMousedown={(event) => {
+                  const target = event.target as HTMLElement;
+
+                  // 允许输入类元素获得焦点，避免阻止其默认聚焦行为
+                  if (target.closest('input, textarea, [contenteditable="true"]')) {
+                    return;
+                  }
+
+                  event.preventDefault();
+                }}
               >
                 {slots.content?.({})}
               </div>

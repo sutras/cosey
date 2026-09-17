@@ -7,6 +7,7 @@
   display: none;
   outline: 3px solid css-var(color-primary-light-5);
   pointer-events: none;
+  user-select: none;
 
   @include is(show) {
     display: block;

@@ -1,7 +1,7 @@
-import { useEditor } from 'slate-vue3';
 import { defineComponent } from 'vue';
 import { Icon } from '../../icon';
 import Button from '../button';
+import { useEditor } from '../pm/context';
 
 export default defineComponent({
   name: 'CoEditorFormatIndent',

@@ -1,7 +1,7 @@
 import { computed, defineComponent } from 'vue';
-import { useEditor } from 'slate-vue3';
-import { getCssVar } from '../../../utils';
 import Select from './select';
+import { getCssVar } from '../../../utils';
+import { useEditor } from '../pm/context';
 import { HEADING_TYPES, type HeadingParagraphType } from '../types';
 
 export default defineComponent({
@@ -36,7 +36,10 @@ export default defineComponent({
 
     const editor = useEditor();
 
-    const activeType = computed(() => editor.getActiveHeadingType());
+    const activeType = computed(() => {
+      void editor.version.value;
+      return editor.getActiveHeadingType();
+    });
 
     const onChange = (value: HeadingParagraphType) => {
       editor.formatHeading(value);

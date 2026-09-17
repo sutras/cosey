@@ -1,14 +1,17 @@
 import { computed, defineComponent } from 'vue';
-import { useEditor } from 'slate-vue3';
 import { Icon } from '../../icon';
 import Button from '../button';
+import { useEditor } from '../pm/context';
 
 export default defineComponent({
   name: 'CoEditorFormatBlockQuote',
   setup() {
     const editor = useEditor();
 
-    const isActive = computed(() => editor.isBlockQuoteActive());
+    const isActive = computed(() => {
+      void editor.version.value;
+      return editor.isBlockQuoteActive();
+    });
 
     const onClick = () => {
       editor.formatBlockQuote();

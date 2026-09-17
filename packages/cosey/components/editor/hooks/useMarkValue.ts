@@ -1,20 +1,15 @@
-import { useEditor } from 'slate-vue3';
-import { Editor } from 'slate-vue3/core';
 import { ref, watch } from 'vue';
+import { useEditor } from '../pm/context';
 
 export function useMarkValue(mark: string, initial: boolean | number | string = '') {
   const editor = useEditor();
 
-  const current = ref(initial);
+  const current = ref(initial as string);
 
   watch(
-    () => editor.selection,
+    () => editor.version.value,
     () => {
-      const marks = Editor.marks(editor);
-      current.value = marks ? marks[mark as keyof typeof marks] || '' : '';
-    },
-    {
-      deep: true,
+      current.value = editor.getTextStyleValue(mark);
     },
   );
 

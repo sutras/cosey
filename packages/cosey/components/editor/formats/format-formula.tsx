@@ -1,6 +1,5 @@
 import { ref, useTemplateRef, watch, reactive, defineComponent, computed } from 'vue';
 import { ElButton, ElInput, ElSpace } from 'element-plus';
-import { useEditor } from 'slate-vue3';
 import katex from 'katex';
 import Button from '../button';
 import { Panel } from '../../panel';
@@ -9,16 +8,18 @@ import { Form } from '../../form';
 import Row from '../../row';
 import Col from '../../col';
 import Icon from '../../icon';
-import { formulas } from '../plugins/formula';
-import { getPointingOptions, isPointingAt } from '../utils';
-import { type FormulaElement } from '../types';
+import { useEditor } from '../pm/context';
+import { formulas } from './formula-presets';
 
 export default defineComponent({
   name: 'CoEditorFormatFormula',
   setup() {
     const editor = useEditor();
 
-    const isActive = computed(() => isPointingAt(editor, 'formula'));
+    const isActive = computed(() => {
+      void editor.version.value;
+      return editor.isFormulaActive();
+    });
 
     const visible = ref(false);
 
@@ -33,18 +34,8 @@ export default defineComponent({
     };
 
     const onClick = () => {
-      if (!editor.selection) return;
-
-      const nodes = editor.nodes<FormulaElement>(getPointingOptions(editor, 'formula'));
-      const { done, value } = nodes.next();
-
-      if (done) {
-        formModel.formula = '';
-      } else {
-        const [node] = value;
-        formModel.formula = node.formula;
-      }
-
+      const attrs = editor.getFormulaAttrs();
+      formModel.formula = attrs?.formula || '';
       visible.value = true;
     };
 

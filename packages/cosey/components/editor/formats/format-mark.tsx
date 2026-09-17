@@ -1,7 +1,7 @@
 import { defineComponent } from 'vue';
-import { useEditor } from 'slate-vue3';
 import { Icon } from '../../icon';
 import Button from '../button';
+import { useEditor } from '../pm/context';
 import { useMarkActive } from '../hooks/useMarkActive';
 
 export default defineComponent({
@@ -12,11 +12,10 @@ export default defineComponent({
   },
   setup(props) {
     const editor = useEditor();
-
     const isMarkActive = useMarkActive(props.format);
 
     const onClick = () => {
-      editor.formatMark(props.format);
+      editor.toggleMark(props.format);
     };
 
     return () => {

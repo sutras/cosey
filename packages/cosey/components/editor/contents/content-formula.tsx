@@ -1,45 +1,41 @@
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, type PropType } from 'vue';
+import { type Node as PMNode } from 'prosemirror-model';
+import { type EditorView } from 'prosemirror-view';
 import katex from 'katex';
-import { useEditor, useElement } from 'slate-vue3';
-import { Range } from 'slate-vue3/core';
-import { DOMEditor } from 'slate-vue3/dom';
 import { createBem } from '../../../utils';
 
 export default defineComponent({
   name: 'CoEditorContentFormula',
   props: {
-    formula: {
-      type: String,
+    node: { type: Object as PropType<PMNode>, required: true },
+    view: { type: Object as PropType<EditorView>, required: true },
+    getPos: { type: Function as PropType<() => number | undefined>, required: true },
+    selected: { type: Boolean },
+    registerEl: {
+      type: Function as PropType<(el: HTMLElement | null) => void>,
       required: true,
     },
   },
-  setup(props, { slots }) {
+  setup(props) {
     const bem = createBem('editor-content-formula');
 
+    void props.view;
+    void props.getPos;
+
     const mathml = computed(() =>
-      katex.renderToString(props.formula, {
+      katex.renderToString((props.node.attrs.formula as string) || '', {
         throwOnError: false,
         output: 'mathml',
       }),
     );
 
-    const editor = useEditor();
-
-    const element = useElement();
-
-    const isActive = computed(() => {
-      return !!(
-        editor.selection &&
-        Range.isCollapsed(editor.selection) &&
-        Range.surrounds(editor.range(DOMEditor.findPath(editor, element.value)), editor.selection)
-      );
-    });
-
     return () => {
       return (
-        <span class={[bem.b(), bem.is('active', isActive.value)]}>
+        <span
+          ref={(el) => props.registerEl(el as HTMLElement | null)}
+          class={[bem.b(), bem.is('active', props.selected)]}
+        >
           <span v-html={mathml.value} contenteditable={false}></span>
-          {slots.default?.()}
         </span>
       );
     };

@@ -66,6 +66,8 @@ export default defineComponent({
   emits: {
     resize: (event: { width: number; height: number }) =>
       isNumber(event.width) && isNumber(event.height),
+    resizeEnd: (event: { width: number; height: number }) =>
+      isNumber(event.width) && isNumber(event.height),
   },
   setup(props, { emit }) {
     const bem = createBem('editor-resize');
@@ -77,23 +79,27 @@ export default defineComponent({
     let downRect: DOMRect | null = null;
 
     const onPointerDown = (corner: ResizePosition, event: PointerEvent) => {
-      downs[corner] = true;
-      const el = event.currentTarget as HTMLElement;
-      el.setPointerCapture(event.pointerId);
+      const el = elRef.value;
+      if (!el) return;
 
-      downRect = elRef.value!.getBoundingClientRect();
+      event.preventDefault();
+      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+
+      downs[corner] = true;
+      downRect = el.getBoundingClientRect();
     };
 
     const width = ref(0);
     const height = ref(0);
 
-    const onPointerMove = (corner: ResizePosition, event: PointerEvent) => {
-      if (downs[corner]) {
+    const onPointerMove = (corner: ResizePosition, event: MouseEvent) => {
+      event.preventDefault();
+
+      if (downs[corner] && downRect) {
         sizeVisible.value = true;
-        const rect = elRef.value!.getBoundingClientRect();
         sizeX.value = event.clientX;
         sizeY.value = event.clientY;
-        onDrag(downRect!, rect, {
+        onDrag(downRect, downRect, {
           position: corner,
           x: event.clientX,
           y: event.clientY,
@@ -110,8 +116,14 @@ export default defineComponent({
     };
 
     const onPointerUp = (corner: ResizePosition) => {
-      downs[corner] = false;
+      const resized = sizeVisible.value;
+      if (resized) {
+        emit('resizeEnd', { width: width.value, height: height.value });
+      }
+
       sizeVisible.value = false;
+      downRect = null;
+      downs[corner] = false;
     };
 
     // size
@@ -135,13 +147,22 @@ export default defineComponent({
 
     return () => {
       return (
-        <div ref="el" class={[bem.b(), bem.is('show', props.visible)]}>
+        <div
+          ref="el"
+          class={[bem.b(), bem.is('show', props.visible)]}
+          onMousemove={(event) => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }}
+        >
           {corners.map((corner) => {
             return (
               <div
                 key={corner}
                 class={[bem.e('corner'), bem.em('corner', corner)]}
-                onPointerdown={(event) => onPointerDown(corner, event)}
+                onPointerdown={(event) => {
+                  onPointerDown(corner, event);
+                }}
                 onPointermove={(event) => onPointerMove(corner, event)}
                 onPointerup={() => onPointerUp(corner)}
                 onPointercancel={() => onPointerUp(corner)}

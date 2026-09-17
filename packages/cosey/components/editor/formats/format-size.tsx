@@ -1,7 +1,7 @@
 import { computed, defineComponent } from 'vue';
-import { useEditor } from 'slate-vue3';
 import Select from './select';
 import FontSizeDelta from './format-size-delta';
+import { useEditor } from '../pm/context';
 import { useMarkValue } from '../hooks/useMarkValue';
 
 const sizes = [
@@ -51,6 +51,7 @@ export default defineComponent({
     const onDeltaChange = (value: string) => {
       current.value = value;
     };
+
     return () => {
       return (
         <>

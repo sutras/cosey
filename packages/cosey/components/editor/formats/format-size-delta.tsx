@@ -1,8 +1,8 @@
 import { defineComponent } from 'vue';
-import { useEditor } from 'slate-vue3';
 import Button from '../button';
 import { Icon } from '../../icon';
 import { isString } from '../../../utils';
+import { useEditor } from '../pm/context';
 
 export default defineComponent({
   name: 'CoEditorFormatSizeDelta',
@@ -21,6 +21,7 @@ export default defineComponent({
         emit('change', numSize + 'px');
       });
     };
+
     return () => {
       return (
         <Button onClick={onClick}>

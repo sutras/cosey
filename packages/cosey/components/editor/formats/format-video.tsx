@@ -1,12 +1,10 @@
 import { computed, defineComponent, reactive, ref } from 'vue';
-import { useEditor } from 'slate-vue3';
 import { Icon } from '../../icon';
 import Button from '../button';
 import { FormDialog } from '../../form-dialog';
 import { Form, FormItem } from '../../form';
 import { useLocale } from '../../../hooks';
-import { VideoElement } from '../types';
-import { getPointingOptions, isPointingAt } from '../utils';
+import { useEditor } from '../pm/context';
 
 export default defineComponent({
   name: 'CoEditorFormatVideo',
@@ -15,43 +13,14 @@ export default defineComponent({
 
     const editor = useEditor();
 
-    const isActive = computed(() => isPointingAt(editor, 'video'));
-
-    const onClick = () => {
-      if (!editor.selection) return;
-
-      const nodes = editor.nodes<VideoElement>(getPointingOptions(editor, 'video'));
-      const { done, value } = nodes.next();
-
-      if (done) {
-        Object.assign(model, {
-          url: '',
-          width: '',
-          height: '',
-        });
-        actionType.value = 'insert';
-      } else {
-        const [node] = value;
-        Object.assign(model, {
-          url: node.url,
-          width: node.width,
-          height: node.height,
-        });
-        actionType.value = 'update';
-      }
-
-      visible.value = true;
-    };
-
-    // form
     const visible = ref(false);
 
     const actionType = ref<'update' | 'insert'>('insert');
 
-    const title = computed(
-      () =>
-        `${actionType.value === 'update' ? t('co.editor.edit') : t('co.editor.insert')}${t('co.editor.video')}`,
-    );
+    const isActive = computed(() => {
+      void editor.version.value;
+      return editor.isVideoActive();
+    });
 
     const model = reactive({
       url: '',
@@ -59,18 +28,42 @@ export default defineComponent({
       height: '',
     });
 
-    const onSubmit = () => {
-      if (!editor.selection) return;
+    const title = computed(
+      () =>
+        `${actionType.value === 'update' ? t('co.editor.edit') : t('co.editor.insert')}${t('co.editor.video')}`,
+    );
 
+    const onClick = () => {
+      const attrs = editor.getVideoAttrs();
+
+      if (attrs) {
+        Object.assign(model, {
+          url: attrs.src || '',
+          width: attrs.width ?? '',
+          height: attrs.height ?? '',
+        });
+        actionType.value = 'update';
+      } else {
+        Object.assign(model, {
+          url: '',
+          width: '',
+          height: '',
+        });
+        actionType.value = 'insert';
+      }
+
+      visible.value = true;
+    };
+
+    const onSubmit = () => {
       if (!model.url.trim()) return;
 
       if (actionType.value === 'update') {
-        editor.setNodes(
-          {
-            ...model,
-          },
-          getPointingOptions(editor, 'video'),
-        );
+        editor.updateVideo({
+          src: model.url,
+          width: model.width || null,
+          height: model.height || null,
+        });
       } else {
         editor.insertVideo(model.url, model.width, model.height);
       }

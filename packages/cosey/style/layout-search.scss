@@ -53,9 +53,11 @@
 
   @include e(item) {
     display: flex;
-    height: 56px;
+    justify-content: space-between;
+    min-height: 56px;
     margin-block-end: css-var(margin-xxs);
-    padding-inline: css-var(padding-xs);
+    padding-inline: css-var(padding-sm);
+    padding-block: css-var(padding-xs);
     cursor: pointer;
     align-items: center;
     border-radius: css-var(border-radius-base);
@@ -63,13 +65,25 @@
     background-color: css-var(fill-color-light);
 
     @include is(active) {
-      color: css-var(color-white);
       background-color: css-var(color-primary);
+
+      @include e(item-title, item-path) {
+        color: css-var(color-white);
+      }
     }
   }
 
-  @include e(enter) {
-    margin-inline-start: auto;
+  @include e(item-title) {
+    font-size: css-var(font-size-base);
+    color: css-var(text-color-primary);
+    word-break: break-all;
+  }
+
+  @include e(item-path) {
+    margin-inline-start: css-var(margin-sm);
+    font-size: css-var(font-size-extra-small);
+    color: css-var(text-color-secondary);
+    word-break: break-all;
   }
 
   @include e(footer) {

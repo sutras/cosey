@@ -1,9 +1,3 @@
-import { h } from 'vue';
-import { useInheritRef } from 'slate-vue3';
-import { Editor } from 'slate-vue3/core';
-import contentFormula from '../contents/content-formula';
-import { getPointingOptions, isPointingAt } from '../utils';
-
 export const formulas = [
   {
     name: '傅里叶级数',
@@ -101,63 +95,3 @@ export const formulas = [
       '\\frac{{\\partial f}}{{\\partial l}} = \\frac{{\\partial f}}{{\\partial x}}\\cos \\phi  + \\frac{{\\partial f}}{{\\partial y}}\\sin \\phi',
   },
 ];
-
-declare module 'slate-vue3/core' {
-  interface BaseEditor {
-    insertFormula: (value: string) => void;
-  }
-}
-
-function insertFormula(editor: Editor, value: string) {
-  if (!editor.selection) return;
-
-  if (isPointingAt(editor, 'formula')) {
-    editor.setNodes(
-      {
-        formula: value,
-      },
-      getPointingOptions(editor, 'formula'),
-    );
-  } else {
-    editor.insertNodes({
-      type: 'formula',
-      formula: value,
-      children: [{ text: '' }],
-    });
-  }
-}
-
-export function withFormula(editor: Editor) {
-  const { isInline, isVoid, renderElement } = editor;
-
-  editor.isInline = (element) => {
-    return element.type === 'formula' ? true : isInline(element);
-  };
-
-  editor.isVoid = (element) => {
-    return element.type === 'formula' ? true : isVoid(element);
-  };
-
-  editor.insertFormula = (value) => {
-    insertFormula(editor, value);
-  };
-
-  editor.renderElement = (props) => {
-    const { attributes, children, element } = props;
-
-    if (element.type === 'formula') {
-      return h(
-        contentFormula,
-        {
-          ...useInheritRef(attributes),
-          formula: element.formula,
-        },
-        () => children,
-      );
-    }
-
-    return renderElement(props);
-  };
-
-  return editor;
-}

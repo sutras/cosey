@@ -145,7 +145,7 @@ function declarationsToCSS(decls: CSSDeclarations): string {
 
 function buildThemeCSS(token: ThemeToken, palettes: Record<string, string>): string {
   const cssBody = declarationsToCSS(generatePalettes(token, palettes));
-  return cssBody ? `:root:root {\n${cssBody}}\n` : '';
+  return cssBody ? `:root {\n${cssBody}}\n` : '';
 }
 
 // ============================================================
