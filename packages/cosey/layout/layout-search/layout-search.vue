@@ -1,9 +1,9 @@
 <template>
   <div>
     <el-button link :class="[bem.e('button')]" @click="open = !open">
-      <Icon v-if="layoutStore.isMobile" size="xl" name="co:search" />
+      <Icon v-if="layoutStore.isMobile" size="xl"><RtiSearch /></Icon>
       <div v-else :class="bem.e('button-wrapper')">
-        <Icon name="co:search" size="lg" />
+        <Icon size="lg"><RtiSearch /></Icon>
         <span :class="bem.e('button-text')">{{ t('co.form.search') }}</span>
         <span :class="bem.e('button-kbd')">
           {{ controlKey }}
@@ -24,7 +24,7 @@
           @keydown="onKeydown"
         >
           <template #prefix>
-            <Icon name="co:search" size="xl" :class="bem.e('input-icon')" />
+            <Icon size="xl" :class="bem.e('input-icon')"><RtiSearch /></Icon>
           </template>
         </el-input>
       </template>
@@ -49,12 +49,12 @@
       <template #footer>
         <div :class="bem.e('footer')">
           <div>
-            <Icon name="co:return" />
+            <Icon><RtiReturn /></Icon>
             <span :class="bem.e('footer-text')">{{ t('co.search.select') }}</span>
           </div>
           <div>
-            <Icon name="co:arrow-up" />
-            <Icon name="co:arrow-down" />
+            <Icon><RtiArrowUp /></Icon>
+            <Icon><RtiArrowDown /></Icon>
             <span :class="bem.e('footer-text')">{{ t('co.search.switch') }}</span>
           </div>
           <div>
@@ -82,6 +82,7 @@ import { useTimeoutFn } from '@vueuse/core';
 import { useLocale } from '../../hooks';
 import { useI18n } from 'vue-i18n';
 import { createBem } from '../../utils';
+import { RtiArrowDown, RtiArrowUp, RtiReturn, RtiSearch } from 'richtext-icons';
 
 defineOptions({
   name: 'CoLayoutSearch',

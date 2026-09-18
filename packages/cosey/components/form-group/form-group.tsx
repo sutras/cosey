@@ -4,6 +4,7 @@ import { reactiveOmit } from '@vueuse/core';
 import { Icon } from '../icon';
 import { ElTooltip } from 'element-plus';
 import { createBem } from '../../utils';
+import { RtiCaretDown, RtiCaretUp, RtiHelp } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoFormGroup',
@@ -66,7 +67,7 @@ export default defineComponent({
                 onClick={handleToggle}
               >
                 {props.collapsible && (
-                  <Icon name={innerCollapsed.value ? 'co:caret-up' : 'co:caret-down'} size="xl" />
+                  <Icon size="xl">{innerCollapsed.value ? <RtiCaretUp /> : <RtiCaretDown />}</Icon>
                 )}
                 {props.title || slots.title?.()}
                 {(props.tooltip || slots.tooltip) && (
@@ -74,7 +75,11 @@ export default defineComponent({
                     placement="top"
                     v-slots={{
                       content: () => props.tooltip || slots.tooltip?.(),
-                      default: () => <Icon name="co:help" class={bem.e('title-icon')} size="md" />,
+                      default: () => (
+                        <Icon class={bem.e('title-icon')} size="md">
+                          <RtiHelp />
+                        </Icon>
+                      ),
                     }}
                   />
                 )}

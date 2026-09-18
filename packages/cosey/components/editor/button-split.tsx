@@ -3,6 +3,7 @@ import { createBem } from '../../utils';
 import { pickerContextKey } from './formats/picker.api';
 import Button, { type EditorButtonExpose } from './button';
 import { Icon } from '../icon';
+import { RtiChevronDown } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoEditorButtonSplit',
@@ -47,7 +48,9 @@ export default defineComponent({
             class={bem.e('chevron')}
             onClick={onChevronClick}
           >
-            <Icon class={bem.e('arrow')} name="co:chevron-down" size="lg" />
+            <Icon class={bem.e('arrow')} size="lg">
+              <RtiChevronDown />
+            </Icon>
           </Button>
         </div>
       );

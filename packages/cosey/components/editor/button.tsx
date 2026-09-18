@@ -10,6 +10,7 @@ export default defineComponent({
   name: 'CoEditorButton',
   props: {
     active: { type: Boolean },
+    disabled: { type: Boolean },
     title: { type: String },
     /**
      * 作为外层 Picker 的触发器时打开：把自身元素登记给它。
@@ -43,7 +44,8 @@ export default defineComponent({
           ref="button"
           type="button"
           title={props.title}
-          class={[bem.b(), bem.is('active', props.active)]}
+          disabled={props.disabled}
+          class={[bem.b(), bem.is('active', props.active), bem.is('disabled', props.disabled)]}
           onClick={(event) => emit('click', event)}
           onMousedown={(event) => event.preventDefault()}
         >

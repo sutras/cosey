@@ -30,6 +30,16 @@
     outline-offset: 1px;
   }
 
+  @include is(disabled) {
+    color: css-var(text-color-disabled);
+    cursor: not-allowed;
+
+    &:hover,
+    &:active {
+      background-color: transparent;
+    }
+  }
+
   @include e(group) {
     display: flex;
     flex-wrap: wrap;

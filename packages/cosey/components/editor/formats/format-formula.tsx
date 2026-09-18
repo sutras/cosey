@@ -10,6 +10,7 @@ import Col from '../../col';
 import Icon from '../../icon';
 import { useEditor } from '../pm/context';
 import { formulas } from './formula-presets';
+import { RtiFormula } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoEditorFormatFormula',
@@ -55,7 +56,9 @@ export default defineComponent({
       return (
         <>
           <Button active={isActive.value} onClick={onClick}>
-            <Icon name="co:function-math" />
+            <Icon>
+              <RtiFormula />
+            </Icon>
           </Button>
 
           <FormDialog v-model={visible.value} title="LaTeX 公式" width="760px">

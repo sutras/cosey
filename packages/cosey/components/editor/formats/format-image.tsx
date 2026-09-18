@@ -7,6 +7,7 @@ import { FormDialog } from '../../form-dialog';
 import { Form, FormItem } from '../../form';
 import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';
+import { RtiImage, RtiUpload } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoEditorFormatImage',
@@ -88,7 +89,9 @@ export default defineComponent({
       return (
         <>
           <Button active={isActive.value} onClick={onClick}>
-            <Icon name="co:image" />
+            <Icon>
+              <RtiImage />
+            </Icon>
           </Button>
 
           <FormDialog v-model={visible.value} title={title.value} width="sm">
@@ -101,7 +104,9 @@ export default defineComponent({
                 colProps={{ span: 20 }}
               />
               <ElButton text onClick={onSelect}>
-                <Icon name="co:upload" />
+                <Icon size="lg">
+                  <RtiUpload />
+                </Icon>
               </ElButton>
               <FormItem
                 v-model={model.width}

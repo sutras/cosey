@@ -1,7 +1,8 @@
-import { defineComponent } from 'vue';
+import { defineComponent, h } from 'vue';
 import { Icon } from '../icon';
-import { createBem } from '../../utils';
+import { createBem, isString } from '../../utils';
 import { contextMenuContentProps } from './content.api';
+import { RtiChevronRight } from 'richtext-icons';
 
 export default defineComponent({
   props: contextMenuContentProps,
@@ -20,12 +21,17 @@ export default defineComponent({
           ]}
         >
           {props.withIcon && (
-            <div class={bem.e('content-icon')}>{props.icon && <Icon name={props.icon} />}</div>
+            <div class={bem.e('content-icon')}>
+              {props.icon &&
+                (isString(props.icon) ? <Icon name={props.icon} /> : <Icon>{h(props.icon)}</Icon>)}
+            </div>
           )}
           <span class={bem.e('content-title')}>{props.title}</span>
           <div class={bem.e('content-arrow')}>
             {props.arrow && (
-              <Icon name="co:chevron-right" class={bem.e('content-arrow-icon')} size="lg" />
+              <Icon class={bem.e('content-arrow-icon')} size="lg">
+                <RtiChevronRight />
+              </Icon>
             )}
           </div>
         </div>

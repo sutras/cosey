@@ -2,7 +2,7 @@
   <el-dropdown placement="bottom" trigger="click">
     <el-button link :class="bem.b()">
       <el-avatar :size="32" :src="userStore.userInfo?.avatar">
-        <Icon name="co:user" />
+        <Icon><RtiUser /></Icon>
       </el-avatar>
       <span :class="bem.e('name')">
         {{ userStore.userInfo?.nickname }}
@@ -11,18 +11,18 @@
     <template #dropdown>
       <el-dropdown-menu :class="[bem.e('dropdown')]">
         <el-dropdown-item @click="toHome">
-          <Icon name="co:home" size="lg" />
+          <Icon size="lg"><RtiHome /></Icon>
           <span :class="bem.e('item-title')">{{ t('co.common.home') }}</span>
         </el-dropdown-item>
 
         <component :is="UserMenu" />
 
         <el-dropdown-item v-if="apiConfig.changePassword" @click="toChangePassword">
-          <Icon name="co:password" size="lg" />
+          <Icon size="lg"><RtiPassword /></Icon>
           <span :class="bem.e('item-title')">{{ t('co.auth.changePassword') }}</span>
         </el-dropdown-item>
         <el-dropdown-item divided @click="logout">
-          <Icon name="co:logout" size="lg" />
+          <Icon size="lg"><RtiLogout /></Icon>
           <span :class="bem.e('item-title')">{{ t('co.auth.logout') }}</span>
         </el-dropdown-item>
       </el-dropdown-menu>
@@ -41,6 +41,7 @@ import { useLocale } from '../../hooks';
 import { ref } from 'vue';
 import { ElLoading } from 'element-plus';
 import { createBem } from '../../utils';
+import { RtiHome, RtiLogout, RtiPassword, RtiUser } from 'richtext-icons';
 
 defineOptions({
   name: 'CoLayoutUserMenu',

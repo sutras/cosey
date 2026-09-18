@@ -45,11 +45,9 @@
                   :hide-after="0"
                 >
                   <el-button circle @click="reload">
-                    <Icon
-                      name="co:rotate-360"
-                      size="md"
-                      :class="[bem.e('refresh-icon'), bem.is('spinning', reloading)]"
-                    />
+                    <Icon size="lg" :class="[bem.e('refresh-icon'), bem.is('spinning', reloading)]">
+                      <RtiRotate360 />
+                    </Icon>
                   </el-button>
                 </el-tooltip>
               </div>
@@ -62,7 +60,7 @@
                   :hide-after="0"
                 >
                   <el-button circle @click="exportVisible = true">
-                    <Icon name="co:download" size="md" />
+                    <Icon size="lg"><RtiDownload /></Icon>
                   </el-button>
                 </el-tooltip>
 
@@ -84,7 +82,9 @@
                   :hide-after="0"
                 >
                   <el-button circle @click="onFullScreen">
-                    <Icon :name="isFullPage ? 'co:fullscreen-exit' : 'co:fullscreen'" size="md" />
+                    <Icon size="lg">
+                      <component :is="isFullPage ? RtiFullscreenExit : RtiFullscreen" />
+                    </Icon>
                   </el-button>
                 </el-tooltip>
               </div>
@@ -97,7 +97,7 @@
                   :hide-after="0"
                 >
                   <el-button ref="setting-ref" circle>
-                    <Icon name="co:settings-adjust" size="md" />
+                    <Icon size="lg"><RtiSettingsAdjust /></Icon>
                   </el-button>
                 </el-tooltip>
 
@@ -256,6 +256,13 @@ import { hColgroup } from 'element-plus/es/components/table/src/h-helper.mjs';
 import TableFooter from './table-footer';
 import { defaultSummaryMethod } from './table-footer/utils';
 import TableStats from './table-stats/table-stats';
+import {
+  RtiDownload,
+  RtiFullscreen,
+  RtiFullscreenExit,
+  RtiRotate360,
+  RtiSettingsAdjust,
+} from 'richtext-icons';
 
 defineOptions({
   name: 'CoTable',

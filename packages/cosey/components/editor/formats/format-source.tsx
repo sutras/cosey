@@ -4,6 +4,7 @@ import { Icon } from '../../icon';
 import Button from '../button';
 import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';
+import { RtiSourceCode } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoEditorFormatSource',
@@ -35,7 +36,9 @@ export default defineComponent({
       return (
         <>
           <Button onClick={onClick}>
-            <Icon name="co:repo-source-code" />
+            <Icon>
+              <RtiSourceCode />
+            </Icon>
           </Button>
           <ElDialog
             title={t('co.editor.sourceCode')}

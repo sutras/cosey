@@ -15,6 +15,7 @@ import Toolbar from './toolbar';
 import ButtonGroup from './button-group';
 import FormatMark from './formats/format-mark';
 import FormatHeading from './formats/format-heading';
+import FormatHistory from './formats/format-history';
 import FormatBlockQuote from './formats/format-block-quote';
 import FormatTable from './formats/format-table';
 import FormatFont from './formats/format-font';
@@ -52,6 +53,23 @@ import { localeContextKey } from '../../hooks';
 import { injectUploadConfig, uploadContextKey } from '../../config/upload';
 import { CHANGE_EVENT, useFormDisabled, useFormItem } from 'element-plus';
 import ButtonGroupList from './button-group-list';
+import {
+  RtiAlignCenter,
+  RtiAlignJustify,
+  RtiAlignLeft,
+  RtiAlignRight,
+  RtiBold,
+  RtiBulletList,
+  RtiIndentDecrease,
+  RtiIndentIncrease,
+  RtiInlineCode,
+  RtiItalic,
+  RtiOrderedList,
+  RtiStrikethrough,
+  RtiSubscript,
+  RtiSuperscript,
+  RtiUnderline,
+} from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoEditor',
@@ -230,48 +248,54 @@ export default defineComponent({
             <Toolbar>
               <ButtonGroupList>
                 <ButtonGroup>
+                  <FormatHistory direction="undo" />
+                  <FormatHistory direction="redo" />
+                </ButtonGroup>
+                <ButtonGroup>
                   <FormatHeading />
+                </ButtonGroup>
+                <ButtonGroup>
                   <FormatFont />
                   <FormatSize />
                 </ButtonGroup>
                 <ButtonGroup>
-                  <FormatMark format="bold" icon="co:text-bold" />
-                  <FormatMark format="italic" icon="co:text-italic" />
-                  <FormatMark format="underline" icon="co:text-underline" />
-                  <FormatMark format="strikethrough" icon="co:text-strikethrough" />
+                  <FormatMark format="bold" icon={RtiBold} />
+                  <FormatMark format="italic" icon={RtiItalic} />
+                  <FormatMark format="underline" icon={RtiUnderline} />
+                  <FormatMark format="strikethrough" icon={RtiStrikethrough} />
+                  <FormatMark format="code" icon={RtiInlineCode} />
                 </ButtonGroup>
                 <ButtonGroup>
-                  <FormatMark format="superscript" icon="co:text-superscript" />
-                  <FormatMark format="subscript" icon="co:text-subscript" />
+                  <FormatMark format="superscript" icon={RtiSuperscript} />
+                  <FormatMark format="subscript" icon={RtiSubscript} />
                 </ButtonGroup>
                 <ButtonGroup>
                   <FormatColor />
                   <FormatBackground />
                 </ButtonGroup>
                 <ButtonGroup>
-                  <FormatList format="numbered-list" icon="co:list-numbered" />
-                  <FormatList format="bulleted-list" icon="co:list-bulleted" />
+                  <FormatList format="numbered-list" icon={RtiOrderedList} />
+                  <FormatList format="bulleted-list" icon={RtiBulletList} />
                 </ButtonGroup>
                 <ButtonGroup>
-                  <FormatIndent delta={-1} icon="co:text-indent-less" />
-                  <FormatIndent delta={+1} icon="co:text-indent-more" />
+                  <FormatIndent delta={-1} icon={RtiIndentDecrease} />
+                  <FormatIndent delta={+1} icon={RtiIndentIncrease} />
                 </ButtonGroup>
                 <ButtonGroup>
-                  <FormatAlign format="left" icon="co:text-align-left" />
-                  <FormatAlign format="center" icon="co:text-align-center" />
-                  <FormatAlign format="right" icon="co:text-align-right" />
-                  <FormatAlign format="justify" icon="co:text-align-justify" />
+                  <FormatAlign format="left" icon={RtiAlignLeft} />
+                  <FormatAlign format="center" icon={RtiAlignCenter} />
+                  <FormatAlign format="right" icon={RtiAlignRight} />
+                  <FormatAlign format="justify" icon={RtiAlignJustify} />
                 </ButtonGroup>
                 <ButtonGroup>
                   <FormatBlockQuote />
-                  <FormatMark format="code" icon="co:code" />
+                  <FormatCodeBlock />
                 </ButtonGroup>
                 <ButtonGroup>
                   <FormatLink />
                   <FormatImage />
                   <FormatVideo />
                   <FormatTable />
-                  <FormatCodeBlock />
                   <FormatFormula />
                 </ButtonGroup>
                 <ButtonGroup>

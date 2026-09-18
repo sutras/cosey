@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import { useLocale } from '../../../hooks';
 import { Icon } from '../../icon';
 import { getCssVar } from '../../../utils';
+import { RtiHelp } from 'richtext-icons';
 
 const TableColumn = defineComponent({
   // 使用和ep一样的组件名
@@ -82,7 +83,9 @@ const TableColumn = defineComponent({
     const renderTooltip = () => (
       <>
         <ElTooltip content={mergedProps.value.tooltip} placement="top">
-          <Icon name="co:help" style={{ marginInlineStart: getCssVar('margin-xxs') }} />
+          <Icon style={{ marginInlineStart: getCssVar('margin-xxs') }}>
+            <RtiHelp />
+          </Icon>
         </ElTooltip>
       </>
     );

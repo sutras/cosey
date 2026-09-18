@@ -2,6 +2,7 @@ import { computed, defineComponent } from 'vue';
 import { Icon } from '../../icon';
 import Button from '../button';
 import { useEditor } from '../pm/context';
+import { RtiQuote } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoEditorFormatBlockQuote',
@@ -20,7 +21,9 @@ export default defineComponent({
     return () => {
       return (
         <Button active={isActive.value} onClick={onClick}>
-          <Icon name="co:quotes" />
+          <Icon>
+            <RtiQuote />
+          </Icon>
         </Button>
       );
     };

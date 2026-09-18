@@ -1,11 +1,9 @@
 <template>
   <div>
     <el-button ref="button" link size="large" :class="bem.b()" @click="onClick">
-      <Icon
-        :class="[bem.e('icon'), bem.is('light', !isDark)]"
-        :name="`${isDark ? 'co:moon' : 'co:sun'}`"
-        size="xl"
-      />
+      <Icon :class="[bem.e('icon'), bem.is('light', !isDark)]" size="xl">
+        <component :is="isDark ? RtiMoon : RtiSun" />
+      </Icon>
     </el-button>
   </div>
 </template>
@@ -13,6 +11,7 @@
 <script lang="tsx" setup>
 import { useColorScheme } from '../../hooks';
 import { Icon } from '../../components';
+import { RtiMoon, RtiSun } from 'richtext-icons';
 import { computed, nextTick, useTemplateRef } from 'vue';
 import { type ButtonInstance, ElButton } from 'element-plus';
 import { createBem } from '../../utils';

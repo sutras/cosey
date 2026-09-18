@@ -1,4 +1,4 @@
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, h, type Component, type PropType } from 'vue';
 import { Icon } from '../../icon';
 import Button from '../button';
 import { useBlockValueActive } from '../hooks/useBlockValueActive';
@@ -9,7 +9,7 @@ export default defineComponent({
   name: 'CoEditorFormatAlign',
   props: {
     icon: {
-      type: String,
+      type: [Object, Function] as PropType<Component>,
       required: true,
     },
     format: {
@@ -29,7 +29,7 @@ export default defineComponent({
     return () => {
       return (
         <Button active={isActive.value} onClick={onClick}>
-          <Icon name={props.icon} />
+          <Icon>{h(props.icon)}</Icon>
         </Button>
       );
     };

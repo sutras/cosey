@@ -23,13 +23,13 @@
               </template>
               <ContextMenuItem
                 :title="t('co.common.reload')"
-                icon="co:rotate-360"
+                :icon="RtiRotate360"
                 :disabled="item.name !== layoutStore.activeTab"
                 @click="layoutStore.reload()"
               />
               <ContextMenuItem
                 :title="t('co.common.close')"
-                icon="co:close-large"
+                :icon="RtiClose"
                 :disabled="!item.meta.closable"
                 divided
                 @click="closeTab(item.name)"
@@ -70,6 +70,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useGlobalConfig } from '../../config';
 import { useLayoutStore } from '../../store';
 import { ContextMenu, ContextMenuItem, Icon } from '../../components';
+import { RtiClose, RtiRotate360 } from 'richtext-icons';
 import Reload from './reload.vue';
 
 import { useLocale } from '../../hooks';

@@ -3,6 +3,7 @@ import Select from './select';
 import FontSizeDelta from './format-size-delta';
 import { useEditor } from '../pm/context';
 import { useMarkValue } from '../hooks/useMarkValue';
+import { RtiFontSizeDecrease, RtiFontSizeIncrease } from 'richtext-icons';
 
 const sizes = [
   '8px',
@@ -61,8 +62,8 @@ export default defineComponent({
             button-width="100px"
             onChange={onChange}
           />
-          <FontSizeDelta delta={-1} icon="co:text-minus" onChange={onDeltaChange} />
-          <FontSizeDelta delta={+1} icon="co:text-plus" onChange={onDeltaChange} />
+          <FontSizeDelta delta={-1} icon={RtiFontSizeDecrease} onChange={onDeltaChange} />
+          <FontSizeDelta delta={+1} icon={RtiFontSizeIncrease} onChange={onDeltaChange} />
         </>
       );
     };

@@ -22,7 +22,9 @@
     </ScrollView>
     <div v-if="!layoutStore.isMobile" :class="bem.e('footer')">
       <el-button text bg size="small" @click="layoutStore.collapse = !layoutStore.collapse">
-        <Icon size="lg" :name="layoutStore.collapse ? 'co:chevron-right' : 'co:chevron-left'" />
+        <Icon size="lg">
+          <component :is="layoutStore.collapse ? RtiChevronRight : RtiChevronLeft" />
+        </Icon>
       </el-button>
     </div>
   </div>
@@ -37,6 +39,7 @@ import { useLayoutStore } from '../../store';
 import { useGlobalConfig } from '../../config';
 import { useOptionalComponent } from '../../hooks';
 import { ScrollView, Icon } from '../../components';
+import { RtiChevronLeft, RtiChevronRight } from 'richtext-icons';
 import { createBem } from '../../utils';
 
 defineOptions({

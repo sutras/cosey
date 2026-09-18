@@ -10,7 +10,7 @@
             <slot v-else name="tooltip"></slot>
           </template>
           <template #default>
-            <Icon name="co:help" :class="bem.e('label-icon')" size="md" />
+            <Icon :class="bem.e('label-icon')" size="md"><RtiHelp /></Icon>
           </template>
         </ElTooltip>
       </template>
@@ -75,6 +75,7 @@ import { ElFormItem, ElTooltip, type FormItemInstance } from 'element-plus';
 import { reactiveOmit } from '@vueuse/core';
 import { useLocale } from '../../hooks';
 import { omit } from 'lodash-es';
+import { RtiHelp } from 'richtext-icons';
 
 defineOptions({
   name: 'CoFormItem',

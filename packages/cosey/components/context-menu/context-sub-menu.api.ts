@@ -1,4 +1,4 @@
-import { type SlotsType, type ExtractPropTypes } from 'vue';
+import { type Component, type SlotsType, type ExtractPropTypes, type PropType } from 'vue';
 
 export const contextSubMenuProps = {
   disabled: {
@@ -8,7 +8,8 @@ export const contextSubMenuProps = {
     type: Boolean,
   },
   icon: {
-    type: String,
+    /** 图标组件，或图标名（如 `co:user`） */
+    type: [String, Object, Function] as PropType<string | Component>,
   },
   title: {
     type: String,

@@ -1,8 +1,9 @@
-import { type ExtractPropTypes } from 'vue';
+import { type Component, type ExtractPropTypes, type PropType } from 'vue';
 
 export const contextMenuContentProps = {
   icon: {
-    type: String,
+    /** 图标组件，或图标名（如 `co:user`） */
+    type: [String, Object, Function] as PropType<string | Component>,
   },
   withIcon: {
     type: Boolean,

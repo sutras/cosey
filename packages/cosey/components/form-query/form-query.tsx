@@ -23,8 +23,8 @@ import {
 } from 'vue';
 import { useTwoWayBinding } from '../../hooks';
 import { useLocale } from '../../hooks';
-import { Search } from '@element-plus/icons-vue';
 import { createBem } from '../../utils';
+import { RtiSearch } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoFormQuery',
@@ -130,7 +130,7 @@ export default defineComponent({
                     type="primary"
                     {...props.submitProps}
                     loading={submitting.value}
-                    icon={Search}
+                    icon={RtiSearch}
                     onClick={() => submit()}
                   >
                     {t(props.submitText)}

@@ -1,10 +1,8 @@
 <template>
   <el-button link size="small" :class="bem.e('reload')" @click="layoutStore.reload()">
-    <Icon
-      name="co:rotate-360"
-      size="xl"
-      :class="[bem.e('reload-icon'), bem.is('spinning', spinning)]"
-    />
+    <Icon size="xl" :class="[bem.e('reload-icon'), bem.is('spinning', spinning)]">
+      <RtiRotate360 />
+    </Icon>
   </el-button>
 </template>
 
@@ -15,6 +13,7 @@ import { Icon } from '../../components';
 import { useLayoutStore } from '../../store';
 import { useTimeoutFn } from '@vueuse/core';
 import { createBem } from '../../utils';
+import { RtiRotate360 } from 'richtext-icons';
 
 defineOptions({
   name: 'CoLayoutReload',

@@ -3,7 +3,7 @@
 @include b(copy) {
   width: css-var(size-lg);
   height: css-var(size-lg) !important;
-  font-size: css-var(font-size-base);
+  font-size: css-var(font-size-medium);
   transition: none;
 
   &:not(.is-copied):hover {

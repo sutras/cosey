@@ -6,6 +6,7 @@ import { FormDialog } from '../../form-dialog';
 import { Form, FormItem } from '../../form';
 import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';
+import { RtiLink } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoEditorFormatLink',
@@ -81,7 +82,9 @@ export default defineComponent({
       return (
         <>
           <Button active={isActive.value} onClick={onClick}>
-            <Icon name="co:link" />
+            <Icon>
+              <RtiLink />
+            </Icon>
           </Button>
 
           <FormDialog v-model={visible.value} title={t('co.editor.insertLink')} width="sm">

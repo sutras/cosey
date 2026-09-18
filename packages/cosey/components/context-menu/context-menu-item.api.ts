@@ -1,4 +1,4 @@
-import { type ExtractPropTypes, type SlotsType } from 'vue';
+import { type Component, type ExtractPropTypes, type PropType, type SlotsType } from 'vue';
 
 export const contextMenuItemProps = {
   command: {},
@@ -9,7 +9,8 @@ export const contextMenuItemProps = {
     type: Boolean,
   },
   icon: {
-    type: String,
+    /** 图标组件，或图标名（如 `co:user`） */
+    type: [String, Object, Function] as PropType<string | Component>,
   },
   title: {
     type: String,

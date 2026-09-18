@@ -38,6 +38,7 @@ import {
 } from '../../utils';
 import { getCssVar } from '../../utils';
 import { useLocale } from '../../hooks';
+import { RtiDelete, RtiPlus } from 'richtext-icons';
 
 defineOptions({
   name: 'CoFormList',
@@ -265,7 +266,9 @@ const template = defineTemplate(() => {
                         })}
                         {!mergedReadonly.value && showRemoveButton.value && (
                           <ElButton link type="danger" onClick={() => remove(index)}>
-                            <Icon name="co:trash-can" size="lg" />
+                            <Icon size="lg">
+                              <RtiDelete />
+                            </Icon>
                           </ElButton>
                         )}
                       </ElSpace>
@@ -276,7 +279,9 @@ const template = defineTemplate(() => {
             </DndSort>
             {!mergedReadonly.value && showAddButton.value && (
               <ElButton link type="primary" onClick={handleAdd}>
-                <Icon name="co:add-large" class={bem.e('plus-icon')} />
+                <Icon class={bem.e('plus-icon')}>
+                  <RtiPlus />
+                </Icon>
                 {t(props.addText)}
               </ElButton>
             )}
