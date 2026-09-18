@@ -2,6 +2,7 @@ import { Icon } from '../icon';
 import { fileCardProps, fileCardSlots } from './file-card.api';
 import { createBem } from '../../utils';
 import { defineComponent } from 'vue';
+import { RtiDocument } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoFileCard',
@@ -13,7 +14,9 @@ export default defineComponent({
     return () => {
       return (
         <div class={[bem.b(), bem.is(props.size)]} title={props.title || props.src}>
-          <Icon name="co:document" />
+          <Icon>
+            <RtiDocument />
+          </Icon>
           <div class={bem.e('filename')}>{props.name}</div>
         </div>
       );

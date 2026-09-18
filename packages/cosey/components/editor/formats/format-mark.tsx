@@ -1,4 +1,4 @@
-import { defineComponent } from 'vue';
+import { defineComponent, h, type Component, type PropType } from 'vue';
 import { Icon } from '../../icon';
 import Button from '../button';
 import { useEditor } from '../pm/context';
@@ -7,7 +7,7 @@ import { useMarkActive } from '../hooks/useMarkActive';
 export default defineComponent({
   name: 'CoEditorFormatMark',
   props: {
-    icon: { type: String, required: true },
+    icon: { type: [Object, Function] as PropType<Component>, required: true },
     format: { type: String, required: true },
   },
   setup(props) {
@@ -21,7 +21,7 @@ export default defineComponent({
     return () => {
       return (
         <Button active={isMarkActive.value} onClick={onClick}>
-          <Icon name={props.icon} />
+          <Icon>{h(props.icon)}</Icon>
         </Button>
       );
     };

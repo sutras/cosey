@@ -7,7 +7,7 @@
         @change="onCheckChange($event, node)"
       />
       <div v-if="!disabled" ref="holderRef" v-bind="holderBinder" :class="bem.e('item-holder')">
-        <Icon name="co:draggable" size="lg" />
+        <Icon size="lg"><RtiDragHandle /></Icon>
       </div>
       <div :class="bem.e('item-label')">
         {{ column.label }}
@@ -19,10 +19,9 @@
           :type="column.fixed === true || column.fixed === 'left' ? 'primary' : ''"
           @click="onFixedLeft(column)"
         >
-          <Icon
-            size="lg"
-            :name="column.fixed === true || column.fixed === 'left' ? 'co:pin-filled' : 'co:pin'"
-          />
+          <Icon size="lg">
+            <component :is="isFixedLeft ? RtiPinFilled : RtiPin" />
+          </Icon>
         </el-button>
         <el-button
           link
@@ -30,11 +29,9 @@
           :type="column.fixed === 'right' ? 'primary' : ''"
           @click="onFixedRight(column)"
         >
-          <Icon
-            size="lg"
-            :name="column.fixed === 'right' ? 'co:pin-filled' : 'co:pin'"
-            style="transform: scaleX(-1)"
-          />
+          <Icon size="lg" style="transform: scaleX(-1)">
+            <component :is="isFixedRight ? RtiPinFilled : RtiPin" />
+          </Icon>
         </el-button>
       </div>
     </div>
@@ -52,6 +49,7 @@ import { createBem } from '../../../utils';
 import { useTreeCheckInject, type CheckableNode } from '../../../hooks';
 import { computed } from 'vue';
 import { ElButton } from 'element-plus';
+import { RtiDragHandle, RtiPin, RtiPinFilled } from 'richtext-icons';
 
 const props = defineProps<{
   node: CheckableNode<TableColumnProps>;
@@ -62,6 +60,10 @@ const props = defineProps<{
 const bem = createBem('table-column-editor');
 
 const column = computed(() => props.node.data);
+
+const isFixedLeft = computed(() => column.value.fixed === true || column.value.fixed === 'left');
+
+const isFixedRight = computed(() => column.value.fixed === 'right');
 
 // drag
 const { disabled, itemRef, holderRef, itemBinder, holderBinder, isPressing } = useDndSortItem(

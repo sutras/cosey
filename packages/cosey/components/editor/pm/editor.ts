@@ -2,6 +2,7 @@ import { ref, type Ref } from 'vue';
 import { type Mark } from 'prosemirror-model';
 import { type Transaction, TextSelection } from 'prosemirror-state';
 import { type EditorView } from 'prosemirror-view';
+import { redo, undo } from 'prosemirror-history';
 import {
   CellSelection,
   addColumnAfter,
@@ -139,6 +140,25 @@ export class EditorFacade {
 
   focus() {
     this.view.focus();
+  }
+
+  // ===== history =====
+
+  /** 不传 dispatch 时命令只做可达性判断，据此决定按钮是否置灰 */
+  canUndo() {
+    return undo(this.state);
+  }
+
+  canRedo() {
+    return redo(this.state);
+  }
+
+  undo() {
+    this.exec(undo);
+  }
+
+  redo() {
+    this.exec(redo);
   }
 
   // ===== marks =====

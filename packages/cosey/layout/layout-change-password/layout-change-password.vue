@@ -14,7 +14,7 @@
           :placeholder="t('co.auth.currentPassword')"
         >
           <template #prefix>
-            <co-icon name="co:password" :class="bem.e('icon')" />
+            <co-icon :class="bem.e('icon')"><RtiPassword /></co-icon>
           </template>
         </el-input>
       </el-form-item>
@@ -31,7 +31,7 @@
           :placeholder="t('co.auth.newPassword')"
         >
           <template #prefix>
-            <co-icon name="co:password" :class="bem.e('icon')" />
+            <co-icon :class="bem.e('icon')"><RtiPassword /></co-icon>
           </template>
         </el-input>
       </el-form-item>
@@ -57,7 +57,7 @@
           :placeholder="t('co.auth.confirmPassword')"
         >
           <template #prefix>
-            <co-icon name="co:password" :class="bem.e('icon')" />
+            <co-icon :class="bem.e('icon')"><RtiPassword /></co-icon>
           </template>
         </el-input>
       </el-form-item>
@@ -90,6 +90,7 @@ import { useUserStore } from '../../store';
 import { ElMessage, type FormInstance, ElButton } from 'element-plus';
 import { useLocale } from '../../hooks';
 import { createBem } from '../../utils';
+import { RtiPassword } from 'richtext-icons';
 
 const { t } = useLocale();
 

@@ -1,4 +1,4 @@
-import { computed, defineComponent, type PropType } from 'vue';
+import { computed, defineComponent, h, type Component, type PropType } from 'vue';
 import { Icon } from '../../icon';
 import Button from '../button';
 import { useEditor } from '../pm/context';
@@ -7,7 +7,7 @@ import { type ListType } from '../types';
 export default defineComponent({
   name: 'CoEditorFormatList',
   props: {
-    icon: { type: String, required: true },
+    icon: { type: [Object, Function] as PropType<Component>, required: true },
     format: { type: String as PropType<ListType>, required: true },
   },
   setup(props) {
@@ -25,7 +25,7 @@ export default defineComponent({
     return () => {
       return (
         <Button active={isListActive.value} onClick={onClick}>
-          <Icon name={props.icon} />
+          <Icon>{h(props.icon)}</Icon>
         </Button>
       );
     };

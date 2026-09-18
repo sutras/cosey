@@ -78,7 +78,7 @@ const [tableProps, { reload, getSelectionRows }] = useTable(
     columns: [
       { type: 'selection' },
       { prop: 'id', label: 'ID' },
-      { prop: 'nickname', label: t('user.nickname') },
+      { prop: 'nickname', label: t('user.nickname'), tooltip: t('user.nickname') },
       {
         label: t('user.contact'),
         columns: [

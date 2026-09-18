@@ -2,6 +2,7 @@ import { computed, defineComponent } from 'vue';
 import { Icon } from '../../icon';
 import Button from '../button';
 import { useEditor } from '../pm/context';
+import { RtiCodeBlock } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoEditorFormatCodeBlock',
@@ -20,7 +21,9 @@ export default defineComponent({
     return () => {
       return (
         <Button active={isActive.value} onClick={onClick}>
-          <Icon name="co:code-block" />
+          <Icon>
+            <RtiCodeBlock />
+          </Icon>
         </Button>
       );
     };

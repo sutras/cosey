@@ -2,6 +2,7 @@ import { computed, defineComponent, ref, watch } from 'vue';
 import { ElButton } from 'element-plus';
 import { toggleProps, toggleSlots, toggleEmits } from './toggle.api';
 import { Icon } from '../icon';
+import { RtiChevronDown, RtiChevronUp } from 'richtext-icons';
 import { useLocale } from '../../hooks';
 
 export default defineComponent({
@@ -34,7 +35,7 @@ export default defineComponent({
       return (
         <ElButton type="primary" link onClick={handleClick}>
           {text.value}
-          <Icon name={innerValue.value ? 'co:chevron-down' : 'co:chevron-up'} size="xl" />
+          <Icon size="xl">{innerValue.value ? <RtiChevronDown /> : <RtiChevronUp />}</Icon>
         </ElButton>
       );
     };

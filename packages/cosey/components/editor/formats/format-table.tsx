@@ -4,6 +4,7 @@ import Button from '../button';
 import { Icon } from '../../icon';
 import { createBem } from '../../../utils';
 import { useEditor } from '../pm/context';
+import { RtiTable } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoEditorFormatTable',
@@ -59,7 +60,9 @@ export default defineComponent({
           v-slots={{
             default: () => (
               <Button ref="button" onClick={onBtnClick}>
-                <Icon name="co:table" />
+                <Icon>
+                  <RtiTable />
+                </Icon>
               </Button>
             ),
             content: () => (

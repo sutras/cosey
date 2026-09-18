@@ -1,4 +1,4 @@
-import { defineComponent } from 'vue';
+import { defineComponent, h, type Component, type PropType } from 'vue';
 import Button from '../button';
 import { Icon } from '../../icon';
 import { isString } from '../../../utils';
@@ -7,7 +7,7 @@ import { useEditor } from '../pm/context';
 export default defineComponent({
   name: 'CoEditorFormatSizeDelta',
   props: {
-    icon: { type: String, required: true },
+    icon: { type: [Object, Function] as PropType<Component>, required: true },
     delta: { type: Number, required: true },
   },
   emits: {
@@ -25,7 +25,7 @@ export default defineComponent({
     return () => {
       return (
         <Button onClick={onClick}>
-          <Icon name={props.icon} />
+          <Icon>{h(props.icon)}</Icon>
         </Button>
       );
     };

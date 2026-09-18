@@ -8,6 +8,7 @@
     align-items: center;
 
     @include e(item-holder) {
+      display: flex;
       margin-inline-end: css-var(margin-xs);
       width: css-var(size);
       flex: none;

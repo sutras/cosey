@@ -2,6 +2,7 @@ import { defineComponent } from 'vue';
 import { Icon } from '../icon';
 import { closeEmits } from './close.api';
 import { createBem } from '../../utils';
+import { RtiClose } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoClose',
@@ -12,7 +13,9 @@ export default defineComponent({
     return () => {
       return (
         <span class={bem.b()} onClick={(event) => emit('click', event)}>
-          <Icon name="co:close-large" />
+          <Icon>
+            <RtiClose />
+          </Icon>
         </span>
       );
     };

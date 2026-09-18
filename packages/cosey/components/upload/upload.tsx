@@ -31,6 +31,7 @@ import { Icon } from '../icon';
 
 import { useLocale } from '../../hooks';
 import { injectUploadConfig } from '../../config/upload';
+import { RtiPlus } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoUpload',
@@ -275,7 +276,9 @@ export default defineComponent({
 
           {showSelect.value && (
             <div class={[bem.e('select'), bem.is(props.size)]} onClick={onSelect}>
-              <Icon name="co:add-large" size="24" />
+              <Icon size="24">
+                <RtiPlus />
+              </Icon>
             </div>
           )}
         </div>

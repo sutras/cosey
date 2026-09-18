@@ -3,6 +3,7 @@ import { defineComponent, reactive, toRef } from 'vue';
 import { useDndSortItem } from './useDndSortItem';
 import { Icon } from '../icon';
 import { createBem } from '../../utils';
+import { RtiDragHandle } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoDndSortItem',
@@ -24,7 +25,9 @@ export default defineComponent({
             {slots.prepend?.({})}
             {!disabled.value && (
               <div ref={holderRef} {...holderBinder} class={bem.e('item-holder')}>
-                <Icon name="co:draggable" size="lg" />
+                <Icon size="lg">
+                  <RtiDragHandle />
+                </Icon>
               </div>
             )}
             <div class={bem.e('item-content')}>{slots.default?.({})}</div>

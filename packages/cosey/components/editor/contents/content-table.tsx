@@ -21,19 +21,30 @@ import { Icon } from '../../icon';
 import ButtonGroup from '../button-group';
 import Button from '../button';
 import ColorPicker from '../formats/color-picker';
-import {
-  cellBackgroundIcon,
-  cellTextColorIcon,
-  headerCellIcon,
-  headerColumnIcon,
-  headerRowIcon,
-  mergeCellsIcon,
-  splitCellIcon,
-  verticalAlignBottomIcon,
-  verticalAlignMiddleIcon,
-  verticalAlignTopIcon,
-} from './table-icons';
 import ButtonGroupList from '../button-group-list';
+import {
+  RtiAlignBottom,
+  RtiAlignCenterVertical,
+  RtiAlignTop,
+  RtiCellBackground,
+  RtiCellHeader,
+  RtiCellTextColor,
+  RtiColumnDelete,
+  RtiColumnHeader,
+  RtiColumnInsert,
+  RtiColumnInsertLeft,
+  RtiColumnMoveLeft,
+  RtiColumnMoveRight,
+  RtiMergeCells,
+  RtiRowDelete,
+  RtiRowHeader,
+  RtiRowInsert,
+  RtiRowInsertAbove,
+  RtiRowMoveDown,
+  RtiRowMoveUp,
+  RtiSplitCells,
+  RtiTableDelete,
+} from 'richtext-icons';
 
 /**
  * 工具条默认贴在表格上方，但编辑区上方空间不足时（表格就是文档第一块）它会盖住
@@ -387,44 +398,64 @@ export default defineComponent({
                     <ButtonGroupList>
                       <ButtonGroup>
                         <Button title="上移行" onClick={() => editor.moveRowUp()}>
-                          <Icon name="co:chevron-up" />
+                          <Icon>
+                            <RtiRowMoveUp />
+                          </Icon>
                         </Button>
                         <Button title="上方插入行" onClick={() => editor.insertRowAbove()}>
-                          <Icon name="co:table-row-plus-before" />
+                          <Icon>
+                            <RtiRowInsertAbove />
+                          </Icon>
                         </Button>
                         <Button title="下方插入行" onClick={() => editor.insertRowBelow()}>
-                          <Icon name="co:table-row-plus-after" />
+                          <Icon>
+                            <RtiRowInsert />
+                          </Icon>
                         </Button>
                         <Button title="下移行" onClick={() => editor.moveRowDown()}>
-                          <Icon name="co:chevron-down" />
+                          <Icon>
+                            <RtiRowMoveDown />
+                          </Icon>
                         </Button>
                         <Button title="删除行" onClick={() => editor.deleteRow()}>
-                          <Icon name="co:table-row-remove" />
+                          <Icon>
+                            <RtiRowDelete />
+                          </Icon>
                         </Button>
                       </ButtonGroup>
                       <ButtonGroup>
                         <Button title="左移列" onClick={() => editor.moveColumnLeft()}>
-                          <Icon name="co:chevron-left" />
+                          <Icon>
+                            <RtiColumnMoveLeft />
+                          </Icon>
                         </Button>
                         <Button title="左侧插入列" onClick={() => editor.insertColumnLeft()}>
-                          <Icon name="co:table-column-plus-before" />
+                          <Icon>
+                            <RtiColumnInsertLeft />
+                          </Icon>
                         </Button>
                         <Button title="右侧插入列" onClick={() => editor.insertColumnRight()}>
-                          <Icon name="co:table-column-plus-after" />
+                          <Icon>
+                            <RtiColumnInsert />
+                          </Icon>
                         </Button>
                         <Button title="右移列" onClick={() => editor.moveColumnRight()}>
-                          <Icon name="co:chevron-right" />
+                          <Icon>
+                            <RtiColumnMoveRight />
+                          </Icon>
                         </Button>
                         <Button title="删除列" onClick={() => editor.deleteColumn()}>
-                          <Icon name="co:table-column-remove" />
+                          <Icon>
+                            <RtiColumnDelete />
+                          </Icon>
                         </Button>
                       </ButtonGroup>
                       <ButtonGroup>
                         <Button title="合并单元格" onClick={() => editor.mergeCells()}>
-                          {mergeCellsIcon()}
+                          <RtiMergeCells />
                         </Button>
                         <Button title="拆分单元格" onClick={() => editor.splitCell()}>
-                          {splitCellIcon()}
+                          <RtiSplitCells />
                         </Button>
                       </ButtonGroup>
                       <ButtonGroup>
@@ -433,21 +464,21 @@ export default defineComponent({
                           active={tableState.headerRow}
                           onClick={() => editor.toggleHeaderRow()}
                         >
-                          {headerRowIcon()}
+                          <RtiRowHeader />
                         </Button>
                         <Button
                           title="选中列设为标题列"
                           active={tableState.headerColumn}
                           onClick={() => editor.toggleHeaderColumn()}
                         >
-                          {headerColumnIcon()}
+                          <RtiColumnHeader />
                         </Button>
                         <Button
                           title="当前单元格设为标题单元格"
                           active={tableState.headerCell}
                           onClick={() => editor.toggleHeaderCell()}
                         >
-                          {headerCellIcon()}
+                          <RtiCellHeader />
                         </Button>
                       </ButtonGroup>
                       <ButtonGroup>
@@ -462,7 +493,7 @@ export default defineComponent({
                             pickerTrigger
                             onClick={onToggleColor}
                           >
-                            {cellBackgroundIcon(tableState.background)()}
+                            <RtiCellBackground />
                           </Button>
                         </ColorPicker>
                         <ColorPicker
@@ -476,7 +507,7 @@ export default defineComponent({
                             pickerTrigger
                             onClick={onToggleTextColor}
                           >
-                            {cellTextColorIcon(tableState.color)()}
+                            <RtiCellTextColor />
                           </Button>
                         </ColorPicker>
                       </ButtonGroup>
@@ -486,26 +517,28 @@ export default defineComponent({
                           active={tableState.verticalAlign === 'top'}
                           onClick={() => onVerticalAlign('top')}
                         >
-                          {verticalAlignTopIcon()}
+                          <RtiAlignTop />
                         </Button>
                         <Button
                           title="垂直居中"
                           active={tableState.verticalAlign === 'middle'}
                           onClick={() => onVerticalAlign('middle')}
                         >
-                          {verticalAlignMiddleIcon()}
+                          <RtiAlignCenterVertical />
                         </Button>
                         <Button
                           title="底端对齐"
                           active={tableState.verticalAlign === 'bottom'}
                           onClick={() => onVerticalAlign('bottom')}
                         >
-                          {verticalAlignBottomIcon()}
+                          <RtiAlignBottom />
                         </Button>
                       </ButtonGroup>
                       <ButtonGroup>
                         <Button title="删除表格" onClick={() => editor.deleteTable()}>
-                          <Icon name="co:table-remove" />
+                          <Icon>
+                            <RtiTableDelete />
+                          </Icon>
                         </Button>
                       </ButtonGroup>
                     </ButtonGroupList>

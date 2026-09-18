@@ -4,6 +4,7 @@ import { audioCardProps, audioCardEmits } from './audio-card.api';
 import { Icon } from '../icon';
 import { AudioViewer } from '../audio-viewer';
 import { createBem } from '../../utils';
+import { RtiVolumeUp } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoAudioCard',
@@ -42,7 +43,9 @@ export default defineComponent({
             title={props.title || props.src}
             onClick={() => openViewer()}
           >
-            <Icon name="co:volume-up" />
+            <Icon>
+              <RtiVolumeUp />
+            </Icon>
             <div class={bem.e('filename')}>{props.name}</div>
           </div>
 

@@ -11,10 +11,12 @@ import {
   onBeforeUnmount,
   onMounted,
   provide,
+  type Component,
   type Ref,
   ref,
   watch,
 } from 'vue';
+import { RtiCircleHalfFull, RtiMoon, RtiSun } from 'richtext-icons';
 import { isClient } from '../utils';
 import { persist } from '../persist';
 
@@ -27,7 +29,8 @@ type AppliedColorScheme = 'dark' | 'light';
 
 export interface ColorSchemeOption {
   label: string;
-  icon: string;
+  /** 图标组件，直接 `<component :is="option.icon" />` 渲染 */
+  icon: Component;
   value: ColorScheme;
 }
 
@@ -38,9 +41,9 @@ interface ColorSchemeContext {
 }
 
 export const colorSchemeOptions: ColorSchemeOption[] = [
-  { label: 'co.colorScheme.auto', icon: 'co:circle-half-full', value: 'auto' },
-  { label: 'co.colorScheme.light', icon: 'co:sun', value: 'light' },
-  { label: 'co.colorScheme.dark', icon: 'co:moon', value: 'dark' },
+  { label: 'co.colorScheme.auto', icon: RtiCircleHalfFull, value: 'auto' },
+  { label: 'co.colorScheme.light', icon: RtiSun, value: 'light' },
+  { label: 'co.colorScheme.dark', icon: RtiMoon, value: 'dark' },
 ];
 
 export function useColorSchemeProvide() {

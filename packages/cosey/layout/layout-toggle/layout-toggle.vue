@@ -1,9 +1,8 @@
 <template>
   <el-button link @click.stop="toggle">
-    <Icon
-      :name="layoutStore.sidebarVisible ? 'co:side-panel-close' : 'co:side-panel-open'"
-      size="xl"
-    />
+    <Icon size="xl">
+      <component :is="layoutStore.sidebarVisible ? RtiSidePanelClose : RtiSidePanelOpen" />
+    </Icon>
   </el-button>
 </template>
 
@@ -11,6 +10,7 @@
 import { ElButton } from 'element-plus';
 import { useLayoutStore } from '../../store';
 import { Icon } from '../../components';
+import { RtiSidePanelClose, RtiSidePanelOpen } from 'richtext-icons';
 
 defineOptions({
   name: 'CoLayoutToggle',

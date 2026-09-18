@@ -2,6 +2,7 @@ import { defineComponent, inject, onMounted, useTemplateRef } from 'vue';
 import { createBem } from '../../utils';
 import { Icon } from '../icon';
 import { pickerContextKey } from './formats/picker.api';
+import { RtiChevronDown } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoEditorButtonSelect',
@@ -35,7 +36,9 @@ export default defineComponent({
           onClick={(event) => emit('click', event)}
         >
           <div class={bem.e('text')}>{slots.default?.()}</div>
-          <Icon class={bem.e('arrow')} name="co:chevron-down" size="lg" />
+          <Icon class={bem.e('arrow')} size="lg">
+            <RtiChevronDown />
+          </Icon>
         </button>
       );
     };

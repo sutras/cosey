@@ -3,6 +3,7 @@ import { ElButton } from 'element-plus';
 import { useClipboard } from '@vueuse/core';
 import { copyProps } from './copy.api';
 import Icon from '../icon';
+import { RtiCheck, RtiCopy } from 'richtext-icons';
 import { createBem } from '../../utils';
 
 export default defineComponent({
@@ -22,7 +23,7 @@ export default defineComponent({
           style={{ color: props.color }}
           onClick={() => copy(props.text || '')}
         >
-          <Icon name={copied.value ? 'co:checkmark' : 'co:copy'} class={bem.e('icon')} />
+          <Icon class={bem.e('icon')}>{copied.value ? <RtiCheck /> : <RtiCopy />}</Icon>
         </ElButton>
       );
     };

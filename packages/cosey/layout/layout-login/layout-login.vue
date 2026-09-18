@@ -8,7 +8,7 @@
       >
         <el-input v-model="formState.username" size="large" :placeholder="t('co.auth.username')">
           <template #prefix>
-            <co-icon name="co:user" :class="bem.e('icon')" />
+            <co-icon :class="bem.e('icon')"><RtiUser /></co-icon>
           </template>
         </el-input>
       </el-form-item>
@@ -25,7 +25,7 @@
           :placeholder="t('co.auth.password')"
         >
           <template #prefix>
-            <co-icon name="co:password" :class="bem.e('icon')" />
+            <co-icon :class="bem.e('icon')"><RtiPassword /></co-icon>
           </template>
         </el-input>
       </el-form-item>
@@ -43,7 +43,7 @@
             :placeholder="t('co.auth.captcha')"
           >
             <template #prefix>
-              <co-icon name="co:certificate-check" :class="bem.e('icon')" />
+              <co-icon :class="bem.e('icon')"><RtiCaptcha /></co-icon>
             </template>
           </el-input>
           <img :class="bem.e('captcha')" :src="captchaUrl" @click="getCaptcha" />
@@ -71,6 +71,7 @@ import { useLocale } from '../../hooks';
 import { type LoginFormModel, useGlobalConfig } from '../../config';
 import { warningOnce } from '../../utils';
 import { createBem } from '../../utils';
+import { RtiCaptcha, RtiPassword, RtiUser } from 'richtext-icons';
 
 const { t } = useLocale();
 

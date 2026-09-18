@@ -5,6 +5,7 @@ import { isString, createBem } from '../../utils';
 import { MediaCard } from '../media-card';
 import { Icon } from '../icon';
 import { useLocale } from '../../hooks';
+import { RtiClose, RtiCloseFilled } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoUploadItem',
@@ -73,7 +74,9 @@ export default defineComponent({
                   >
                     {({ percentage }: any) => {
                       return props.file.status === 'error' ? (
-                        <Icon name="co:close-filled" size="lg" />
+                        <Icon size="lg">
+                          <RtiCloseFilled />
+                        </Icon>
                       ) : (
                         <span class={bem.e('progress-text')}>{progressFormat(percentage)}</span>
                       );
@@ -119,7 +122,9 @@ export default defineComponent({
           </Transition>
           {showRemove.value && (
             <div class={bem.e('remove')} onClick={() => emit('remove')}>
-              <Icon name="co:close-large" size="md" />
+              <Icon size="md">
+                <RtiClose />
+              </Icon>
             </div>
           )}
         </div>

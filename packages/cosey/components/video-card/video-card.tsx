@@ -4,6 +4,7 @@ import { useLockscreen } from 'element-plus';
 import VideoViewer from '../video-viewer';
 import { Icon } from '../icon';
 import { createBem } from '../../utils';
+import { RtiPlayCircleOutline } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoVideoCard',
@@ -44,7 +45,9 @@ export default defineComponent({
           >
             <video src={props.src} class={bem.e('video')} />
             <div class={bem.e('play-mask')}>
-              <Icon name="co:play-circle-outline" class={bem.e('play-icon')} />
+              <Icon class={bem.e('play-icon')}>
+                <RtiPlayCircleOutline />
+              </Icon>
             </div>
           </div>
 

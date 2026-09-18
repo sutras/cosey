@@ -6,6 +6,7 @@ import { ElInput } from 'element-plus';
 import { TinyColor } from '@ctrl/tinycolor';
 import { useHistoryColor } from '../hooks/useHistoryColor';
 import { isBoolean, isString, createBem } from '../../../utils';
+import { RtiColorPicker, RtiSlashForward } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoEditorColorPicker',
@@ -118,7 +119,9 @@ export default defineComponent({
                 <div class={bem.e('manual')}>
                   {isEyeDropperSupported.value && (
                     <button type="button" class={bem.e('btn')} onClick={onAbsorb}>
-                      <Icon name="co:eyedropper" size="lg" />
+                      <Icon size="lg">
+                        <RtiColorPicker />
+                      </Icon>
                     </button>
                   )}
                   <ElInput
@@ -138,7 +141,9 @@ export default defineComponent({
                     class={[bem.e('color'), bem.e('btn'), bem.e('clear')]}
                     onClick={onClear}
                   >
-                    <Icon name="co:slash-forward" size="lg" />
+                    <Icon size="lg">
+                      <RtiSlashForward />
+                    </Icon>
                   </button>
                 </div>
               </>
