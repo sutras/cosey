@@ -37,7 +37,7 @@ export default defineComponent({
     const { addItem, removeItem, select, enter, leave, withIcon } = useItemInject();
 
     const itemInstance = reactive({
-      icon: computed(() => !!props.icon),
+      icon: computed(() => !!props.icon || !!slots.icon),
       hide: () => {
         hide();
       },
@@ -128,7 +128,7 @@ export default defineComponent({
       }
     });
 
-    const { addSub, removeSub, showSub, hideSub } = useSubInject();
+    const { addSub, removeSub, showSub, hideSub, persistent } = useSubInject();
 
     const subInstance = reactive({
       show,
@@ -207,24 +207,40 @@ export default defineComponent({
               hover={visible.value}
               arrow
               disabled={props.disabled}
+              v-slots={slots.icon ? { icon: () => slots.icon!({}) } : undefined}
             />
           </div>
 
-          <Transition name="co-fade-out">
-            {visible.value && (
-              <Teleport to="body">
-                <div
-                  ref="sub"
-                  class={bem.b()}
-                  style={subStyle.value}
-                  onPointerenter={onEnter}
-                  onPointerleave={onLeave}
-                >
-                  {slots.default?.({})}
-                </div>
-              </Teleport>
-            )}
-          </Transition>
+          {persistent ? (
+            <Teleport to="body">
+              <div
+                ref="sub"
+                v-show={visible.value}
+                class={bem.b()}
+                style={subStyle.value}
+                onPointerenter={onEnter}
+                onPointerleave={onLeave}
+              >
+                {slots.default?.({})}
+              </div>
+            </Teleport>
+          ) : (
+            <Transition name="co-fade-out">
+              {visible.value && (
+                <Teleport to="body">
+                  <div
+                    ref="sub"
+                    class={bem.b()}
+                    style={subStyle.value}
+                    onPointerenter={onEnter}
+                    onPointerleave={onLeave}
+                  >
+                    {slots.default?.({})}
+                  </div>
+                </Teleport>
+              )}
+            </Transition>
+          )}
         </>
       );
     };

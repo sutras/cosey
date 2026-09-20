@@ -2,6 +2,7 @@ import { computed, defineComponent } from 'vue';
 import Select from './select';
 import FontSizeDelta from './format-size-delta';
 import { useEditor } from '../pm/context';
+import { useLocale } from '../../../hooks';
 import { useMarkValue } from '../hooks/useMarkValue';
 import { RtiFontSizeDecrease, RtiFontSizeIncrease } from 'richtext-icons';
 
@@ -25,6 +26,8 @@ const sizes = [
 export default defineComponent({
   name: 'CoEditorFormatSize',
   setup() {
+    const { t } = useLocale();
+
     const list = computed(() => {
       const sizeList = sizes.map((size) => {
         return {
@@ -34,7 +37,7 @@ export default defineComponent({
       });
       return [
         {
-          label: '默认字号',
+          label: t('co.editor.defaultFontSize'),
           value: '',
         },
         ...sizeList,

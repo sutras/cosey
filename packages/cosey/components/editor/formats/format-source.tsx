@@ -35,7 +35,7 @@ export default defineComponent({
     return () => {
       return (
         <>
-          <Button onClick={onClick}>
+          <Button title={t('co.editor.sourceCode')} onClick={onClick}>
             <Icon>
               <RtiSourceCode />
             </Icon>

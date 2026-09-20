@@ -15,12 +15,27 @@ export const contextMenuItemProps = {
   title: {
     type: String,
   },
+  /**
+   * 点击后是否关闭整个菜单。默认 `true`。
+   * 当菜单项内嵌了需要继续交互的浮层（如下拉、网格选择器）时设为 `false`。
+   */
+  closeOnSelect: {
+    type: Boolean,
+    default: true,
+  },
+  /** 是否为当前激活态（如当前选中的标题层级、列表类型、对齐方式）。 */
+  active: {
+    type: Boolean,
+  },
 };
 
 export type ContextMenuItemProps = ExtractPropTypes<typeof contextMenuItemProps>;
 
 export interface ContextMenuItemSlots {
+  /** 菜单项正文内容（覆盖 `title`）。 */
   default: {};
+  /** 图标插槽：覆盖 `icon` prop，放置图标组件。 */
+  icon: {};
 }
 
 export const contextMenuItemSlots = Object as SlotsType<ContextMenuItemSlots>;

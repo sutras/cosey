@@ -1,13 +1,18 @@
-import { defineComponent, h } from 'vue';
+import { defineComponent, h, useTemplateRef } from 'vue';
 import { Icon } from '../icon';
 import { createBem, isString } from '../../utils';
-import { contextMenuContentProps } from './content.api';
+import { contextMenuContentProps, contextMenuContentSlots } from './content.api';
 import { RtiChevronRight } from 'richtext-icons';
 
 export default defineComponent({
   props: contextMenuContentProps,
-  setup(props, { attrs }) {
+  slots: contextMenuContentSlots,
+  setup(props, { attrs, slots, expose }) {
     const bem = createBem('context-menu');
+
+    const itemRef = useTemplateRef<HTMLElement>('item');
+
+    expose({ el: itemRef });
 
     return () => {
       return (
@@ -18,15 +23,28 @@ export default defineComponent({
             bem.e('content'),
             bem.is('disabled', props.disabled),
             bem.is('hover', props.hover),
+            bem.is('active', props.active),
           ]}
         >
-          {props.withIcon && (
-            <div class={bem.e('content-icon')}>
-              {props.icon &&
-                (isString(props.icon) ? <Icon name={props.icon} /> : <Icon>{h(props.icon)}</Icon>)}
-            </div>
+          {slots.icon ? (
+            <div class={bem.e('content-icon')}>{slots.icon({})}</div>
+          ) : (
+            props.withIcon && (
+              <div class={bem.e('content-icon')}>
+                {props.icon &&
+                  (isString(props.icon) ? (
+                    <Icon name={props.icon} />
+                  ) : (
+                    <Icon>{h(props.icon)}</Icon>
+                  ))}
+              </div>
+            )
           )}
-          <span class={bem.e('content-title')}>{props.title}</span>
+          {slots.default ? (
+            <div class={bem.e('content-body')}>{slots.default({})}</div>
+          ) : (
+            <span class={bem.e('content-title')}>{props.title}</span>
+          )}
           <div class={bem.e('content-arrow')}>
             {props.arrow && (
               <Icon class={bem.e('content-arrow-icon')} size="lg">

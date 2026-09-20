@@ -12,6 +12,8 @@ export default defineComponent({
     active: { type: Boolean },
     disabled: { type: Boolean },
     title: { type: String },
+    /** 可选的文字标签：有值时按钮显示「图标 + 文字」，宽度自适应（用于上下文菜单） */
+    label: { type: String },
     /**
      * 作为外层 Picker 的触发器时打开：把自身元素登记给它。
      * 否则 Picker 会把这个触发器的点击当成「点到弹层外面」，刚打开就自己关掉。
@@ -43,13 +45,19 @@ export default defineComponent({
         <button
           ref="button"
           type="button"
-          title={props.title}
+          title={props.title ?? props.label}
           disabled={props.disabled}
-          class={[bem.b(), bem.is('active', props.active), bem.is('disabled', props.disabled)]}
+          class={[
+            bem.b(),
+            bem.is('active', props.active),
+            bem.is('disabled', props.disabled),
+            bem.is('with-label', !!props.label),
+          ]}
           onClick={(event) => emit('click', event)}
           onMousedown={(event) => event.preventDefault()}
         >
           {slots.default?.()}
+          {props.label && <span class={bem.e('label')}>{props.label}</span>}
         </button>
       );
     };

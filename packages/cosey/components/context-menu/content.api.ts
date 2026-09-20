@@ -1,4 +1,4 @@
-import { type Component, type ExtractPropTypes, type PropType } from 'vue';
+import { type Component, type ExtractPropTypes, type PropType, type SlotsType } from 'vue';
 
 export const contextMenuContentProps = {
   icon: {
@@ -20,6 +20,17 @@ export const contextMenuContentProps = {
   hover: {
     type: Boolean,
   },
+  active: {
+    type: Boolean,
+  },
 };
 
 export type ContextMenuContentProps = ExtractPropTypes<typeof contextMenuContentProps>;
+
+export interface ContextMenuContentSlots {
+  default: {};
+  /** 图标插槽：覆盖默认的 `content-icon` 列，可放置任意图标组件。 */
+  icon: {};
+}
+
+export const contextMenuContentSlots = Object as SlotsType<ContextMenuContentSlots>;

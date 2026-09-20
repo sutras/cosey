@@ -2,6 +2,7 @@ import { defineComponent, h, type Component, type PropType } from 'vue';
 import Button from '../button';
 import { Icon } from '../../icon';
 import { isString } from '../../../utils';
+import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';
 
 export default defineComponent({
@@ -9,12 +10,14 @@ export default defineComponent({
   props: {
     icon: { type: [Object, Function] as PropType<Component>, required: true },
     delta: { type: Number, required: true },
+    label: { type: String },
   },
   emits: {
     change: (size: string) => isString(size),
   },
   setup(props, { emit }) {
     const editor = useEditor();
+    const { t } = useLocale();
 
     const onClick = () => {
       editor.formatSizeDelta(props.delta, (numSize) => {
@@ -24,7 +27,14 @@ export default defineComponent({
 
     return () => {
       return (
-        <Button onClick={onClick}>
+        <Button
+          label={props.label}
+          title={
+            props.label ??
+            t(props.delta > 0 ? 'co.editor.fontSizeIncrease' : 'co.editor.fontSizeDecrease')
+          }
+          onClick={onClick}
+        >
           <Icon>{h(props.icon)}</Icon>
         </Button>
       );
