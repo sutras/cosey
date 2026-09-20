@@ -396,7 +396,7 @@ export default defineComponent({
                 default: () => (
                   <div ref="tableToolbar" class={bem.e('toolbar')}>
                     <ButtonGroupList>
-                      <ButtonGroup>
+                      <ButtonGroup duo>
                         <Button title="上移行" onClick={() => editor.moveRowUp()}>
                           <Icon>
                             <RtiRowMoveUp />
@@ -407,23 +407,16 @@ export default defineComponent({
                             <RtiRowInsertAbove />
                           </Icon>
                         </Button>
-                        <Button title="下方插入行" onClick={() => editor.insertRowBelow()}>
-                          <Icon>
-                            <RtiRowInsert />
-                          </Icon>
-                        </Button>
                         <Button title="下移行" onClick={() => editor.moveRowDown()}>
                           <Icon>
                             <RtiRowMoveDown />
                           </Icon>
                         </Button>
-                        <Button title="删除行" onClick={() => editor.deleteRow()}>
+                        <Button title="下方插入行" onClick={() => editor.insertRowBelow()}>
                           <Icon>
-                            <RtiRowDelete />
+                            <RtiRowInsert />
                           </Icon>
                         </Button>
-                      </ButtonGroup>
-                      <ButtonGroup>
                         <Button title="左移列" onClick={() => editor.moveColumnLeft()}>
                           <Icon>
                             <RtiColumnMoveLeft />
@@ -434,37 +427,39 @@ export default defineComponent({
                             <RtiColumnInsertLeft />
                           </Icon>
                         </Button>
-                        <Button title="右侧插入列" onClick={() => editor.insertColumnRight()}>
-                          <Icon>
-                            <RtiColumnInsert />
-                          </Icon>
-                        </Button>
                         <Button title="右移列" onClick={() => editor.moveColumnRight()}>
                           <Icon>
                             <RtiColumnMoveRight />
                           </Icon>
                         </Button>
-                        <Button title="删除列" onClick={() => editor.deleteColumn()}>
+                        <Button title="右侧插入列" onClick={() => editor.insertColumnRight()}>
                           <Icon>
-                            <RtiColumnDelete />
+                            <RtiColumnInsert />
                           </Icon>
                         </Button>
                       </ButtonGroup>
-                      <ButtonGroup>
-                        <Button title="合并单元格" onClick={() => editor.mergeCells()}>
-                          <RtiMergeCells />
+
+                      <ButtonGroup duo>
+                        <Button
+                          title="顶端对齐"
+                          active={tableState.verticalAlign === 'top'}
+                          onClick={() => onVerticalAlign('top')}
+                        >
+                          <RtiAlignTop />
                         </Button>
-                        <Button title="拆分单元格" onClick={() => editor.splitCell()}>
-                          <RtiSplitCells />
-                        </Button>
-                      </ButtonGroup>
-                      <ButtonGroup>
                         <Button
                           title="选中行设为标题行"
                           active={tableState.headerRow}
                           onClick={() => editor.toggleHeaderRow()}
                         >
                           <RtiRowHeader />
+                        </Button>
+                        <Button
+                          title="垂直居中"
+                          active={tableState.verticalAlign === 'middle'}
+                          onClick={() => onVerticalAlign('middle')}
+                        >
+                          <RtiAlignCenterVertical />
                         </Button>
                         <Button
                           title="选中列设为标题列"
@@ -474,6 +469,13 @@ export default defineComponent({
                           <RtiColumnHeader />
                         </Button>
                         <Button
+                          title="底端对齐"
+                          active={tableState.verticalAlign === 'bottom'}
+                          onClick={() => onVerticalAlign('bottom')}
+                        >
+                          <RtiAlignBottom />
+                        </Button>
+                        <Button
                           title="当前单元格设为标题单元格"
                           active={tableState.headerCell}
                           onClick={() => editor.toggleHeaderCell()}
@@ -481,7 +483,11 @@ export default defineComponent({
                           <RtiCellHeader />
                         </Button>
                       </ButtonGroup>
-                      <ButtonGroup>
+
+                      <ButtonGroup duo>
+                        <Button title="合并单元格" onClick={() => editor.mergeCells()}>
+                          <RtiMergeCells />
+                        </Button>
                         <ColorPicker
                           v-model:visible={colorVisible.value}
                           onSelect={(color: string) => onSelectColor(color)}
@@ -496,6 +502,9 @@ export default defineComponent({
                             <RtiCellBackground />
                           </Button>
                         </ColorPicker>
+                        <Button title="拆分单元格" onClick={() => editor.splitCell()}>
+                          <RtiSplitCells />
+                        </Button>
                         <ColorPicker
                           v-model:visible={textColorVisible.value}
                           onSelect={(color: string) => onSelectTextColor(color)}
@@ -511,30 +520,19 @@ export default defineComponent({
                           </Button>
                         </ColorPicker>
                       </ButtonGroup>
-                      <ButtonGroup>
-                        <Button
-                          title="顶端对齐"
-                          active={tableState.verticalAlign === 'top'}
-                          onClick={() => onVerticalAlign('top')}
-                        >
-                          <RtiAlignTop />
+
+                      <ButtonGroup duo>
+                        <Button title="删除行" onClick={() => editor.deleteRow()}>
+                          <Icon>
+                            <RtiRowDelete />
+                          </Icon>
                         </Button>
-                        <Button
-                          title="垂直居中"
-                          active={tableState.verticalAlign === 'middle'}
-                          onClick={() => onVerticalAlign('middle')}
-                        >
-                          <RtiAlignCenterVertical />
+                        <div></div>
+                        <Button title="删除列" onClick={() => editor.deleteColumn()}>
+                          <Icon>
+                            <RtiColumnDelete />
+                          </Icon>
                         </Button>
-                        <Button
-                          title="底端对齐"
-                          active={tableState.verticalAlign === 'bottom'}
-                          onClick={() => onVerticalAlign('bottom')}
-                        >
-                          <RtiAlignBottom />
-                        </Button>
-                      </ButtonGroup>
-                      <ButtonGroup>
                         <Button title="删除表格" onClick={() => editor.deleteTable()}>
                           <Icon>
                             <RtiTableDelete />

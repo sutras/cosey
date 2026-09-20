@@ -81,7 +81,7 @@ export default defineComponent({
     return () => {
       return (
         <>
-          <Button active={isActive.value} onClick={onClick}>
+          <Button active={isActive.value} title={t('co.editor.insertLink')} onClick={onClick}>
             <Icon>
               <RtiLink />
             </Icon>

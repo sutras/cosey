@@ -1,0 +1,70 @@
+@use './base/index' as *;
+
+// 浮动「块级菜单」：入口按钮 + 上下文菜单
+@include b(editor-block-menu) {
+  padding: 0 !important;
+
+  // 入口按钮所在的浮层
+  @include e(entry-popper) {
+    min-width: 0 !important;
+    width: fit-content !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  @include e(entry) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    color: css-var(text-color-secondary);
+    border-radius: css-var(border-radius-small);
+    border: 1px solid css-var(border-color-lighter);
+    background-color: css-var(bg-color-overlay);
+    box-shadow: css-var(box-shadow);
+    cursor: pointer;
+
+    &:hover {
+      color: css-var(color-primary);
+      border-color: css-var(color-primary-light-5);
+    }
+  }
+
+  @include e(menu-popper) {
+    padding: 0 !important;
+  }
+
+  @include e(menu) {
+    padding-block: css-var(padding-xs);
+    padding-inline: css-var(padding-sm);
+    min-width: 180px;
+  }
+
+  @include e(menu-section) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+
+    & + & {
+      margin-top: css-var(margin-xs);
+      padding-top: css-var(padding-xs);
+      border-top: 1px solid css-var(border-color-lighter);
+    }
+
+    // 菜单项按钮占满整行，图标 + 文字左对齐
+    .co-editor-button {
+      width: 100%;
+      justify-content: flex-start;
+    }
+
+    // 下拉选择器（如标题）占满整行，箭头靠右
+    .co-editor-button-select {
+      width: 100%;
+    }
+  }
+}

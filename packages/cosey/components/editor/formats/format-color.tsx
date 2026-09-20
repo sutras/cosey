@@ -1,12 +1,14 @@
 import { defineComponent, ref } from 'vue';
 import ButtonSplit from '../button-split';
 import ColorPicker from './color-picker';
+import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';
 
 export default defineComponent({
   name: 'CoEditorFormatColor',
   setup() {
     const editor = useEditor();
+    const { t } = useLocale();
 
     const visible = ref(false);
 
@@ -38,6 +40,7 @@ export default defineComponent({
         <ColorPicker v-model:visible={visible.value} onSelect={onSelect} onClear={onClear}>
           <ButtonSplit
             chevronActive={visible.value}
+            title={t('co.editor.textColor')}
             onClick={onBtnClick}
             onChevron-click={onChevronClick}
           >

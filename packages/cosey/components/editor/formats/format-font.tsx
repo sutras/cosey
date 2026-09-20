@@ -1,6 +1,7 @@
 import { computed, defineComponent } from 'vue';
 import Select from './select';
 import { useEditor } from '../pm/context';
+import { useLocale } from '../../../hooks';
 import { useMarkValue } from '../hooks/useMarkValue';
 
 const fonts = [
@@ -32,6 +33,8 @@ const fonts = [
 export default defineComponent({
   name: 'CoEditorFormatFont',
   setup() {
+    const { t } = useLocale();
+
     const list = computed(() => {
       const sizeList = fonts.map(([label, value]) => {
         return {
@@ -44,7 +47,7 @@ export default defineComponent({
       });
       return [
         {
-          label: '默认字体',
+          label: t('co.editor.defaultFont'),
           value: '',
         },
         ...sizeList,

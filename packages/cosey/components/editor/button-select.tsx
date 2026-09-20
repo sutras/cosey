@@ -35,6 +35,7 @@ export default defineComponent({
           onMousedown={(event) => event.preventDefault()}
           onClick={(event) => emit('click', event)}
         >
+          {slots.prefix?.()}
           <div class={bem.e('text')}>{slots.default?.()}</div>
           <Icon class={bem.e('arrow')} size="lg">
             <RtiChevronDown />

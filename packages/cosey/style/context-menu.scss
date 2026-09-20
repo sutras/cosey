@@ -36,6 +36,14 @@
       color: css-var(text-color-disabled);
     }
 
+    @include is(active) {
+      color: css-var(color-primary);
+
+      @include e(content-icon) {
+        color: css-var(color-primary);
+      }
+    }
+
     @include e(content-icon) {
       display: flex;
       margin-inline-end: css-var(margin-xs);
@@ -49,6 +57,11 @@
       font-size: css-var(font-size-base);
       line-height: css-var(line-height);
       @include truncate;
+    }
+
+    @include e(content-body) {
+      min-width: 0;
+      flex: 1;
     }
 
     @include e(content-arrow) {

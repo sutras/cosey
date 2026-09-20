@@ -40,19 +40,50 @@
     }
   }
 
+  // 带文字标签：用于上下文菜单，宽度自适应、横向排列图标与文字
+  @include is(with-label) {
+    width: auto;
+    height: auto;
+    justify-content: flex-start;
+    column-gap: css-var(size-xs);
+    padding-block: css-var(padding-xs);
+    padding-inline: css-var(padding-sm);
+    font-size: css-var(font-size-base);
+    border-radius: css-var(border-radius-small);
+  }
+
+  @include e(label) {
+    font-size: css-var(font-size-base);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
   @include e(group) {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     height: fit-content;
     gap: 2px;
+
+    @include is(wrap) {
+      flex-wrap: wrap;
+    }
+
+    @include is(duo) {
+      display: grid;
+      grid-template-rows: repeat(2, auto);
+      grid-auto-columns: auto;
+      grid-auto-flow: column;
+    }
   }
 
   @include e(group-list) {
     display: flex;
-    flex-wrap: wrap;
     column-gap: css-var(size-lg);
     row-gap: css-var(size-xxs);
+
+    @include is(wrap) {
+      flex-wrap: wrap;
+    }
   }
 
   @include e(select) {
@@ -61,6 +92,7 @@
     padding-inline: css-var(padding-xs);
     font-size: css-var(font-size-base);
     background-color: css-var(fill-color-light);
+    column-gap: css-var(size-xs);
   }
 
   @include e(chevron) {
@@ -69,6 +101,8 @@
 
   @include e(text) {
     @include truncate;
+    flex: 1;
+    text-align: left;
   }
 
   @include e(arrow) {

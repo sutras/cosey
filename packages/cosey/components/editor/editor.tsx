@@ -12,6 +12,8 @@ import { EditorState, TextSelection } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 
 import Toolbar from './toolbar';
+import FloatFormatToolbar from './float-format-toolbar';
+import BlockMenu from './block-menu';
 import ButtonGroup from './button-group';
 import FormatMark from './formats/format-mark';
 import FormatHeading from './formats/format-heading';
@@ -244,7 +246,7 @@ export default defineComponent({
             bem.is('disabled', disabled.value),
           ]}
         >
-          {!props.readonly && !disabled.value && (
+          {!props.readonly && !disabled.value && props.toolbar !== 'float' && (
             <Toolbar>
               <ButtonGroupList>
                 <ButtonGroup>
@@ -253,8 +255,6 @@ export default defineComponent({
                 </ButtonGroup>
                 <ButtonGroup>
                   <FormatHeading />
-                </ButtonGroup>
-                <ButtonGroup>
                   <FormatFont />
                   <FormatSize />
                 </ButtonGroup>
@@ -264,14 +264,12 @@ export default defineComponent({
                   <FormatMark format="underline" icon={RtiUnderline} />
                   <FormatMark format="strikethrough" icon={RtiStrikethrough} />
                   <FormatMark format="code" icon={RtiInlineCode} />
+                  <FormatColor />
+                  <FormatBackground />
                 </ButtonGroup>
                 <ButtonGroup>
                   <FormatMark format="superscript" icon={RtiSuperscript} />
                   <FormatMark format="subscript" icon={RtiSubscript} />
-                </ButtonGroup>
-                <ButtonGroup>
-                  <FormatColor />
-                  <FormatBackground />
                 </ButtonGroup>
                 <ButtonGroup>
                   <FormatList format="numbered-list" icon={RtiOrderedList} />
@@ -308,6 +306,12 @@ export default defineComponent({
             </Toolbar>
           )}
           <div class={[bem.e('container'), bem.is('focus', isFocus.value)]}>
+            {!props.readonly && !disabled.value && props.toolbar === 'float' && (
+              <>
+                <FloatFormatToolbar />
+                <BlockMenu />
+              </>
+            )}
             <div
               ref={wrapperElement}
               class={bem.e('wrapper')}

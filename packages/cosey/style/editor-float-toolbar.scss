@@ -1,0 +1,8 @@
+@use './base/index' as *;
+
+// 浮动「行内样式」工具条：选中文本后浮出
+@include b(editor-float-toolbar) {
+  position: relative;
+  padding-block: css-var(padding-xs);
+  padding-inline: css-var(padding-sm);
+}

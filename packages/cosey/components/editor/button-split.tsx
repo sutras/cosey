@@ -10,6 +10,7 @@ export default defineComponent({
   props: {
     chevronActive: { type: Boolean },
     active: { type: Boolean },
+    title: { type: String },
   },
   emits: {
     click: (event: MouseEvent) => event instanceof MouseEvent,
@@ -39,7 +40,7 @@ export default defineComponent({
     return () => {
       return (
         <div class={[bem.e('split'), bem.is('active', props.chevronActive)]}>
-          <Button active={props.active} {...{ onClick: onBtnClick }}>
+          <Button active={props.active} title={props.title} {...{ onClick: onBtnClick }}>
             {slots.default?.()}
           </Button>
           <Button

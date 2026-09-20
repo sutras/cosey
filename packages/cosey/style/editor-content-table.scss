@@ -55,7 +55,6 @@
   }
 
   @include e(toolbar) {
-    max-width: 406px;
     width: fit-content;
   }
 }

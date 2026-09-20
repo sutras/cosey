@@ -1,17 +1,25 @@
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, type Component, type PropType } from 'vue';
 import Select from './select';
 import { getCssVar } from '../../../utils';
+import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';
 import { HEADING_TYPES, type HeadingParagraphType } from '../types';
 
 export default defineComponent({
   name: 'CoEditorFormatHeading',
-  setup() {
+  props: {
+    label: { type: String },
+    icon: { type: [Object, Function] as PropType<Component> },
+    buttonWidth: { type: String, default: '116px' },
+  },
+  setup(props) {
+    const { t } = useLocale();
+
     const list = computed(() => {
       const headingList = HEADING_TYPES.map((item, i) => {
         const n = (i + 1) as 1 | 2 | 3 | 4 | 5 | 6;
         return {
-          label: `标题 ${n}`,
+          label: `${t('co.editor.leading')} ${n}`,
           value: item,
           style: {
             fontSize: getCssVar('font-size-heading-' + n),
@@ -23,7 +31,7 @@ export default defineComponent({
 
       return [
         {
-          label: '正文',
+          label: t('co.editor.mainBody'),
           value: 'paragraph',
           style: {
             lineHeight: getCssVar('line-height'),
@@ -50,7 +58,9 @@ export default defineComponent({
         <Select
           v-model={activeType.value}
           list={list.value}
-          button-width="100px"
+          button-width={props.buttonWidth}
+          label={props.label}
+          icon={props.icon}
           onChange={onChange}
         ></Select>
       );

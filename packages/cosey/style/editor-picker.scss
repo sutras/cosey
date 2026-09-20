@@ -14,3 +14,11 @@
     }
   }
 }
+
+// 「立即隐藏」过渡：表格网格选择器关闭时会连带关闭锚定的上下文菜单，
+// 菜单项 display:none 会让弹窗 reference 丢失、被 popper 移到左上角。
+// 用零时长过渡让弹窗即时隐藏，避开淡出期间的闪动。
+.co-editor-picker-instant-enter-active,
+.co-editor-picker-instant-leave-active {
+  transition: none;
+}

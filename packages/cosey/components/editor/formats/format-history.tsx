@@ -1,6 +1,7 @@
 import { computed, defineComponent, type PropType } from 'vue';
 import { Icon } from '../../icon';
 import Button from '../button';
+import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';
 import { RtiRedo, RtiUndo } from 'richtext-icons';
 
@@ -14,9 +15,11 @@ export default defineComponent({
   name: 'CoEditorFormatHistory',
   props: {
     direction: { type: String as PropType<HistoryDirection>, required: true },
+    label: { type: String },
   },
   setup(props) {
     const editor = useEditor();
+    const { t } = useLocale();
 
     const disabled = computed(() => {
       void editor.version.value;
@@ -33,7 +36,12 @@ export default defineComponent({
 
     return () => {
       return (
-        <Button disabled={disabled.value} onClick={onClick}>
+        <Button
+          disabled={disabled.value}
+          label={props.label}
+          title={props.label ?? t(props.direction === 'undo' ? 'co.editor.undo' : 'co.editor.redo')}
+          onClick={onClick}
+        >
           <Icon>{props.direction === 'undo' ? <RtiUndo /> : <RtiRedo />}</Icon>
         </Button>
       );
