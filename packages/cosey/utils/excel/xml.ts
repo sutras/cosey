@@ -1,3 +1,4 @@
+import { escapeXml } from './utils';
 import { WorkBook } from './workBook';
 
 /**
@@ -24,7 +25,7 @@ export function wb2xml(wb: WorkBook) {
   ${wb.sheets
     .map((ws) => {
       const sheet = ws.sheet;
-      return `<Worksheet ss:Name="${ws.name}">
+      return `<Worksheet ss:Name="${escapeXml(ws.name)}">
     <Table>
       ${sheet
         .map((row) => {
@@ -37,7 +38,7 @@ export function wb2xml(wb: WorkBook) {
               const mergeAcrossAttr = mergeAcross ? ` ss:MergeAcross="${mergeAcross}"` : '';
               const indexAttr =
                 cell.isHeader && cell.colIndex > -1 ? ` ss:Index="${cell.colIndex + 1}"` : '';
-              return `<Cell${mergeDownAttr}${mergeAcrossAttr}${indexAttr}><Data ss:Type="String">${cell?.value ?? ''}</Data></Cell>`;
+              return `<Cell${mergeDownAttr}${mergeAcrossAttr}${indexAttr}><Data ss:Type="String">${escapeXml(cell.value)}</Data></Cell>`;
             })
             .join('')}</Row>`;
         })

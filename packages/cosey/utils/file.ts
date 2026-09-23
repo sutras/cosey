@@ -1,5 +1,5 @@
 import { type AxiosResponse } from 'axios';
-import { isString } from './is';
+import { isFunction, isString } from './is';
 import mime from 'mime';
 
 let input: HTMLInputElement;
@@ -71,6 +71,9 @@ export function getFileType(urlOrFile: string | File) {
   return suffix;
 }
 
+/**
+ * 把文件读取为 dataURL
+ */
 export function readAsDataURL(file: File) {
   return new Promise<string>((resolve) => {
     const reader = new FileReader();
@@ -81,6 +84,9 @@ export function readAsDataURL(file: File) {
   });
 }
 
+/**
+ * 把文件读取为 ArrayBuffer
+ */
 export function readAsArrayBuffer(file: File) {
   return new Promise<ArrayBuffer>((resolve) => {
     const reader = new FileReader();
@@ -92,27 +98,110 @@ export function readAsArrayBuffer(file: File) {
 }
 
 /**
- * 下载附件
+ * 根据提供的 url 下载文件
  */
-export function downloadAttachment(
-  response: AxiosResponse,
+export function downloadFile(url: string, filename: string) {
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+/**
+ * 下载 Blob 文件
+ */
+export function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  downloadFile(url, filename);
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 60000);
+}
+
+/**
+ * 根据内容和mime类型生成 Blob
+ */
+export function createBlob(content: string, mimeType: string) {
+  const blob = new Blob([content], {
+    type: mimeType,
+  });
+  return blob;
+}
+
+/**
+ * 从 content-disposition 响应头中解析文件名，
+ * 兼容 filename*=UTF-8''xxx（RFC 5987）与 filename="xxx" 两种写法，
+ * 解析不到时返回空字符串
+ */
+export function getDispositionFilename(contentDisposition?: string | null) {
+  if (!contentDisposition) {
+    return '';
+  }
+
+  // 形如 attachment; filename*=UTF-8''%E4%B8%AD%E6%96%87.pdf
+  const extended = /filename\*=\s*(?:[^']*'[^']*')?([^;]*)/i.exec(contentDisposition)?.[1]?.trim();
+  // 形如 attachment; filename="中文.pdf"（等号两侧允许有空格）
+  const basic = /filename\s*=\s*"?([^";]*)"?/i.exec(contentDisposition)?.[1]?.trim();
+
+  const value = extended || basic;
+
+  if (!value) {
+    return '';
+  }
+
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    // 文件名里含有非法转义序列（如 100%.pdf）时按原文返回
+    return value;
+  }
+}
+
+/**
+ * 附件响应：axios 的 AxiosResponse 或 fetch 的 Response
+ */
+type AttachmentResponse = AxiosResponse | Response;
+
+/**
+ * 判断是否为 fetch 的 Response
+ */
+function isFetchResponse(response: AttachmentResponse): response is Response {
+  return typeof Response !== 'undefined' && response instanceof Response;
+}
+
+/**
+ * 读取响应头，兼容 axios 的普通对象响应头与 Headers / AxiosHeaders 实例
+ * （后两者都提供了不区分大小写的 get 方法，普通对象则按 key 直接取）
+ */
+function getHeader(response: AttachmentResponse, name: string) {
+  const headers = response.headers as unknown as Record<string, any> & {
+    get?: (name: string) => unknown;
+  };
+
+  const value = isFunction(headers?.get) ? headers.get(name) : headers?.[name];
+
+  return isString(value) ? value : '';
+}
+
+/**
+ * 下载附件，支持 axios 的 AxiosResponse 与 fetch 的 Response。
+ *
+ * 传入 Response 时需要读取响应体，请务必 await
+ */
+export async function downloadAttachment(
+  response: AttachmentResponse,
   options?: {
     filename?: string;
   },
 ) {
   let { filename } = options || {};
 
-  const type = response.headers['content-type'];
+  const type = getHeader(response, 'content-type');
 
   if (!filename) {
-    const contentDisposition = response.headers['content-disposition'];
-
-    if (contentDisposition) {
-      filename = contentDisposition.split('filename=')[1].trim().replace(/"/g, '');
-      if (filename) {
-        filename = decodeURIComponent(filename);
-      }
-    }
+    filename = getDispositionFilename(getHeader(response, 'content-disposition'));
   }
 
   if (!filename) {
@@ -120,15 +209,12 @@ export function downloadAttachment(
     filename = `download${ext ? `.${ext}` : ''}`;
   }
 
-  const blob = new Blob([response.data], { type });
-  const link = document.createElement('a');
-  link.href = window.URL.createObjectURL(blob);
-  link.download = filename;
-  link.click();
+  if (isFetchResponse(response)) {
+    downloadBlob(await response.blob(), filename);
+    return;
+  }
 
-  setTimeout(() => {
-    window.URL.revokeObjectURL(link.href);
-  }, 100);
+  downloadBlob(createBlob(response.data, type), filename);
 }
 
 export const imageExtensions = [

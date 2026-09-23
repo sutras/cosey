@@ -4,7 +4,7 @@
 
 Cosey 中所有展示图标的地方都会使用 Icon 组件，包括标签栏、菜单栏和页面其他地方。
 
-图标数据来源有三个，一是 [iconify](https://github.com/iconify/iconify)，二是本地的 svg 文件，三是图标字体。
+图标数据来源有四个，一是 [iconify](https://github.com/iconify/iconify)，二是本地的 svg 文件，三是图标字体，四是直接使用图标组件。
 
 ### iconify
 
@@ -66,6 +66,22 @@ import '@/style/font-awesome.min.css';
 <Icon name="fa fa-tachometer" />
 ```
 
+### 直接使用图标组件
+
+前面三种方式都是通过 `name` 指定图标。如果手里已经有一个图标组件，可以直接放进 `Icon` 的默认插槽——[richtext-icons](https://richtext-icons.wzt.zone/) 是本库的依赖，Cosey 内部组件（如 `Close`）就是用它来渲染图标的：
+
+```ts
+import { RtiClose } from 'richtext-icons';
+```
+
+```tsx
+<Icon>
+  <RtiClose />
+</Icon>
+```
+
+传了默认插槽后 `name` 会被忽略，`Icon` 只负责外层容器，尺寸和颜色仍由它统一控制：图标组件按 `1em` 设置宽高、用 `currentColor` 作为颜色，就会自动跟随 `Icon` 的 `size` 与当前文字颜色。
+
 ## 代码演示
 
 ### Iconify
@@ -92,6 +108,14 @@ icon/font-icon
 
 :::
 
+### 图标组件
+
+::: demo
+
+icon/component
+
+:::
+
 ## API
 
 ### IconProps
@@ -100,3 +124,9 @@ icon/font-icon
 | ---- | -------- | ------------------------------------------------ | ------ |
 | name | 图标名称 | string                                           | -      |
 | size | 图标尺寸 | 'sm' \| 'md' \| 'lg' \| 'xl' \| number \| string | -      |
+
+### IconSlots
+
+| 插槽    | 描述                               | 属性 |
+| ------- | ---------------------------------- | ---- |
+| default | 自定义图标内容，可传入任意图标组件 | -    |

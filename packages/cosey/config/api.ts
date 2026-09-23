@@ -8,6 +8,11 @@ export interface LoginFormModel {
   captchaId?: string;
 }
 
+export interface CaptchaResponseData {
+  image: string;
+  id: string;
+}
+
 /**
  * 请求接口
  */
@@ -32,13 +37,7 @@ export const defaultApiConfig = {
    * 验证码
    */
   captcha: null as
-    | ((
-        data: any,
-        config?: AxiosRequestConfig,
-      ) => Promise<{
-        image: string;
-        id: string;
-      }>)
+    | ((data: any, config?: AxiosRequestConfig) => Promise<CaptchaResponseData>)
     | null,
 
   /**

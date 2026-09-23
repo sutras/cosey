@@ -39,15 +39,28 @@ export const bookFormats: ExportBookFormat[] = [
 ];
 
 /**
+ * 根据 bookType 获取格式信息
+ */
+export function getBookFormat(bookType: ExportBookType) {
+  const format = bookFormats.find((item) => item.type === bookType);
+
+  if (!format) {
+    throw new Error(`不支持的导出格式：${bookType}`);
+  }
+
+  return format;
+}
+
+/**
  * 根据 bookType 获取扩展名
  */
 export function getExtByBookType(bookType: ExportBookType) {
-  return bookFormats.find((item) => item.type === bookType)!.ext;
+  return getBookFormat(bookType).ext;
 }
 
 /**
  * 根据 bookType 获取 mime 类型
  */
 export function getMimeByBookType(bookType: ExportBookType) {
-  return bookFormats.find((item) => item.type === bookType)!.mime;
+  return getBookFormat(bookType).mime;
 }
