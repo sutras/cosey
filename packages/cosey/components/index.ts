@@ -11,7 +11,6 @@ export * from './copy';
 export * from './descriptions';
 export * from './dnd-sort';
 export * from './editor';
-export * from './editor';
 export * from './field';
 export * from './file-card';
 export * from './form';

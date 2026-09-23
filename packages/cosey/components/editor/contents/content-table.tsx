@@ -18,10 +18,10 @@ import { viewVersion } from '../pm/reactive-view';
 import { DEFAULT_CELL_MIN_WIDTH } from '../pm/plugins';
 import { type EditorTableState } from '../pm/editor';
 import { Icon } from '../../icon';
-import ButtonGroup from '../button-group';
-import Button from '../button';
-import ColorPicker from '../formats/color-picker';
-import ButtonGroupList from '../button-group-list';
+import ButtonGroup from '../ui/button-group';
+import Button from '../ui/button';
+import ColorPicker from '../ui/color-picker';
+import ButtonGroupList from '../ui/button-group-list';
 import {
   RtiAlignBottom,
   RtiAlignCenterVertical,

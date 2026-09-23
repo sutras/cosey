@@ -1,7 +1,7 @@
 import { defineComponent, inject } from 'vue';
 import { ElPopover, popoverProps } from 'element-plus';
-import { createBem } from '../../../utils';
-import { popoverContainerContextKey } from '../usePopoverContainer';
+import { createBem } from '../../../../utils';
+import { popoverContainerContextKey } from '../../hooks/usePopoverContainer';
 
 export default defineComponent({
   name: 'CoEditorWidgetPopover',

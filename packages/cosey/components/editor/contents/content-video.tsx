@@ -3,7 +3,7 @@ import { type Node as PMNode } from 'prosemirror-model';
 import { NodeSelection } from 'prosemirror-state';
 import { type EditorView } from 'prosemirror-view';
 import { createBem } from '../../../utils';
-import Resize from './resize';
+import Resize from './base/resize';
 import { ref } from 'vue';
 
 export default defineComponent({

@@ -1,6 +1,6 @@
 import { defineComponent, ref } from 'vue';
-import ButtonSplit from '../button-split';
-import ColorPicker from './color-picker';
+import ButtonSplit from '../ui/button-split';
+import ColorPicker from '../ui/color-picker';
 import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';
 

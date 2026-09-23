@@ -1,7 +1,7 @@
 import { computed, defineComponent, h, type Component, type PropType, ref } from 'vue';
 import { Icon } from '../../icon';
 import Picker from './picker';
-import ButtonSelect from '../button-select';
+import ButtonSelect from './button-select';
 import SelectList, { type SelectListItem } from './select-list';
 
 export default defineComponent({

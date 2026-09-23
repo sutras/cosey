@@ -1,5 +1,5 @@
 import { defineComponent, h, type Component, type PropType } from 'vue';
-import Button from '../button';
+import Button from '../ui/button';
 import { Icon } from '../../icon';
 import { isString } from '../../../utils';
 import { useLocale } from '../../../hooks';

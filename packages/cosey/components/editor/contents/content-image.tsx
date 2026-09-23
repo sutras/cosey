@@ -4,9 +4,9 @@ import { NodeSelection } from 'prosemirror-state';
 import { type EditorView } from 'prosemirror-view';
 import { useObjectUrl } from '../../../hooks';
 import { createBem } from '../../../utils';
-import Resize from './resize';
-import Upload from './upload';
-import { getUploadFile, clearUploadFile } from '../pm/editor';
+import Resize from './base/resize';
+import Upload from './base/upload';
+import { getUploadFile, clearUploadFile } from '../pm/upload-cache';
 
 export default defineComponent({
   name: 'CoEditorContentImage',

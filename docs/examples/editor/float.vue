@@ -2,7 +2,7 @@
   <co-editor
     v-model="value"
     placeholder="选中文字试试浮动工具条，鼠标移入试试块级菜单"
-    toolbar="float"
+    mode="float"
   />
 </template>
 

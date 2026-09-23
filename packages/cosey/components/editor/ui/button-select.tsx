@@ -1,7 +1,7 @@
 import { defineComponent, inject, onMounted, useTemplateRef } from 'vue';
-import { createBem } from '../../utils';
-import { Icon } from '../icon';
-import { pickerContextKey } from './formats/picker.api';
+import { createBem } from '../../../utils';
+import { Icon } from '../../icon';
+import { pickerContextKey } from './picker.api';
 import { RtiChevronDown } from 'richtext-icons';
 
 export default defineComponent({
