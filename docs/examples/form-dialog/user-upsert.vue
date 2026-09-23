@@ -13,7 +13,7 @@
   </el-button>
 
   <co-form-dialog v-bind="dialogProps" width="lg">
-    <co-form v-bind="formProps" label-width="auto" width="md">
+    <co-form v-bind="formProps" v-loading="loading" label-width="auto" width="md">
       <co-form-group>
         <co-form-item v-model="model.nickname" prop="nickname" label="昵称" />
         <co-form-item v-model="model.mobile" prop="mobile" label="手机号" required />
@@ -121,11 +121,11 @@ const model = reactive<Model>({
   avatar: undefined,
 });
 
-const { dialogProps, formProps, edit, add, expose } = useUpsert({
+const { dialogProps, formProps, edit, add, expose, loading } = useUpsert({
   stuffTitle: '用户',
   model,
-  add: () => new Promise((resolve) => setTimeout(resolve, 300)),
-  edit: () => new Promise((resolve) => setTimeout(resolve, 300)),
+  addFetch: () => new Promise((resolve) => setTimeout(resolve, 300)),
+  editFetch: () => new Promise((resolve) => setTimeout(resolve, 300)),
 });
 
 defineExpose(expose);
