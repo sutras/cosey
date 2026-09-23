@@ -99,23 +99,37 @@ layoutStore.activeTab = route.name as string;
 const homeRoute = router.getRoutes().find((route) => route.path === routerConfig.homePath);
 
 if (homeRoute) {
-  layoutStore.tabList = [{ name: homeRoute.name as string, meta: homeRoute.meta }];
+  layoutStore.tabList = [
+    {
+      name: homeRoute.name as string,
+      meta: homeRoute.meta,
+      fullPath: router.resolve(routerConfig.homePath).fullPath,
+    },
+  ];
 }
 
 if (route.path !== routerConfig.homePath) {
   layoutStore.tabList.push({
     name: route.name as string,
     meta: route.meta,
+    fullPath: route.fullPath,
   });
 }
 
 router.afterEach((to) => {
-  if (!layoutStore.tabList.find((item) => item.name === to.name)) {
+  const tab = layoutStore.tabList.find((item) => item.name === to.name);
+
+  if (tab) {
+    // 同一个标签页只记最后一次访问的地址，切回来时按它恢复 query / params
+    tab.fullPath = to.fullPath;
+  } else {
     layoutStore.tabList.push({
       name: to.name as string,
       meta: to.meta,
+      fullPath: to.fullPath,
     });
   }
+
   layoutStore.activeTab = to.name as string;
 });
 
@@ -151,12 +165,29 @@ const closeOtherTabs = (name: string) => {
   layoutStore.activeTab = name;
 };
 
+/**
+ * 跳转到指定标签页，优先使用标签页自己记录的完整地址（保留 query / params）
+ */
+const goto = (name: string) => {
+  const tab = layoutStore.tabList.find((item) => item.name === name);
+
+  if (tab?.fullPath) {
+    router.push(tab.fullPath);
+  } else {
+    router.push({ name });
+  }
+};
+
 watch(
   () => layoutStore.activeTab,
-  () => {
-    router.push({
-      name: layoutStore.activeTab as string,
-    });
+  (name) => {
+    // 路由变化后会把 activeTab 同步过来，此时二者必然一致，说明不是点击标签页触发的切换，
+    // 直接返回，否则会二次跳转并把 query / params 丢掉
+    if (name === route.name) {
+      return;
+    }
+
+    goto(name);
   },
 );
 

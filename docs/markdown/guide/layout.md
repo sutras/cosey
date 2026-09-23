@@ -369,12 +369,14 @@ snug 菜单数据。
 - 类型：`Ref<LayoutTab[]>`
 - 默认值：`[]`
 
-标签页数据。
+标签页数据。标签页会记录自己最后一次访问的地址，切换回来时按该地址跳转（`query` 等参数一并恢复）。
 
 ```ts
 interface LayoutTab {
   name: string;
   meta: RouteMeta;
+  // 完整地址，由标签栏自动维护；外部自行添加标签页时可不传，此时按 name 跳转
+  fullPath?: string;
 }
 ```
 

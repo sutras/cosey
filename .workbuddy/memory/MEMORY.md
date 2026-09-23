@@ -129,3 +129,28 @@
   基线有 10 条既有报错：4 条在 `components/editor/formats/*.tsx`、`permissions-upsert.vue` 1 条、
   `users/user-upsert.vue` 5 条）与 `vue-tsc -p docs/tsconfig.json`（docs 有独立 tsconfig，
   `vitepress build` 不做类型检查，所以 docs 里的示例坏了也不会被 CI 拦住）。
+
+## 浏览器端行为验证（跑真机）
+
+- 起本地站：`NODE_ENV=development ./node_modules/.bin/vite`（`server.port` 配的 8882，被占会自动顺延，
+  看输出里的实际端口）。mock 是**浏览器端**的 `@cosey/mock`（Dexie/IndexedDB，首访 `initSeed()` 自动灌种子），
+  所以不需要起任何后端服务；登录 `admin / 123456`，验证码随便填（mock 的 `/auth/login` 不校验）。
+- 用 agent-browser 驱动（`open snapshot -i click @eN type eval close`）。要数「跳了几次」就在 `eval` 里
+  桩掉 `history.pushState/replaceState` 记账，别靠肉眼看 URL；hash 路由下 pushState 一样会调。
+- 标签栏选择器：`.el-tabs__item[id="tab-<路由名>"]`（路由名首字母大写，如 `tab-Users`）、
+  关闭按钮 `.is-icon-close`；bem 前缀是 `co-`（如 `.co-layout-tabbar__reload`）。
+  右键菜单用 `dispatchEvent(new MouseEvent('contextmenu', {bubbles:true, clientX, clientY}))` 触发，
+  菜单项用 `agent-browser find text "关闭其他标签页" click` 点。
+- 收尾：`agent-browser close`，并记得把后台 vite 任务停掉（否则端口一直占着，下次会顺延）。
+
+## layout-tabbar 的标签页与路由同步（改动前先看）
+
+- 双向同步不变量：`afterEach` 把 `route.name` 写进 `activeTab`，`watch(activeTab)` 反过来跳路由。
+  这个回环里 **watch 回调必须保留 `if (name === route.name) return`**，否则每次带 query 的导航后
+  都会多跳一次并把 query 丢掉（曾经就是这么坏的）。
+- 跳转统一走 `goto(name)`：优先 `router.push(tab.fullPath)`（标签页自己记的完整地址，含 query / params），
+  没 `fullPath` 才退回 `router.push({ name })`。
+- `LayoutTab.fullPath?: string` 是可选字段：内部所有标签都会填，外部自定义标签页可以不填。
+  **同名标签只记最后一次地址**（`/users?id=1` → `/users?id=2` 不会新开标签，只更新 fullPath）。
+- 首页标签的 fullPath 用 `router.resolve(routerConfig.homePath).fullPath`；别按 name resolve，
+  home 路由无 name 时 setup 阶段会直接抛。
