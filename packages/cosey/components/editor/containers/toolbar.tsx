@@ -1,5 +1,5 @@
 import { defineComponent } from 'vue';
-import { createBem } from '../../utils';
+import { createBem } from '../../../utils';
 
 export default defineComponent({
   name: 'CoEditorToolbar',

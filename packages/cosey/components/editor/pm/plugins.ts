@@ -14,6 +14,10 @@ import {
 import { changeIndent, toggleMark } from './commands';
 import { prismPlugin } from './prism';
 import { schema } from './schema';
+import { EDITOR_TOOLS, EDITOR_TOOL_SHORTCUTS, type EditorTool } from '../tools';
+
+/** 「这个功能是否可用」，由 facade 提供（读的是 `features` 解析后的集合） */
+export type HasTool = (tool: EditorTool) => boolean;
 
 /**
  * 未拖拽过的列至少留出这么宽，拖拽手柄才有落点，表格也不会被压成一条线。
@@ -83,16 +87,43 @@ function tableEdgePlugin() {
   });
 }
 
-function buildKeymap(): Record<string, Command> {
-  return {
+/**
+ * 给命令套上功能守卫。功能没开时**吞掉按键**：返回 `true`，但不 dispatch。
+ *
+ * 不能返回 `false` 把事件让出去 —— 那样浏览器会执行自己的默认编辑动作，而 contenteditable 里
+ * 原生 `execCommand` 改出来的 DOM 会被 ProseMirror 的 DOMObserver 解析回文档
+ * （实测：关掉加粗后按 ⌘+B 依然产出 `<strong>`）。返回 `true` 才能让 `features` 关得干净。
+ */
+function whenTool(tool: EditorTool, hasTool: HasTool, command: Command): Command {
+  return (state, dispatch, view) => {
+    if (!hasTool(tool)) return true;
+    return command(state, dispatch, view);
+  };
+}
+
+/**
+ * Tab / Shift-Tab：在表格里是换到相邻单元格，其余位置是缩进。
+ *
+ * 表格内的方向键、跨单元格框选、删除单元格内容都由 tableEditing() 的 handleKeyDown 处理
+ * （它排在 keymap 之前），只有 Tab 换格没被它接管，这里补上。
+ *
+ * 换格属于表格能力、缩进属于 `indent-*` 功能，所以守卫只能加在缩进那条分支上 ——
+ * 整键统一收敛会把表格换格跟着一起关掉。
+ */
+function tabCommand(direction: 1 | -1, hasTool: HasTool): Command {
+  const tool: EditorTool = direction > 0 ? 'indent-increase' : 'indent-decrease';
+
+  return (state, dispatch, view) => {
+    if (isInTable(state)) return goToNextCell(direction)(state, dispatch);
+    return whenTool(tool, hasTool, changeIndent(direction))(state, dispatch, view);
+  };
+}
+
+/** 导出仅为回归测试断言守卫语义，见 components/editor/tools.test.ts */
+export function buildKeymap(hasTool: HasTool): Record<string, Command> {
+  const bindings: Record<string, Command> = {
     ...baseKeymap,
     Enter: chainCommands(splitListItem(schema.nodes.list_item), baseKeymap.Enter),
-    'Mod-z': undo,
-    'Mod-y': redo,
-    'Shift-Mod-z': redo,
-    'Mod-b': toggleMark('strong'),
-    'Mod-i': toggleMark('em'),
-    'Mod-u': toggleMark('underline'),
     'Shift-Enter': (state, dispatch) => {
       if (state.selection.$from.parent.type.spec.code) {
         return newlineInCode(state, dispatch);
@@ -103,20 +134,39 @@ function buildKeymap(): Record<string, Command> {
       }
       return true;
     },
-    // 表格内的上下左右移动、跨单元格框选、删除单元格内容都由 tableEditing() 的
-    // handleKeyDown 处理（它排在 keymap 之前），这里只需要补上它没管的 Tab 换格。
-    Tab: (state, dispatch) => {
-      if (isInTable(state)) return goToNextCell(1)(state, dispatch);
-      return changeIndent(1)(state, dispatch);
-    },
-    'Shift-Tab': (state, dispatch) => {
-      if (isInTable(state)) return goToNextCell(-1)(state, dispatch);
-      return changeIndent(-1)(state, dispatch);
-    },
   };
+
+  /** 有快捷键的功能对应的命令；键位一律取自 EDITOR_TOOL_SHORTCUTS，不在这里重复写键名。 */
+  const commands: Partial<Record<EditorTool, Command>> = {
+    undo,
+    redo,
+    bold: toggleMark('strong'),
+    italic: toggleMark('em'),
+    underline: toggleMark('underline'),
+  };
+
+  for (const tool of EDITOR_TOOLS) {
+    const command = commands[tool];
+    if (!command) continue;
+
+    for (const key of EDITOR_TOOL_SHORTCUTS[tool] ?? []) {
+      bindings[key] = whenTool(tool, hasTool, command);
+    }
+  }
+
+  // 缩进与表格共用 Tab / Shift-Tab，守卫按分支加，见 tabCommand
+  for (const key of EDITOR_TOOL_SHORTCUTS['indent-increase'] ?? []) {
+    bindings[key] = tabCommand(1, hasTool);
+  }
+
+  for (const key of EDITOR_TOOL_SHORTCUTS['indent-decrease'] ?? []) {
+    bindings[key] = tabCommand(-1, hasTool);
+  }
+
+  return bindings;
 }
 
-export function buildPlugins() {
+export function buildPlugins(hasTool: HasTool) {
   return [
     prismPlugin,
     history(),
@@ -132,6 +182,6 @@ export function buildPlugins() {
     tableEdgePlugin(),
     tableEditing(),
     trailingBlockPlugin(),
-    keymap(buildKeymap()),
+    keymap(buildKeymap(hasTool)),
   ];
 }

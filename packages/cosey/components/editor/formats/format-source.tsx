@@ -1,7 +1,7 @@
 import { defineComponent, ref } from 'vue';
 import { ElButton, ElDialog, ElInput } from 'element-plus';
 import { Icon } from '../../icon';
-import Button from '../button';
+import Button from '../ui/button';
 import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';
 import { RtiSourceCode } from 'richtext-icons';

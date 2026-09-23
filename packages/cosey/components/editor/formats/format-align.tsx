@@ -1,6 +1,6 @@
 import { defineComponent, h, type Component, type PropType } from 'vue';
 import { Icon } from '../../icon';
-import Button from '../button';
+import Button from '../ui/button';
 import { useBlockValueActive } from '../hooks/useBlockValueActive';
 import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';

@@ -1,6 +1,6 @@
 import { defineComponent, ref, useTemplateRef, watch } from 'vue';
 import { useZIndex } from 'element-plus';
-import { createBem, isNumber } from '../../../utils';
+import { createBem, isNumber } from '../../../../utils';
 
 export type ResizePosition = 'nw' | 'ne' | 'sw' | 'se';
 

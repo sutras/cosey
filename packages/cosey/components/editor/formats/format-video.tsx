@@ -1,6 +1,6 @@
 import { computed, defineComponent, reactive, ref, type PropType } from 'vue';
 import { Icon } from '../../icon';
-import Button from '../button';
+import Button from '../ui/button';
 import { ContextMenuContent } from '../../context-menu';
 import { FormDialog } from '../../form-dialog';
 import { Form, FormItem } from '../../form';

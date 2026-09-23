@@ -1,5 +1,5 @@
 import { computed, defineComponent } from 'vue';
-import Select from './select';
+import Select from '../ui/select';
 import FontSizeDelta from './format-size-delta';
 import { useEditor } from '../pm/context';
 import { useLocale } from '../../../hooks';

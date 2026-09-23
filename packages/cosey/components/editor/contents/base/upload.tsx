@@ -1,7 +1,7 @@
 import { defineComponent, onBeforeUnmount, PropType } from 'vue';
 import { ElButton } from 'element-plus';
-import { createBem, isString } from '../../../utils';
-import { useLocale, useSingleUpload } from '../../../hooks';
+import { createBem, isString } from '../../../../utils';
+import { useLocale, useSingleUpload } from '../../../../hooks';
 
 export default defineComponent({
   name: 'CoEditorUpload',

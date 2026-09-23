@@ -1,5 +1,5 @@
 import { computed, defineComponent, type Component, type PropType } from 'vue';
-import Select from './select';
+import Select from '../ui/select';
 import { getCssVar } from '../../../utils';
 import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';

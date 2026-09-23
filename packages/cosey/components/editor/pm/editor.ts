@@ -55,6 +55,9 @@ import {
   type Command,
 } from './commands';
 import { schema, type CellVerticalAlign, type TextStyleAttrs } from './schema';
+import { createRow } from './table-utils';
+import { setUploadFile } from './upload-cache';
+import { EDITOR_TOOLS, parseEditorFeatures, type EditorTool } from '../tools';
 
 const markAliases: Record<string, string> = {
   bold: 'strong',
@@ -72,27 +75,6 @@ const textStyleKeyMap: Record<string, keyof TextStyleAttrs> = {
   color: 'color',
   background: 'background',
 };
-
-const uploadFiles = new Map<string, File>();
-
-export function getUploadFile(id: string): File | undefined {
-  return uploadFiles.get(id);
-}
-
-function clearUploadFile(id: string) {
-  uploadFiles.delete(id);
-}
-
-function createCell(type: 'table_cell' | 'table_header' = 'table_cell') {
-  return schema.nodes[type].create(null, [schema.nodes.paragraph.create()]);
-}
-
-function createRow(columns: number, cellType: 'table_cell' | 'table_header' = 'table_cell') {
-  return schema.nodes.table_row.create(
-    null,
-    Array.from({ length: columns }, () => createCell(cellType)),
-  );
-}
 
 /** 表格工具条需要的状态快照，随每次事务重建。 */
 export interface EditorTableState {
@@ -125,6 +107,9 @@ export class EditorFacade {
   /** 只读/禁用状态，为 false 时丢弃所有文档变更 */
   editable: Ref<boolean> = ref(true);
 
+  /** 编辑器可用的功能（由 `features` 属性决定），未启用的功能不渲染入口、也不响应交互 */
+  tools: Ref<Set<EditorTool>> = ref(new Set(EDITOR_TOOLS));
+
   get state() {
     return this.view.state;
   }
@@ -140,6 +125,16 @@ export class EditorFacade {
 
   focus() {
     this.view.focus();
+  }
+
+  /** 同步 `features` 属性 */
+  setTools(features?: string | null) {
+    this.tools.value = parseEditorFeatures(features);
+  }
+
+  /** 某个功能是否可用 */
+  hasTool(tool: EditorTool) {
+    return this.tools.value.has(tool);
   }
 
   // ===== history =====
@@ -422,6 +417,24 @@ export class EditorFacade {
     };
   }
 
+  // ===== text =====
+
+  /**
+   * 在光标处插入一段纯文本。有选区时替换选区内容；
+   * 插入的文字按事务自带的规则继承插入点已有的行内样式。
+   */
+  insertText(text: string) {
+    if (!text) return;
+
+    const { state } = this;
+    const { from, to } = state.selection;
+
+    // 整块被选中时（如整张表格）这个位置放不下行内文本，插进去会抛错，直接放弃
+    if (!state.selection.$from.parent.inlineContent) return;
+
+    this.dispatch(state.tr.insertText(text, from, to).scrollIntoView());
+  }
+
   // ===== image / video / formula =====
 
   insertImage(url: string, file?: File, width?: number | string, height?: number | string) {
@@ -430,7 +443,7 @@ export class EditorFacade {
 
     if (file) {
       const id = `file:${auid('co-editor')}`;
-      uploadFiles.set(id, file);
+      setUploadFile(id, file);
       title = id;
     }
 
@@ -708,5 +721,3 @@ export class EditorFacade {
     this.view.dispatch(tr);
   }
 }
-
-export { clearUploadFile };

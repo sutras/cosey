@@ -10,6 +10,7 @@
     "prepare": "husky",
     "eslint": "eslint --cache --max-warnings 0  \"**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue}\" --fix",
     "eslint:check": "eslint --cache --max-warnings 0  \"**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue}\"",
+    "test:editor": "tsx ./packages/cosey/components/editor/tools.test.ts",
     "test:excel": "tsx ./packages/cosey/utils/excel/excel.test.ts",
     "test:prism": "tsx ./packages/cosey/utils/prism-langs.test.ts",
     "test:upsert": "tsx ./packages/cosey/hooks/useUpsert.test.ts",

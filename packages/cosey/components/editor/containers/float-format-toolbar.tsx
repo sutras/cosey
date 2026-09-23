@@ -8,38 +8,36 @@ import {
   watch,
 } from 'vue';
 import { ElPopover } from 'element-plus';
-import { createBem } from '../../utils';
-import { useLocale } from '../../hooks';
-import { useEditor } from './pm/context';
-import { useSelectionRect } from './hooks/useSelectionRect';
-import ButtonGroup from './button-group';
-import Button from './button';
-import type { EditorButtonExpose } from './button';
-import { Icon } from '../icon';
-import FormatMark from './formats/format-mark';
-import FormatColor from './formats/format-color';
-import FormatBackground from './formats/format-background';
-import FormatLink from './formats/format-link';
-import FormatClear from './formats/format-clear';
-import FormatFont from './formats/format-font';
-import FormatSize from './formats/format-size';
-import FormatIndent from './formats/format-indent';
-import FormatSource from './formats/format-source';
-import {
-  RtiBold,
-  RtiInlineCode,
-  RtiIndentDecrease,
-  RtiIndentIncrease,
-  RtiItalic,
-  RtiMoreHorizontal,
-  RtiStrikethrough,
-  RtiSubscript,
-  RtiSuperscript,
-  RtiUnderline,
-} from 'richtext-icons';
-import type { SelectionRect } from './hooks/useSelectionRect';
-import ButtonGroupList from './button-group-list';
+import { createBem } from '../../../utils';
+import { useLocale } from '../../../hooks';
+import { useEditor } from '../pm/context';
+import { useSelectionRect } from '../hooks/useSelectionRect';
+import ButtonGroup from '../ui/button-group';
+import Button from '../ui/button';
+import type { EditorButtonExpose } from '../ui/button';
+import { Icon } from '../../icon';
+import { RtiMoreHorizontal } from 'richtext-icons';
+import type { SelectionRect } from '../hooks/useSelectionRect';
+import ButtonGroupList from '../ui/button-group-list';
 import FloatToolbar from './float-toolbar';
+import { renderEditorTools } from '../tool-renderers';
+import type { EditorTool } from '../tools';
+
+/** 一级工具条：最常用的行内样式、颜色与链接 */
+const inlineTools: EditorTool[] = ['bold', 'italic', 'underline', 'strikethrough', 'code', 'link'];
+const colorTools: EditorTool[] = ['color', 'background'];
+const clearTools: EditorTool[] = ['clear'];
+
+/** 「更多」扩展面板里的次要操作 */
+const moreTools: EditorTool[] = [
+  'font',
+  'size',
+  'superscript',
+  'subscript',
+  'indent-decrease',
+  'indent-increase',
+  'source',
+];
 
 /** 选区上边中点放一个零尺寸的虚拟锚点，工具条贴在它上方。 */
 function createVirtualRef(rect: SelectionRect) {
@@ -67,7 +65,10 @@ function createVirtualRef(rect: SelectionRect) {
  * （加粗/斜体/下划线/删除线/行内代码/颜色/背景/链接/清除格式）。
  *
  * 末尾有一个「更多」按钮，点击弹出扩展面板，承载不常用的操作（上标/下标、字体、字号、
- * 缩进、撤销/重做、源码模式），保证浮动形态下也能用到固定工具栏的全部功能。
+ * 缩进、源码模式），保证浮动形态下也能用到固定工具栏的全部功能。
+ *
+ * 按钮与固定工具栏共用 `tool-renderers`，并按 `features` 过滤：功能没开启的按钮不出现，
+ * 一组按钮被过滤空之后连分组一起隐藏。
  *
  * 定位复用表格工具条的模式：ElPopover + virtual-ref，内容 teleport 到 body。
  * 选区每次变化都生成新的虚拟锚点对象，popper 检测到 reference 变化后会重新定位。
@@ -89,6 +90,15 @@ export default defineComponent({
 
     // 「更多」按钮：作为扩展面板（popover）的定位锚点
     const moreButtonRef = useTemplateRef<EditorButtonExpose>('moreButton');
+
+    // 按 features 过滤后的分组，空组不渲染
+    const groups = computed(() =>
+      [inlineTools, colorTools, clearTools]
+        .map((tools) => tools.filter((tool) => editor.hasTool(tool)))
+        .filter((tools) => tools.length > 0),
+    );
+
+    const moreToolsEnabled = computed(() => moreTools.filter((tool) => editor.hasTool(tool)));
 
     // 扩展面板的虚拟锚点：指向「更多」按钮，供 ElPopover 定位
     const moreAnchor = computed(() => {
@@ -161,7 +171,10 @@ export default defineComponent({
     return () => {
       const anchor = virtualRef.value;
 
-      if (!anchor) return null;
+      // 没有任何可用按钮时整条工具条不浮出，避免出现一个空壳
+      if (!anchor || (groups.value.length === 0 && moreToolsEnabled.value.length === 0)) {
+        return null;
+      }
 
       return (
         <ElPopover
@@ -180,37 +193,27 @@ export default defineComponent({
               <>
                 <FloatToolbar>
                   <ButtonGroupList>
-                    <ButtonGroup>
-                      <FormatMark format="bold" icon={RtiBold} />
-                      <FormatMark format="italic" icon={RtiItalic} />
-                      <FormatMark format="underline" icon={RtiUnderline} />
-                      <FormatMark format="strikethrough" icon={RtiStrikethrough} />
-                      <FormatMark format="code" icon={RtiInlineCode} />
-                      <FormatLink />
-                    </ButtonGroup>
-                    <ButtonGroup>
-                      <FormatColor />
-                      <FormatBackground />
-                    </ButtonGroup>
-                    <ButtonGroup>
-                      <FormatClear />
-                    </ButtonGroup>
-                    <ButtonGroup>
-                      {/* 更多操作入口：展开独立的扩展面板（ElPopover，挂在一级工具条上方）。
+                    {groups.value.map((tools) => (
+                      <ButtonGroup key={tools.join(',')}>{renderEditorTools(tools)}</ButtonGroup>
+                    ))}
+                    {moreToolsEnabled.value.length > 0 && (
+                      <ButtonGroup>
+                        {/* 更多操作入口：展开独立的扩展面板（ElPopover，挂在一级工具条上方）。
                       用受控 visible + virtual-ref 定位，避免 focus-trap 在焦点
                       落到面板外（如内嵌选择器的弹层）时把面板误关。 */}
-                      <Button
-                        ref="moreButton"
-                        active={moreVisible.value}
-                        class={bem.e('more-toggle')}
-                        title={t('co.editor.more')}
-                        onClick={toggleMore}
-                      >
-                        <Icon>
-                          <RtiMoreHorizontal />
-                        </Icon>
-                      </Button>
-                    </ButtonGroup>
+                        <Button
+                          ref="moreButton"
+                          active={moreVisible.value}
+                          class={bem.e('more-toggle')}
+                          title={t('co.editor.more')}
+                          onClick={toggleMore}
+                        >
+                          <Icon>
+                            <RtiMoreHorizontal />
+                          </Icon>
+                        </Button>
+                      </ButtonGroup>
+                    )}
                   </ButtonGroupList>
                 </FloatToolbar>
                 {moreVisible.value && moreAnchor.value && (
@@ -230,13 +233,7 @@ export default defineComponent({
                       default: () => (
                         <FloatToolbar>
                           <ButtonGroup wrap={false}>
-                            <FormatFont />
-                            <FormatSize />
-                            <FormatMark format="superscript" icon={RtiSuperscript} />
-                            <FormatMark format="subscript" icon={RtiSubscript} />
-                            <FormatIndent delta={-1} icon={RtiIndentDecrease} />
-                            <FormatIndent delta={+1} icon={RtiIndentIncrease} />
-                            <FormatSource />
+                            {renderEditorTools(moreToolsEnabled.value)}
                           </ButtonGroup>
                         </FloatToolbar>
                       ),

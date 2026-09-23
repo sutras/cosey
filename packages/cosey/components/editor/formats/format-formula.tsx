@@ -9,7 +9,7 @@ import {
 } from 'vue';
 import { ElButton, ElInput, ElSpace } from 'element-plus';
 import katex from 'katex';
-import Button from '../button';
+import Button from '../ui/button';
 import { ContextMenuContent } from '../../context-menu';
 import { Panel } from '../../panel';
 import { FormDialog } from '../../form-dialog';

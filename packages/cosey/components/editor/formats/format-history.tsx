@@ -1,6 +1,6 @@
 import { computed, defineComponent, type PropType } from 'vue';
 import { Icon } from '../../icon';
-import Button from '../button';
+import Button from '../ui/button';
 import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';
 import { RtiRedo, RtiUndo } from 'richtext-icons';

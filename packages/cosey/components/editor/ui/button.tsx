@@ -1,6 +1,6 @@
 import { defineComponent, inject, onMounted, useTemplateRef } from 'vue';
-import { createBem } from '../../utils';
-import { pickerContextKey } from './formats/picker.api';
+import { createBem } from '../../../utils';
+import { pickerContextKey } from './picker.api';
 
 export interface EditorButtonExpose {
   el?: HTMLButtonElement;

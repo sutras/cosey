@@ -1,6 +1,6 @@
 import { defineComponent } from 'vue';
 import { Icon } from '../../icon';
-import Button from '../button';
+import Button from '../ui/button';
 import { useLocale } from '../../../hooks';
 import { useEditor } from '../pm/context';
 import { RtiClearFormat } from 'richtext-icons';

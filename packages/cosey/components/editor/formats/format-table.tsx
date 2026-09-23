@@ -7,8 +7,8 @@ import {
   useTemplateRef,
   type PropType,
 } from 'vue';
-import Picker from './picker';
-import Button from '../button';
+import Picker from '../ui/picker';
+import Button from '../ui/button';
 import { Icon } from '../../icon';
 import { ContextMenuContent } from '../../context-menu';
 import { createBem } from '../../../utils';

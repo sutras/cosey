@@ -1,7 +1,7 @@
 import { computed, defineComponent, reactive, ref } from 'vue';
 import { ElButton } from 'element-plus';
 import { Icon } from '../../icon';
-import Button from '../button';
+import Button from '../ui/button';
 import { FormDialog } from '../../form-dialog';
 import { Form, FormItem } from '../../form';
 import { useLocale } from '../../../hooks';
