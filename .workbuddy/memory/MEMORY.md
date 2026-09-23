@@ -179,6 +179,49 @@ build option '-p'`），要指定就写路径 `vue-tsc -b tsconfig.json`。它�
 - 排查手法：错误信息里的交叉类型就是「两个来源」的签名，去 `node_modules/element-plus` 里
   grep 对应 `.d.ts` 的 `options` 就能定位。
 
+## prismjs：语言包 + 全局 Prism（改 highlight / editor 前先看）
+
+三个文件、两层结构，别随手动：
+
+- `utils/prism.ts` —— **只建全局、导出实例**：`if (!globalThis.Prism) globalThis.Prism = Prism`（带守卫，
+  外部已有全局就沿用它，保证「注册进去的」和「读的」是同一个对象），`export const prism`。不装语言包。
+- `utils/prism-langs.ts` —— **语言包的唯一声明处**（16 个）：第一行 `import { prism } from './prism'`，
+  之后才是各语言包，末尾 `export { prism }`。使用方只认这个文件。
+- `components/highlight/highlight.api.ts`、`components/editor/pm/prism.ts` —— 各一行
+  `import { prism } from '.../utils/prism-langs'`，运行时 `prism.xxx`，**绝不再裸引核心、也别各自维护清单**。
+- **为什么必须拆两个文件**：同一模块内所有 `import` 都在模块体之前求值。若把语言包和核心放一个文件，
+  守卫写在模块体里就排在语言包之后，敌意环境下照样炸（实测反证过：语言包在前 → `ReferenceError:
+Prism is not defined`）。所以「守卫先于语言包」只能靠**模块间**的顺序来保证。
+- 顺序不变量由 `utils/prism-langs.test.ts` 钉住（`pnpm test:prism`，5 条）。它从 `highlight.api.ts`
+  的 `Lang*` 类型与 `content-code-block.tsx` 的 `languageOptions` **源码里抽语言名**，再逐个查
+  `prism.languages[x]`，所以清单漂移和「别处又裸引核心」都会当场变红。
+- 起因与历史事故：`prismjs/components/prism-*.js` **不是模块**，是直接读全局 `Prism` 的脚本；全局只由核心
+  `prism.js` 的 UMD 尾巴建立。打包器摇掉全局挂载、或换求值顺序 → 第三方消费时
+  `Uncaught ReferenceError: Prism is not defined`。第二起：highlight 的 `Lang` 里写了 `python`/`py`
+  但清单里没有 `prism-python`，只引 highlight 的项目里 `<Highlight lang="python">` 静默降级成纯文本
+  （组件里是 `Prism.languages[lang] || Prism.languages['text']`，不报错），因为 app 同时用了编辑器才一直没暴露。
+- `highlight.api.ts` 的 `export { prism as Prism }` 是对外 API（有消费方在用），改名按破坏性改动处理。
+- 语言包**无法被 tree-shake**：prismjs 和 cosey 的 package.json 都没有 `sideEffects` 字段，
+  副作用 import 一定保留。所以合并清单没有「本来能省掉」的体积损失，实测多带 python + json5 + nginx
+  约 4.1 KB raw / 2.0 KB gzip，且只影响「只引其中一个」的消费方。
+- 复现这类「只在打包后才炸」的问题：造一份「敌意核心」——把 `prism.js` 副本里的 `_self.Prism = _;`
+  删掉、把末尾的 `module.exports = Prism` 改成 `export default Prism`（否则 Vite 当 ESM 服务时没有
+  default 导出），再用 `resolve.alias: [{ find: /^prismjs$/, replacement: stub }]` 指过去。
+  **alias 必须用正则精确匹配**：字符串 key 会把 `prismjs/components/*` 一起改掉。
+  验证要在一个「不加载 app」的空 HTML 上做，否则应用启动时就已把全局建好了，对照会假绿。
+- 注意：esbuild 单 bundle 时会把核心的 `var Prism` 提升为模块作用域变量，语言包的裸引用被就近解析到它，
+  **测不出这个问题**；node/tsx 与浏览器里语言包各自是独立模块，才会真实暴露。
+- `node_modules/.vite/deps` 是**共享**预打包缓存（消费者项目也读同一份），换配置或修完 bug 后要先删掉
+  再验，否则会读到旧 chunk 得到假结论。
+- **编辑器的「能选」与「能渲染」是两条独立路径**，加语言时两边都想过：
+  - 下拉 = `editor/contents/content-code-block.tsx` 的 `languageOptions`（22–23 行那种 `{ value, label }`）。
+  - 渲染 = `prism.languages[language]`，取不到就静默不加装饰（`prismPlugin` 装饰器直接 return）。
+  - 第三条：`pm/schema.ts` 的 `getLanguageByClass(dom.className)`（parseDOM 读 `<pre class="language-xxx">`），
+    从外部粘一段带 class 的 `<pre>` 进来就会产生**下拉里没有**的 language 值。
+  - 所以「注册了但下拉里没有」（如 sass）不是冗余，是粘贴路径的开关，别顺手删；反过来「下拉里有但没注册」
+    才是 bug（python 事故）。两者都由 `prism-langs.test.ts` 从源码抽名字来钉。
+  - sass 已按 Tiny 的决定加进下拉（他就是产品，不省那几 KB）。
+
 ## ContextMenuContent 的 click 必须是 emit
 
 - `content.tsx` 的根 div 把 attrs 展开后又没关 `inheritAttrs`，同时外面还套了一层

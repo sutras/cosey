@@ -8,6 +8,7 @@ export const languageOptions = [
   { value: 'css', label: 'CSS' },
   { value: 'less', label: 'Less' },
   { value: 'scss', label: 'Scss' },
+  { value: 'sass', label: 'Sass' },
   { value: 'html', label: 'HTML' },
   { value: 'javascript', label: 'JavaScript' },
   { value: 'jsx', label: 'JSX' },
