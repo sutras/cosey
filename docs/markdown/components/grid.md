@@ -88,20 +88,49 @@ grid/breakpoints
 
 ### RowProps
 
-继承 [Row Attributes](https://element-plus.org/zh-CN/component/layout.html#row-attributes)，并添加以下属性：
-
-| 属性        | 描述       | 类型     | 默认值                      |
-| ----------- | ---------- | -------- | --------------------------- |
-| breakpoints | 自定义断点 | number[] | [576, 768, 992, 1200, 1600] |
+| 属性        | 描述                           | 类型                                                                                | 默认值                      |
+| ----------- | ------------------------------ | ----------------------------------------------------------------------------------- | --------------------------- |
+| tag         | 自定义元素标签                 | string                                                                              | 'div'                       |
+| gutter      | 列之间的间距                   | number                                                                              | 0                           |
+| justify     | flex 布局下的水平排列方式      | 'start' \| 'center' \| 'end' \| 'space-around' \| 'space-between' \| 'space-evenly' | —                           |
+| align       | flex 布局下的垂直排列方式      | 'top' \| 'middle' \| 'bottom'                                                       | —                           |
+| breakpoints | 自定义断点，用于计算响应式尺寸 | number[]                                                                            | [576, 768, 992, 1200, 1600] |
 
 ### RowSlots
 
-继承 [Row Slots](https://element-plus.org/zh-CN/component/layout.html#row-slots)。
+| 插槽    | 描述           | 属性 |
+| ------- | -------------- | ---- |
+| default | 自定义默认内容 | -    |
 
 ### ColProps
 
-继承 [Col Attributes](https://element-plus.org/zh-CN/component/layout.html#col-attributes)。
+| 属性   | 描述                               | 类型                    | 默认值 |
+| ------ | ---------------------------------- | ----------------------- | ------ |
+| tag    | 自定义元素标签                     | string                  | 'div'  |
+| span   | 栅格占据的列数                     | number                  | 24     |
+| offset | 栅格左侧的间隔格数                 | number                  | 0      |
+| push   | 栅格向右移动格数                   | number                  | 0      |
+| pull   | 栅格向左移动格数                   | number                  | 0      |
+| xs     | 容器宽度小于 576px 时的栅格配置    | number \| ColSizeObject | —      |
+| sm     | 容器宽度不小于 576px 时的栅格配置  | number \| ColSizeObject | —      |
+| md     | 容器宽度不小于 768px 时的栅格配置  | number \| ColSizeObject | —      |
+| lg     | 容器宽度不小于 992px 时的栅格配置  | number \| ColSizeObject | —      |
+| xl     | 容器宽度不小于 1200px 时的栅格配置 | number \| ColSizeObject | —      |
+| xxl    | 容器宽度不小于 1600px 时的栅格配置 | number \| ColSizeObject | —      |
+
+响应式属性传入 `number` 时表示该尺寸下的 `span`；传入对象时可精确指定各项数值。某个尺寸未设置时，会沿用比它小的最近一个已设置的尺寸。断点由 `row` 的 `breakpoints` 属性决定，测量的是 `row` 容器的宽度而非视口宽度。
+
+### ColSizeObject
+
+| 属性   | 描述               | 类型   | 默认值 |
+| ------ | ------------------ | ------ | ------ |
+| span   | 栅格占据的列数     | number | —      |
+| offset | 栅格左侧的间隔格数 | number | —      |
+| push   | 栅格向右移动格数   | number | —      |
+| pull   | 栅格向左移动格数   | number | —      |
 
 ### ColSlots
 
-继承 [Col Slots](https://element-plus.org/zh-CN/component/layout.html#col-slots)。
+| 插槽    | 描述           | 属性 |
+| ------- | -------------- | ---- |
+| default | 自定义默认内容 | -    |

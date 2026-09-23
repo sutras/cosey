@@ -9,46 +9,21 @@ import { wb2csv } from './csv';
 import { wb2txt } from './txt';
 import { type MayBeTableColumnProps, type TableColumnProps } from '../../components';
 import { isObject } from '../is';
+import { createBlob, downloadBlob } from '../file';
 
 /**
- * 根据提供的 url 下载文件
+ * 需要写 BOM 的纯文本格式
+ *
+ * 不带 BOM 的 UTF-8 csv/txt 在 Windows 版 Excel、WPS 里会被按 GBK 解码，中文必然乱码，
+ * 加 BOM 是最省事且各端都认的解法。序列化函数本身保持纯净，BOM 只在写文件这层加。
  */
-function downloadByUrl(url: string, filename: string) {
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-/**
- * 根据内容和mime类型生成 Blob
- */
-function createBlob(content: string, mimeType: string) {
-  const blob = new Blob([content], {
-    type: mimeType,
-  });
-  return blob;
-}
-
-/**
- * 根据 Blob 下载文件
- */
-function downloadByBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  downloadByUrl(url, filename);
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 60000);
-}
+const BOM_BOOK_TYPES: ExportBookType[] = ['csv', 'txt'];
 
 /**
  * 根据字符串下载文件
  */
 function downloadByString(string: string, filename: string, mimeType: string) {
-  const blob = createBlob(string, mimeType);
-  downloadByBlob(blob, filename);
+  downloadBlob(createBlob(string, mimeType), filename);
 }
 
 /**
@@ -59,7 +34,7 @@ async function writeFile(wb: WorkBook, bookType: ExportBookType) {
 
   if (bookType === 'xlsx') {
     const blob = await wb2xlsx(wb, mime);
-    downloadByBlob(blob, wb.name);
+    downloadBlob(blob, wb.name);
     return;
   }
 
@@ -79,7 +54,39 @@ async function writeFile(wb: WorkBook, bookType: ExportBookType) {
       content = wb2html(wb);
       break;
   }
-  downloadByString(content, wb.name, mime);
+
+  if (BOM_BOOK_TYPES.includes(bookType)) {
+    content = '\ufeff' + content;
+  }
+
+  downloadByString(content, wb.name, `${mime};charset=utf-8`);
+}
+
+/**
+ * 剔除无效列，并递归丢弃子列被剔光的组
+ *
+ * 表头（columns2aoa）与数据行（flatColumns）对「哪些列可见」必须有一致的定义：
+ * flatColumns 会丢掉非对象项、并把空的分组展平成 0 列，所以表头拿到的也必须是同一棵修剪后的树，
+ * 否则表头会多出格、整行错位（例如分组列的子列全被取消勾选时）。
+ */
+export function pruneColumns(columns: MayBeTableColumnProps[]): TableColumnProps[] {
+  return columns.reduce((result, column) => {
+    if (!isObject(column)) {
+      return result;
+    }
+
+    if (Array.isArray(column.columns)) {
+      const children = pruneColumns(column.columns);
+      // 子列被剔光的组在数据侧是 0 列，表头也不能留
+      if (children.length) {
+        result.push({ ...column, columns: children });
+      }
+      return result;
+    }
+
+    result.push(column);
+    return result;
+  }, [] as TableColumnProps[]);
 }
 
 /**
@@ -195,17 +202,32 @@ async function exportExcel(
   const { footerCount = 0 } = options || {};
   const worksheets = scheme.worksheet ? [scheme.worksheet] : scheme.worksheets || [];
 
+  if (!worksheets.length) {
+    throw new Error('exportExcel: 需要提供 worksheet 或 worksheets');
+  }
+
   const bookType = scheme.bookType || 'csv';
-  const filename = scheme.filename + getExtByBookType(bookType);
+  const ext = getExtByBookType(bookType);
+  const rawName = String(scheme.filename ?? '');
+  // 调用方常常自己带上扩展名（"报表.xlsx"），别拼成 "报表.xlsx.csv"
+  const filename = rawName.endsWith(ext) ? rawName : rawName + ext;
 
   const workBook = new WorkBook(filename);
 
   worksheets.forEach((sheet) => {
     const { name, columns, transform, noGroup, noHead } = sheet;
 
-    const fColumns = flatColumns(columns);
+    // 表头与数据必须基于同一棵树，否则表头列数与数据列数会对不上
+    const prunedColumns = pruneColumns(columns);
+    const fColumns = flatColumns(prunedColumns);
 
-    const ooa = Array.isArray(data) ? data : data[name];
+    const ooa = Array.isArray(data) ? data : data?.[name];
+
+    if (!Array.isArray(ooa)) {
+      throw new Error(
+        `exportExcel: 找不到工作表「${name}」的数据，data 需为数组或 { [sheetName]: 数组 }`,
+      );
+    }
 
     let aoa = ooa.map((obj, index) =>
       fColumns.map((column, colIndex) => {
@@ -224,7 +246,7 @@ async function exportExcel(
 
     let headAoa: Cell[][] = [];
     if (!noHead) {
-      headAoa = noGroup ? columns2lastLevelAoa(fColumns) : columns2aoa(columns);
+      headAoa = noGroup ? columns2lastLevelAoa(fColumns) : columns2aoa(prunedColumns);
       aoa = headAoa.concat(aoa);
     }
 

@@ -1,9 +1,18 @@
 import JSZip from 'jszip';
 import { WorkBook } from './workBook';
 import dayjs from 'dayjs';
-import { encodeCell, encodeRange } from './utils';
+import { encodeCell, encodeRange, escapeXml } from './utils';
 
-export const rNum = /^[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)$/;
+/**
+ * 只有真正的数字才写数字格。
+ *
+ * 不要用「长得像数字的字符串」来判断：`0012` 会被吃掉前导零，
+ * 18 位证件号会被 Excel 截成 15 位有效数字（末位归零），
+ * 19 位订单号同理，所以字符串一律按文本写。
+ */
+function isNumericCellValue(value: any): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
 
 /**
  * 将 WorkBook 转换为 xlsx blob
@@ -16,15 +25,19 @@ export async function wb2xlsx(wb: WorkBook, mime: string) {
 
   const sharedStrings: string[] = [];
   const uniqueSharedStrings: string[] = [];
+  const sharedStringIndex = new Map<string, number>();
 
   wb.sheets.forEach((sheet) => {
     sheet.sheet.forEach((row) => {
       row.forEach((cell) => {
+        if (isNumericCellValue(cell.value)) return;
+
         const value = String(cell.value ?? '');
 
-        if (value && !rNum.test(value)) {
+        if (value) {
           sharedStrings.push(value);
-          if (!uniqueSharedStrings.includes(value)) {
+          if (!sharedStringIndex.has(value)) {
+            sharedStringIndex.set(value, uniqueSharedStrings.length);
             uniqueSharedStrings.push(value);
           }
         }
@@ -63,7 +76,7 @@ export async function wb2xlsx(wb: WorkBook, mime: string) {
       `</HeadingPairs>`,
       `<TitlesOfParts>`,
       `<vt:vector size="${wb.sheets.length}" baseType="lpstr">`,
-      wb.sheets.map((sheet) => `<vt:lpstr>${sheet.name}</vt:lpstr>`).join(''),
+      wb.sheets.map((sheet) => `<vt:lpstr>${escapeXml(sheet.name)}</vt:lpstr>`).join(''),
       `</vt:vector>`,
       `</TitlesOfParts>`,
       `</Properties>`,
@@ -110,7 +123,6 @@ export async function wb2xlsx(wb: WorkBook, mime: string) {
         .map((_, idx) => {
           return `<Relationship Id="rId${idx + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${idx + 1}.xml" />`;
         })
-        .reverse()
         .join(''),
       `</Relationships>`,
     ].join(''),
@@ -146,7 +158,7 @@ export async function wb2xlsx(wb: WorkBook, mime: string) {
     });
 
     zip.file(
-      `xl/worksheets/sheet${wb.sheets.length - idx}.xml`,
+      `xl/worksheets/sheet${idx + 1}.xml`,
       [
         `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`,
         `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:etc="http://www.wps.cn/officeDocument/2017/etCustomData">`,
@@ -157,8 +169,8 @@ export async function wb2xlsx(wb: WorkBook, mime: string) {
             r: 0,
           },
           e: {
-            c: Math.max(...sheet.sheet.map((row) => row.length - 1)),
-            r: sheet.sheet.length - 1,
+            c: sheet.sheet.reduce((max, row) => Math.max(max, row.length - 1), 0),
+            r: Math.max(sheet.sheet.length - 1, 0),
           },
         })}" />`,
         `<sheetViews>`,
@@ -172,11 +184,20 @@ export async function wb2xlsx(wb: WorkBook, mime: string) {
           .map((row, idx) => {
             return `<row r="${idx + 1}" spans="1:${row.length}">${row
               .map((cell) => {
-                let value: number | string = String(cell.value ?? '');
-                const index = uniqueSharedStrings.indexOf(value);
-                value = index > -1 ? index : value;
-                const tAttr = index > -1 ? ` t="s"` : '';
-                return `<c r="${encodeCell({ c: cell.colIndex, r: cell.rowIndex })}"${tAttr}><v>${value}</v></c>`;
+                const ref = encodeCell({ c: cell.colIndex, r: cell.rowIndex });
+                const sAttr = cell.isHeader ? ' s="1"' : '';
+                const value = cell.value;
+
+                if (value === undefined || value === null || value === '') {
+                  return `<c r="${ref}"${sAttr} />`;
+                }
+
+                if (isNumericCellValue(value)) {
+                  return `<c r="${ref}"${sAttr}><v>${value}</v></c>`;
+                }
+
+                const index = sharedStringIndex.get(String(value))!;
+                return `<c r="${ref}"${sAttr} t="s"><v>${index}</v></c>`;
               })
               .join('')}</row>`;
           })
@@ -197,7 +218,9 @@ export async function wb2xlsx(wb: WorkBook, mime: string) {
     [
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`,
       `<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${sharedStrings.length}" uniqueCount="${uniqueSharedStrings.length}">`,
-      uniqueSharedStrings.map((value) => `<si><t>${value}</t></si>`).join(''),
+      uniqueSharedStrings
+        .map((value) => `<si><t xml:space="preserve">${escapeXml(value)}</t></si>`)
+        .join(''),
       `</sst>`,
     ].join(''),
   );
@@ -223,7 +246,7 @@ export async function wb2xlsx(wb: WorkBook, mime: string) {
       `<sheets>`,
       wb.sheets
         .map((sheet, idx) => {
-          return `<sheet name="${sheet.name}" sheetId="${idx + 1}" r:id="rId${idx + 1}" />`;
+          return `<sheet name="${escapeXml(sheet.name)}" sheetId="${idx + 1}" r:id="rId${idx + 1}" />`;
         })
         .join(''),
       `</sheets>`,

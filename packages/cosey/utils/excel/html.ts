@@ -1,4 +1,5 @@
 import { cssObjectToString } from '../css';
+import { escapeHtml } from './utils';
 import { WorkBook } from './workBook';
 
 /**
@@ -12,7 +13,7 @@ export function wb2html(wb: WorkBook) {
       return `<tr>${ws.sheet[idx]
         .filter((cell) => !cell.isEmpty)
         .map((cell) => {
-          return `<th rowspan="${cell.rowSpan}" colspan="${cell.colSpan}">${cell.value ?? ''}</th>`;
+          return `<th rowspan="${cell.rowSpan}" colspan="${cell.colSpan}">${escapeHtml(cell.value)}</th>`;
         })
         .join('')}</tr>`;
     })
@@ -24,7 +25,7 @@ export function wb2html(wb: WorkBook) {
     .map((_, idx) => {
       return `<tr>${ws.sheet[idx + ws.headRowCount]
         .map((cell) => {
-          return `<td>${cell.value ?? ''}</td>`;
+          return `<td>${escapeHtml(cell.value)}</td>`;
         })
         .join('')}</tr>`;
     })

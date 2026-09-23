@@ -9,7 +9,14 @@ export function aoa2sheet(sheetName: string, aoa: any[][]) {
 
   aoa.forEach((row, rowIndex) => {
     row.forEach((value, colIndex) => {
-      sheet.setCell(colIndex, rowIndex, value instanceof Cell ? value : new Cell(value));
+      const cell = value instanceof Cell ? value : new Cell(value);
+
+      // 表头以外的单元格（数据行、合并占位）不会自带行列号，
+      // 不补上的话序列化出的单元格引用会退化成非法的 "0"
+      if (cell.colIndex < 0) cell.colIndex = colIndex;
+      if (cell.rowIndex < 0) cell.rowIndex = rowIndex;
+
+      sheet.setCell(colIndex, rowIndex, cell);
     });
   });
 
@@ -75,10 +82,16 @@ export function decodeRange(range: string): Range {
  * 将下标列编码为 A1-Style 列
  */
 export function encodeCol(col: number) {
+  if (!Number.isInteger(col) || col < 0) {
+    throw new RangeError(`encodeCol 需要非负整数，收到 ${col}`);
+  }
+
+  // 是 26 进制的「双射」计数（没有 0 位，第 26 列是 Z 而不是 A@），
+  // 所以每一位都要先减 1 再取模
   let c = '';
 
-  for (col++; col; col = Math.floor(col / 26)) {
-    c = String.fromCharCode((col % 26) + 64) + c;
+  for (let n = col + 1; n > 0; n = Math.floor((n - 1) / 26)) {
+    c = String.fromCharCode(((n - 1) % 26) + 65) + c;
   }
   return c;
 }
@@ -102,4 +115,28 @@ export function encodeCell(cell: CellAddress) {
  */
 export function encodeRange(range: Range) {
   return encodeCell(range.s) + ':' + encodeCell(range.e);
+}
+
+/**
+ * 转义 xml 文本节点与属性值中的特殊字符
+ */
+export function escapeXml(value: any) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+/**
+ * 转义 html 文本节点中的特殊字符
+ */
+export function escapeHtml(value: any) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
