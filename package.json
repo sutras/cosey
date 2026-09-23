@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --force",
-    "build": "vue-tsc && vite build",
+    "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "prepare": "husky",
     "eslint": "eslint --cache --max-warnings 0  \"**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue}\" --fix",

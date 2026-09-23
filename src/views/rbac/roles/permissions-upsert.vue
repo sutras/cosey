@@ -59,7 +59,7 @@ defineExpose(expose);
 
 const permissionTree = ref();
 
-const { isFetching, execute } = useFetch<Record<PropertyKey, any>[][]>(
+const { isFetching, execute } = useFetch<void, number>(
   async (id) => {
     const [permTree, rolePermissions] = await Promise.all([
       getPermissionTree(),

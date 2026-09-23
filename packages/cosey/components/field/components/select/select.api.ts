@@ -30,7 +30,9 @@ export interface FieldSelectConvertedGroup {
 export type FieldSelectConvertedOption = FieldSelectConvertedGroup | FieldSelectObjectOption;
 
 export interface FieldSelectProps extends FieldComponentCommonProps {
-  componentProps?: Partial<ExtractPropTypes<SelectProps>> & {
+  // Omit 'options'：element-plus 自己的 options 只支持对象，与本组件的 options 交叉后会
+  // 变成 `Record<string, any>[] & FieldSelectOption[]`，字符串选项（本项目支持）就传不进来
+  componentProps?: Partial<Omit<ExtractPropTypes<SelectProps>, 'options'>> & {
     'onUpdate:modelValue'?: (value: any) => void;
     onChange?: (value: any) => void;
     onVisibleChange?: (visible: boolean) => void;

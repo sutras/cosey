@@ -34,3 +34,9 @@ export interface ContextMenuContentSlots {
 }
 
 export const contextMenuContentSlots = Object as SlotsType<ContextMenuContentSlots>;
+
+export const contextMenuContentEmits = {
+  click: (event: MouseEvent) => event instanceof MouseEvent,
+};
+
+export type ContextMenuContentEmits = typeof contextMenuContentEmits;
