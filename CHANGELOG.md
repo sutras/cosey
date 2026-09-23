@@ -1,5 +1,10 @@
 ## 0.0.0 (2026-09-23)
 
+## <small>1.1.1 (2026-09-23)</small>
+
+- fix: 修复esm中使用prism的模块问题 ([af7fc7a](https://github.com/sutras/cosey/commit/af7fc7a))
+- build: changelog ([f14127a](https://github.com/sutras/cosey/commit/f14127a))
+
 ## 1.1.0 (2026-09-23)
 
 - chore: update version ([085d459](https://github.com/sutras/cosey/commit/085d459))
