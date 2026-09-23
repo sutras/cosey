@@ -126,9 +126,22 @@
   `packages/cosey` → **文档站直接吃源码**，改 packages 下的代码不需要重建 `lib-dist`
   （`lib-dist` 已 gitignore，只在发布/独立消费时用）。
 - 类型检查分两套：`vue-tsc -p tsconfig.app.json`（include 只有 `src/ packages/ types/ plugins/`，
-  基线有 10 条既有报错：4 条在 `components/editor/formats/*.tsx`、`permissions-upsert.vue` 1 条、
-  `users/user-upsert.vue` 5 条）与 `vue-tsc -p docs/tsconfig.json`（docs 有独立 tsconfig，
-  `vitepress build` 不做类型检查，所以 docs 里的示例坏了也不会被 CI 拦住）。
+  **现已 0 报错**，2026-09-23 修完；此前长期挂着 10 条基线）与 `vue-tsc -p docs/tsconfig.json`
+  （docs 有独立 tsconfig，`vitepress build` 不做类型检查，所以 docs 里的示例坏了也不会被 CI 拦住；
+  它自带的 24 条报错全在 `docs/node_modules/vitepress/**`，与本仓库代码无关，看结果要
+  `grep -v node_modules`）。
+- **`vue-tsc` 不带参数 = 空转**：根 `tsconfig.json` 是 solution 式（`"files": []` + `references`），
+  不带 `-b` 时 TS 不检查被引用的 project，exit 0 且零输出 —— 曾经的 `build` 脚本就是这样白跑。
+  要真检查必须 `-b`（走 references，app + node 两个 project 都查）或显式 `-p <某个 project>`。
+- 现在 `"build": "vue-tsc -b && vite build"`。选 `-b` 而不是 `-p tsconfig.app.json` 是因为后者会漏掉
+  `tsconfig.node.json` 覆盖的 `vite.config.ts` / `plugins/**` / `scripts/**`（构建发布脚本写错没人拦）。
+  耗时实测：`-b` 冷 8.2s / 热 7.4s，`-p tsconfig.app.json` 7.5s（它每次全量，因为 app config 没开
+  `incremental`），差别可忽略。想强制全量可加 `--force`（实测 8.08s）。
+- `-b` 是独立模式：**不能再跟 `-p`**（`vue-tsc -b -p tsconfig.app.json` → `error TS5072: Unknown
+build option '-p'`），要指定就写路径 `vue-tsc -b tsconfig.json`。它的报错是精简格式
+  （`file:line:col - error TSxxxx`，不带源码片段），且某个 project 失败时不会写它的 buildinfo。
+- 仓库**没有 CI workflow**，`.husky/pre-commit` 只跑 lint-staged（eslint + prettier，不查类型），
+  所以 `build` 是唯一的类型检查关卡。
 
 ## 浏览器端行为验证（跑真机）
 
@@ -154,3 +167,21 @@
   **同名标签只记最后一次地址**（`/users?id=1` → `/users?id=2` 不会新开标签，只更新 fullPath）。
 - 首页标签的 fullPath 用 `router.resolve(routerConfig.homePath).fullPath`；别按 name resolve，
   home 路由无 name 时 setup 阶段会直接抛。
+
+## 类型坑：field 的 options 与 element-plus 撞车（加新字段组件时照抄）
+
+- `field/components/*/xxx.api.ts` 的 `componentProps` 是「EP props 的 Partial + 本组件自己的
+  `options`」。如果 EP 自己也声明了 `options`（select、checkbox-group 都有，radio-group 没有），
+  两者交叉成 `EPOption[] & FieldXOption[]`，本组件支持的**字符串/数字选项就传不进来**
+  （`mock.genders` 这类 `string[]` 会直接报错）。
+- 定式：`Partial<Omit<ExtractPropTypes<SelectProps>, 'options'>>`（EP 的 props 定义对象要过
+  `ExtractPropTypes`）或 `Partial<Omit<CheckboxGroupProps, 'options'>>`。radio-group 早就是这么写的。
+- 排查手法：错误信息里的交叉类型就是「两个来源」的签名，去 `node_modules/element-plus` 里
+  grep 对应 `.d.ts` 的 `options` 就能定位。
+
+## ContextMenuContent 的 click 必须是 emit
+
+- `content.tsx` 的根 div 把 attrs 展开后又没关 `inheritAttrs`，同时外面还套了一层
+  `context-menu-item`。要让 `<ContextMenuContent onClick={...}>` 在 TSX 里类型通过（且在 attrs
+  里不会因「显式展开 + 自动透传」被挂两次），做法是像 `contextMenuItemEmits` 一样声明
+  `contextMenuContentEmits = { click }`，再在根 div 上 `onClick={(e) => emit('click', e)}`。

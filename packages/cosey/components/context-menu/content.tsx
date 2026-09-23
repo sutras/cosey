@@ -1,13 +1,19 @@
 import { defineComponent, h, useTemplateRef } from 'vue';
 import { Icon } from '../icon';
 import { createBem, isString } from '../../utils';
-import { contextMenuContentProps, contextMenuContentSlots } from './content.api';
+import {
+  contextMenuContentEmits,
+  contextMenuContentProps,
+  contextMenuContentSlots,
+} from './content.api';
 import { RtiChevronRight } from 'richtext-icons';
 
 export default defineComponent({
+  name: 'CoContextMenuContent',
   props: contextMenuContentProps,
   slots: contextMenuContentSlots,
-  setup(props, { attrs, slots, expose }) {
+  emits: contextMenuContentEmits,
+  setup(props, { attrs, slots, emit, expose }) {
     const bem = createBem('context-menu');
 
     const itemRef = useTemplateRef<HTMLElement>('item');
@@ -25,6 +31,7 @@ export default defineComponent({
             bem.is('hover', props.hover),
             bem.is('active', props.active),
           ]}
+          onClick={(event) => emit('click', event)}
         >
           {slots.icon ? (
             <div class={bem.e('content-icon')}>{slots.icon({})}</div>

@@ -13,7 +13,9 @@ export type FieldCheckboxGroupOption = Partial<CheckboxProps> | string | number;
 type CheckboxPropsObjectOption = Partial<CheckboxProps> & { [k: string]: any };
 
 export interface FieldCheckboxGroupProps extends FieldComponentCommonProps {
-  componentProps?: Partial<CheckboxGroupProps> & {
+  // Omit 'options'：element-plus 自己的 options 只支持对象，与本组件的 options 交叉后会
+  // 变成 `CheckboxOption[] & FieldCheckboxGroupOption[]`，字符串选项（本项目支持）就传不进来
+  componentProps?: Partial<Omit<CheckboxGroupProps, 'options'>> & {
     'onUpdate:modelValue'?: (val: CheckboxGroupValueType) => void;
     onChange?: (val: CheckboxValueType[]) => void;
     [key: PropertyKey]: any;
