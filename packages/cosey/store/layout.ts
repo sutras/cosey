@@ -17,6 +17,11 @@ export type LayoutMenuType =
 export interface LayoutTab {
   name: string;
   meta: RouteMeta;
+  /**
+   * 标签页对应的完整地址（含 query / params），由标签栏自动维护；
+   * 外部自行添加标签页时可不传，此时按 name 跳转
+   */
+  fullPath?: string;
 }
 
 export const useLayoutStore = defineStore(
