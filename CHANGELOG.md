@@ -1,4 +1,16 @@
-## 0.0.0 (2026-09-09)
+## 0.0.0 (2026-09-23)
+
+## 1.1.0 (2026-09-23)
+
+- chore: update version ([085d459](https://github.com/sutras/cosey/commit/085d459))
+- fix: 修复xlsx文件导出兼容性问题 ([a90b241](https://github.com/sutras/cosey/commit/a90b241))
+- fix: 修复标签页切换导致参数丢失问题 ([95fbb81](https://github.com/sutras/cosey/commit/95fbb81))
+- fix: 修复类型报错 ([44b681b](https://github.com/sutras/cosey/commit/44b681b))
+- refactor: 优化useUpsert配置参数 ([f613472](https://github.com/sutras/cosey/commit/f613472))
+- refactor: 更换图标 ([f6e6ba0](https://github.com/sutras/cosey/commit/f6e6ba0))
+- refactor: 重构 editor 组件 ([8b68809](https://github.com/sutras/cosey/commit/8b68809))
+- feat(editor): 新增float菜单模式 ([951e2ad](https://github.com/sutras/cosey/commit/951e2ad))
+- build: changelog ([18dc3b0](https://github.com/sutras/cosey/commit/18dc3b0))
 
 ## <small>1.0.7 (2026-09-09)</small>
 
