@@ -5,21 +5,18 @@ import {
   type ShallowRef,
   type Ref,
   type ComputedRef,
-  type MaybeRef,
+  type MaybeRefOrGetter,
   computed,
   reactive,
   ref,
   shallowRef,
   useTemplateRef,
-  unref,
   readonly,
   nextTick,
-  MaybeRefOrGetter,
   toValue,
 } from 'vue';
 
 import { useLocale } from '../hooks';
-import { toRefs } from '@vueuse/core';
 
 const mapTypeTitle = {
   edit: 'co.common.edit',
@@ -31,8 +28,8 @@ export interface UseUpsertExposeOptions {
 }
 
 export interface UseUpsertExpose<Row extends Record<string, any>, Data = any> {
-  edit: (row: Row, ...args: any[]) => any;
-  add: (...args: any[]) => any;
+  edit: (row: Row, ...args: any[]) => Promise<void>;
+  add: (...args: any[]) => void;
   setData: (data: Data) => UseUpsertExpose<Row, Data>;
   setOptions: (options: UseUpsertExposeOptions) => any;
 }
@@ -54,8 +51,8 @@ export interface UseUpsertOptions<Model, Row = Model> {
   addFetch?: (...args: any[]) => any;
   editFetch?: (row: Row, ...args: any[]) => any;
   success?: (res: any) => any;
-  addSuccessText?: string;
-  editSuccessText?: string;
+  addSuccessText?: MaybeRefOrGetter<string>;
+  editSuccessText?: MaybeRefOrGetter<string>;
 }
 
 export interface UseUpsertReturn<
@@ -64,7 +61,7 @@ export interface UseUpsertReturn<
   Data = any,
 > extends UseUpsertExpose<Row, Data> {
   dialogProps: {
-    modelvalue: boolean;
+    modelValue: boolean;
     'onUpdate:modelValue': (value: boolean) => void;
     title: string;
   };
@@ -73,38 +70,26 @@ export interface UseUpsertReturn<
     ref: string;
     submit: () => Promise<void>;
   };
-  formRef: any;
-  data: Ref<Data | undefined>;
+  formRef: Readonly<ShallowRef<any>>;
+  data: ShallowRef<Data | undefined>;
   expose: UseUpsertExpose<Row, Data>;
   row: ShallowRef<Row | undefined>;
   type: Readonly<Ref<UpsertType>>;
   isEdit: ComputedRef<boolean>;
   isAdd: ComputedRef<boolean>;
+  loading: Readonly<Ref<boolean>>;
 }
 
 export function useUpsert<
   Model extends Record<string, any>,
   Row extends Record<string, any> = Model,
   Data = any,
->(options: MaybeRef<UseUpsertOptions<Model, Row>>): UseUpsertReturn<Model, Row, Data> {
-  const {
-    model,
-    stuffTitle,
-    title,
-    addSuccessText,
-    editSuccessText,
-    onAdd,
-    onEdit,
-    onShow,
-    onShown,
-    onShownAdd,
-    onShownEdit,
-    detailsFetch,
-    beforeFill,
-    addFetch,
-    editFetch,
-    success,
-  } = toRefs(computed(() => unref(options)));
+>(options: MaybeRefOrGetter<UseUpsertOptions<Model, Row>>): UseUpsertReturn<Model, Row, Data> {
+  // options 可以是对象、ref 或 getter：写成 computed(() => ({ stuffTitle: t('...') }))
+  // 即可让标题跟随语言切换。这里是唯一的取值入口，省掉满屏的 unref。
+  const _options = computed(() => toValue(options));
+
+  const getModel = () => _options.value.model;
 
   const { t, lang } = useLocale();
 
@@ -116,15 +101,17 @@ export function useUpsert<
   const visible = ref(false);
 
   const mergedTitle = computed(() => {
+    const { title, stuffTitle } = _options.value;
+
     return (
-      toValue(unref(title)) ||
+      toValue(title) ||
       t(mapTypeTitle[type.value]) +
         (lang.value === 'zh-cn' ? '' : ' ') +
-        (toValue(unref(stuffTitle)) || '')
+        (toValue(stuffTitle) || '')
     );
   });
 
-  const initialModel = cloneDeep(unref(model));
+  const initialModel = cloneDeep(getModel());
 
   const modelKeys = Object.keys(initialModel);
 
@@ -134,7 +121,7 @@ export function useUpsert<
       visible.value = value;
     },
     title: mergedTitle,
-  }) as unknown as UseUpsertReturn<Model, Row, Data>['dialogProps'];
+  });
 
   // data
   const data = shallowRef<Data>();
@@ -142,74 +129,137 @@ export function useUpsert<
   let addParams: any[] = [];
   let editParams: any[] = [];
 
+  // 打开序号：add / edit 各自自增。只有最后一次打开发起的异步回填和回调生效，
+  // 否则连续点两行的「编辑」时，先发出、后返回的详情会覆盖后打开的表单。
+  let openSeq = 0;
+
+  // 正在进行的详情回填，提交前要等它结束（详情没回来就提交等于提交重置后的空表单）
+  let pendingFill: Promise<void> | null = null;
+
+  // detailsFetch / beforeFill 进行中
+  const loading = ref(false);
+
   // form
   const formRefKey = auid();
 
   const formRef = useTemplateRef(formRefKey);
 
   const onSubmit = async () => {
+    await pendingFill;
+
+    const { addFetch, editFetch, addSuccessText, editSuccessText, success } = _options.value;
+
     let res: any;
 
-    if (type.value === 'add') {
-      res = await unref(addFetch)?.(...addParams);
-      ElMessage.success(unref(addSuccessText) || t('co.common.operateSuccess'));
+    if (isAdd.value) {
+      res = await addFetch?.(...addParams);
+      ElMessage.success(toValue(addSuccessText) || t('co.common.operateSuccess'));
     } else {
-      res = await unref(editFetch)?.(row.value!, ...editParams);
-      ElMessage.success(unref(editSuccessText) || t('co.common.operateSuccess'));
+      res = await editFetch?.(row.value!, ...editParams);
+      ElMessage.success(toValue(editSuccessText) || t('co.common.operateSuccess'));
     }
 
-    unref(success)?.(res);
+    success?.(res);
     exposeOptions?.success?.();
   };
 
   const formProps = reactive({
-    model,
+    model: computed(getModel),
     ref: formRefKey,
     submit: onSubmit,
-  }) as unknown as UseUpsertReturn<Model, Row, Data>['formProps'];
+  });
 
   // expose
   let exposeOptions: UseUpsertExposeOptions;
 
   const expose: UseUpsertExpose<Row, Data> = {
-    edit: async (_row, ...args) => {
+    edit: (_row, ...args) => {
+      const seq = ++openSeq;
+      const target = cloneDeep(_row);
+      const opts = _options.value;
+
       editParams = args;
       type.value = 'edit';
-      row.value = cloneDeep(_row);
-      deepAssign(unref(model), initialModel);
+      row.value = target;
+      deepAssign(getModel(), initialModel);
 
-      unref(onEdit)?.(row.value, ...editParams);
+      opts.onEdit?.(target, ...args);
 
       visible.value = true;
-      unref(onShow)?.();
+      opts.onShow?.();
 
       nextTick(() => {
-        unref(onShown)?.();
-        unref(onShownEdit)?.(_row, ...editParams);
+        if (seq !== openSeq) return;
+
+        _options.value.onShown?.();
+        _options.value.onShownEdit?.(target, ...args);
       });
 
-      let filledRow = row.value;
-      if (unref(detailsFetch)) {
-        filledRow = await unref(detailsFetch)!(row.value);
-      }
-      filledRow = cloneDeep(filledRow);
-      filledRow = (await unref(beforeFill)?.(filledRow)) || filledRow;
-      Object.assign(unref(model), pick(filledRow, modelKeys));
+      const fill = async () => {
+        loading.value = true;
+
+        try {
+          let filledRow: any = target;
+
+          if (opts.detailsFetch) {
+            filledRow = await opts.detailsFetch(target);
+          }
+          if (seq !== openSeq) return;
+
+          filledRow = cloneDeep(filledRow);
+          filledRow = (await opts.beforeFill?.(filledRow)) || filledRow;
+          if (seq !== openSeq) return;
+
+          Object.assign(getModel(), pick(filledRow, modelKeys));
+        } catch (err) {
+          console.error(err);
+
+          // 详情取不到，留着空表单容易被误提交
+          if (seq === openSeq) {
+            visible.value = false;
+          }
+        } finally {
+          if (seq === openSeq) {
+            loading.value = false;
+          }
+        }
+      };
+
+      const task = fill();
+
+      const clear = () => {
+        if (pendingFill === tracked) {
+          pendingFill = null;
+        }
+      };
+
+      const tracked = task.then(clear, clear);
+      pendingFill = tracked;
+
+      return tracked;
     },
     add: (...args) => {
+      const seq = ++openSeq;
+      const opts = _options.value;
+
       addParams = args;
       type.value = 'add';
       row.value = undefined;
-      deepAssign(unref(model), initialModel);
+      deepAssign(getModel(), initialModel);
 
-      unref(onAdd)?.(...addParams);
+      // 上一次 edit 的回填已被序号作废，它不会再把 loading 关掉
+      loading.value = false;
+
+      opts.onAdd?.(...args);
 
       visible.value = true;
-      unref(onShow)?.();
+      opts.onShow?.();
 
       nextTick(() => {
-        unref(onShown)?.();
-        unref(onShownAdd)?.(...addParams);
+        if (seq !== openSeq) return;
+
+        _options.value.onShown?.();
+        _options.value.onShownAdd?.(...args);
       });
     },
     setData: (_data: Data) => {
@@ -217,7 +267,7 @@ export function useUpsert<
       return expose;
     },
     setOptions: (options: UseUpsertExposeOptions) => {
-      exposeOptions = options;
+      exposeOptions = { ...exposeOptions, ...options };
     },
   };
 
@@ -232,6 +282,7 @@ export function useUpsert<
     type: readonly(type),
     isEdit,
     isAdd,
+    loading: readonly(loading),
   };
 
   return result;
@@ -243,7 +294,7 @@ export interface UseExternalUpsertOptions {
 
 export interface UseExternalUpsertReturn<Row extends Record<string, any>, Data> {
   add: (...args: any[]) => void;
-  edit: (...args: any[]) => void;
+  edit: (row: Row, ...args: any[]) => Promise<void>;
   setData: (data: Data) => void;
   expose: Readonly<ShallowRef<UseUpsertExpose<Row, Data> | null>>;
   ref: (_expose: any) => void;
@@ -266,8 +317,8 @@ export function useOuterUpsert<Row extends Record<string, any>, Data>(
     expose.value?.add(...args);
   };
 
-  const edit = (row: Row, ...args: any) => {
-    expose.value?.edit(row, ...args);
+  const edit = async (row: Row, ...args: any[]) => {
+    await expose.value?.edit(row, ...args);
   };
 
   const setData = (data: Data) => {

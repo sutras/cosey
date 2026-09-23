@@ -18,6 +18,8 @@ form-dialog/basic
 
 可使用 `useUpsert` 来简化“新增/编辑”弹出框表单的使用。
 
+编辑时详情回填是异步的，回填期间 `loading` 为 `true`，可以绑定 `v-loading` 避免先闪一个空表单。
+
 ::: demo
 
 form-dialog/user-upsert
@@ -27,6 +29,8 @@ form-dialog/user-upsert
 ### useOuterUpsert
 
 “新增/编辑”弹出框表单一般放在单独的文件中，为了简化操作，可以使用 `useOuterUpsert` 函数。
+
+`add`、`edit` 返回 `Promise`，`await` 之后表单已经回填完成，可以在打开后继续操作表单。
 
 ::: demo
 
@@ -53,9 +57,9 @@ form-dialog/use-outer-upsert
 
 继承 `element-plus` 的 [Dialog Slots](https://element-plus.org/zh-CN/component/dialog.html#slots)，并添加以下插槽。
 
-| 插槽   | 描述           | 属性                                                                            |
-| ------ | -------------- | ------------------------------------------------------------------------------- |
-| button | 自定义表单按钮 | { submitting: boolean; confirm: () => any \| Promise\<any>; cancel: () => any;} |
+| 插槽   | 描述           | 属性                                                                             |
+| ------ | -------------- | -------------------------------------------------------------------------------- |
+| button | 自定义表单按钮 | { submitting: boolean; confirm: () => any \| Promise\<any\>; cancel: () => any;} |
 
 ### FormDialogEmits
 
@@ -72,11 +76,11 @@ function useUpsert<
   Model extends Record<string, any>,
   Row extends Record<string, any> = Model,
   Data = any,
->(options: MaybeRef<UseUpsertOptions<Model, Row>>): UseUpsertReturn<Model, Row, Data>;
+>(options: MaybeRefOrGetter<UseUpsertOptions<Model, Row>>): UseUpsertReturn<Model, Row, Data>;
 
 interface UseUpsertOptions<Model, Row = Model> {
-  title?: string;
-  stuffTitle?: string;
+  title?: MaybeRefOrGetter<string>;
+  stuffTitle?: MaybeRefOrGetter<string>;
   model: Model;
   onAdd?: (...args: any[]) => void;
   onEdit?: (row: Row, ...args: any[]) => void;
@@ -89,8 +93,8 @@ interface UseUpsertOptions<Model, Row = Model> {
   addFetch?: (...args: any[]) => any;
   editFetch?: (row: Row, ...args: any[]) => any;
   success?: (res: any) => any;
-  addSuccessText?: string;
-  editSuccessText?: string;
+  addSuccessText?: MaybeRefOrGetter<string>;
+  editSuccessText?: MaybeRefOrGetter<string>;
 }
 
 interface UseUpsertReturn<
@@ -99,7 +103,7 @@ interface UseUpsertReturn<
   Data = any,
 > extends UseUpsertExpose<Row, Data> {
   dialogProps: {
-    modelvalue: boolean;
+    modelValue: boolean;
     'onUpdate:modelValue': (value: boolean) => void;
     title: string;
   };
@@ -108,18 +112,19 @@ interface UseUpsertReturn<
     ref: string;
     submit: () => Promise<void>;
   };
-  formRef: any;
-  data: Ref<Data | undefined>;
+  formRef: Readonly<ShallowRef<any>>;
+  data: ShallowRef<Data | undefined>;
   expose: UseUpsertExpose<Row, Data>;
   row: ShallowRef<Row | undefined>;
   type: Readonly<Ref<UpsertType>>;
   isEdit: ComputedRef<boolean>;
   isAdd: ComputedRef<boolean>;
+  loading: Readonly<Ref<boolean>>;
 }
 
 interface UseUpsertExpose<Row extends Record<string, any>, Data = any> {
-  edit: (row: Row, ...args: any[]) => any;
-  add: (...args: any[]) => any;
+  edit: (row: Row, ...args: any[]) => Promise<void>;
+  add: (...args: any[]) => void;
   setData: (data: Data) => UseUpsertExpose<Row, Data>;
   setOptions: (options: UseUpsertExposeOptions) => any;
 }
@@ -135,8 +140,8 @@ type UpsertType = 'edit' | 'add';
 
 | 属性            | 描述                                                                                                             |
 | --------------- | ---------------------------------------------------------------------------------------------------------------- |
-| title           | 完整标题，会替换 `stuffTitle`                                                                                    |
-| stuffTitle      | 标题后缀，会使用 '新增'、'编辑' 拼接。                                                                           |
+| title           | 完整标题，会替换 `stuffTitle`。支持 `string`、`Ref` 或 `() => string`                                            |
+| stuffTitle      | 标题后缀，会使用 '新增'、'编辑' 拼接。支持 `string`、`Ref` 或 `() => string`                                     |
 | model           | 表单的模型对象，必填                                                                                             |
 | onAdd           | 调用 UseExternalUpsertReturn['add'] 方法时触发的回调，接收传递的所有参数                                         |
 | onEdit          | 调用 UseExternalUpsertReturn['edit'] 方法时触发的回调，接收传递的所有参数                                        |
@@ -148,9 +153,9 @@ type UpsertType = 'edit' | 'add';
 | beforeFill      | 调用 UseExternalUpsertReturn['edit'] 方法时触发的回调，用于回填表单前修改数据                                    |
 | addFetch        | 用于提交新增表单                                                                                                 |
 | editFetch       | 用于提交编辑表单                                                                                                 |
-| success         | 提交表单成功后的回调                                                                                             |
-| addSuccessText  | 新增成功后的提示语                                                                                               |
-| editSuccessText | 编辑成功后的提示语                                                                                               |
+| success         | 提交表单成功后的回调，接收接口的返回值                                                                           |
+| addSuccessText  | 新增成功后的提示语。支持 `string`、`Ref` 或 `() => string`                                                       |
+| editSuccessText | 编辑成功后的提示语。支持 `string`、`Ref` 或 `() => string`                                                       |
 
 #### UseUpsertReturn
 
@@ -160,9 +165,20 @@ type UpsertType = 'edit' | 'add';
 | formProps   | 绑定到 `Form` 组件的属性                                               |
 | data        | 获取通过 UseExternalUpsertReturn['setData'] 设置的数据                 |
 | expose      | 表单弹出框组件暴露出去的对象，用于连接 `useUpsert` 和 `useOuterUpsert` |
+| formRef     | `Form` 组件的实例                                                      |
+| row         | 当前编辑的行（`edit` 传入行的深拷贝），新增时为 `undefined`            |
 | type        | 当前表单类型（新增或编辑）                                             |
 | isEdit      | 是否为编辑表单                                                         |
 | isAdd       | 是否为新增表单                                                         |
+| loading     | 详情回填（`detailsFetch`、`beforeFill`）进行中                         |
+
+#### 补充说明
+
+- 只有 `model` 初始声明过的字段会被回填和重置，详情接口返回的其它字段会被忽略。
+- 详情回填是异步的：回填完成前点确定，会先等回填结束再提交；接口较慢时可以给表单项绑定 `v-loading="loading"`。
+- 详情接口报错时会关闭对话框，避免用户对着空表单提交。
+- 同一时刻只认最后一次打开的详情结果：连续点两行的“编辑”，或编辑过程中切到“新增”，前一次打开的详情会被丢弃。
+- `edit`、`add` 返回 `Promise`，`await` 之后表单已经回填完成。
 
 ### useOuterUpsert
 
@@ -177,7 +193,7 @@ interface UseExternalUpsertOptions {
 
 interface UseExternalUpsertReturn<Row extends Record<string, any>, Data> {
   add: (...args: any[]) => void;
-  edit: (...args: any[]) => void;
+  edit: (row: Row, ...args: any[]) => Promise<void>;
   setData: (data: Data) => void;
   expose: Readonly<ShallowRef<UseUpsertExpose<Row, Data> | null>>;
   ref: (_expose: any) => void;
@@ -195,6 +211,6 @@ interface UseExternalUpsertReturn<Row extends Record<string, any>, Data> {
 | 属性    | 描述                                                         |
 | ------- | ------------------------------------------------------------ |
 | add     | 显示表单弹出框，并设置类型为“新增”                           |
-| edit    | 显示表单弹出框，并设置类型为“编辑”                           |
+| edit    | 显示表单弹出框，设置类型为“编辑”并回填详情，返回 `Promise`   |
 | setData | 设置数据，可通过 UseUpsertReturn['data'] 获取                |
 | ref     | 用于获取表单弹出框组件，连接 `useUpsert` 和 `useOuterUpsert` |

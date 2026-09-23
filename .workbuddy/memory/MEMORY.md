@@ -98,3 +98,34 @@
   `"type": "module"` 作用域下被当 CJS（top-level await 直接报错），且 `mime` 这类非根依赖只有在
   `packages/cosey/**` 里才解析得到。
 - shell 里不要用 `sed` 处理含中文的行（会报 No such file or directory），改用 python 读写。
+
+## hooks/useUpsert（新增/编辑弹框状态机）
+
+- 两个 hook 分工：`useUpsert`（内层，持有 model + 各 Fetch，`defineExpose(expose)` 交控制权）、
+  `useOuterUpsert`（外层，只做 `add()/edit(row)/setData()` + `success` 刷新表格）。
+- 打开序号 `openSeq`：add / edit 各自自增，**回填与 `nextTick` 里的 `onShown*` 都必须过
+  `seq === openSeq` 校验**。这保证「连点两行编辑」「编辑途中切新增」时，先发起的详情不写进后开的表单。
+- `pendingFill` + `onSubmit` 的 `await pendingFill`：详情未回填完就点确定，会等回填结束再提交。
+  新增回填任务时要照旧用 `task.then(clear, clear)` 包一层，别让 fill 的错误变成 unhandled rejection。
+- 详情接口报错 → `console.error` + 关闭弹框（不能留空表单给用户提交）；`loading` 暴露给用户
+  绑 `v-loading`（`detailsFetch` / `beforeFill` 期间为 true）。
+- 回填范围由 `modelKeys = Object.keys(cloneDeep(model))` 决定：**只有 model 初始声明过的字段**
+  会被回填和重置，详情返回的其它字段被 `pick` 丢掉。
+- options 支持对象 / ref / getter（`MaybeRefOrGetter`），统一从 `_options.value` 取值；
+  内部不要退回 vueuse `toRefs(computed)` 那套（每次读任一 option 都会重跑整个 options 工厂）。
+- `formProps.ref` 不是 Form 的 prop：它靠 `v-bind` 展开时 Vue 把 `ref` 当模板 ref，配合
+  `useTemplateRef(auid())` 取实例，改 `formProps` 的键时别动它。
+- 回归测试：`pnpm test:upsert`（= `tsx ./packages/cosey/hooks/useUpsert.test.ts`）。
+  该测试跑在 node 里，需要两个前提：`createApp({}).runWithContext()` 补 inject 上下文
+  （否则 `useLocale()` 直接炸），并替换 `ElMessage.success`（它要真实 DOM）。
+  反证方式：临时把测试的 import 指向 `git show HEAD:...useUpsert.ts` 的副本，用例应当全红。
+
+## 包解析与类型检查范围
+
+- `packages/cosey` 的 `main`/`module` 都是 `index.ts`，且 `docs/node_modules/cosey` 软链到
+  `packages/cosey` → **文档站直接吃源码**，改 packages 下的代码不需要重建 `lib-dist`
+  （`lib-dist` 已 gitignore，只在发布/独立消费时用）。
+- 类型检查分两套：`vue-tsc -p tsconfig.app.json`（include 只有 `src/ packages/ types/ plugins/`，
+  基线有 10 条既有报错：4 条在 `components/editor/formats/*.tsx`、`permissions-upsert.vue` 1 条、
+  `users/user-upsert.vue` 5 条）与 `vue-tsc -p docs/tsconfig.json`（docs 有独立 tsconfig，
+  `vitepress build` 不做类型检查，所以 docs 里的示例坏了也不会被 CI 拦住）。
