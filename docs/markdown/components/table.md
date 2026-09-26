@@ -24,7 +24,142 @@ table/basic
 
 :::
 
+### 筛选条件与 url 同步
+
+`useTable` 把「筛选模型 → 请求参数 → url」这条链路收在一起，顺序由内部保证（模型先于首次请求存在、`formSchemes` 在 `computed` 里求值、重查回调等表格挂载之后再注册）：
+
+- `formSchemes`：筛选表单的方案，推荐写成工厂 `(model) => [...]` —— 工厂里能拿到筛选模型，读到的响应式值也会被收集；各项的 `modelValue` 同时就是该字段的初值（与 `co-table-query` 的约定一致）；
+- `urlFields`：声明哪些筛选字段与 url **双向同步**（**不叫 `fields`**，因为 `fields` 在 cosey 里已经分别指表单暴露的 `FormItemContext[]`、导出时的列 prop，而同一个 `useTable` 的返回值上还有 `getFieldsValue()` —— 那是查询表单的**全部**字段值）；
+- 第二个返回值上的 `model`：表格之外也能直接读写筛选条件。
+
+::: demo
+
+table/query
+
+:::
+
+带条件跳转时，接收页声明 `urlFields`，url 上的条件会在**第一次请求之前**落到模型（而不是先拉全量再补一次）：
+
+```ts
+const [tableProps] = useTable<CommentQuery>({
+  api: getComments,
+  columns: [...],
+  // 初值写在各项的 modelValue 上
+  formSchemes: (model) => [
+    { prop: 'content', label: '评论内容', modelValue: '' },
+    // url 上是 ?postId=18，模型里的字段也叫 postId
+    pinnedSelectScheme({ prop: 'postId', label: '所属文章', select: postSelectConfig, model }),
+  ],
+  urlFields: { postId: parseNumber },
+});
+```
+
+跳转方用 `compactQuery` 拼 url，没有值的字段不会留下 `?postId=`：
+
+```ts
+router.push({ path: '/blog/comments', query: compactQuery({ postId: row.id }) });
+```
+
+url 参数名与模型字段名不一致时用 `param` 声明（给数组表示兼容多个别名）：
+
+```ts
+urlFields: {
+  postTypeId: { param: 'type', parse: parseNumber },
+}
+```
+
+关联字段用 `pinnedSelectScheme` 而不是直接写 `fieldProps`：`co-remote-select` 只在**挂载时**按 `immediate` 拉一次数据来解析当前值的标签，而 url 变化时组件不会重建，标签会退化成裸 id（例如显示 `17`）。它给 scheme 挂了一个以当前值为内容的 `key`，值一变就重建 form-item，重新解析出标签。
+
 ## API
+
+### useTable
+
+`useTable(options)` 配置表格属性，返回 `[tableProps, expose]`：表格属性直接 `v-bind` 给 `co-table`，组件方法与筛选模型在第二个元素上。
+
+`options` 可以是对象，也可以是 getter / `computed` —— 后者让整份属性跟随响应式数据重算（例如列里用到 `t()`、权限码）：
+
+```ts
+const [tableProps, { reload }] = useTable(() => ({
+  api: getRoles,
+  columns: [{ prop: 'name', label: t('rbac.roleName') }],
+}));
+```
+
+| 属性          | 描述                                                                                                      | 类型                                                                       | 默认值   |
+| ------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------- |
+| api           | 请求数据的函数                                                                                            | (...args: any[]) => Promise\<any>                                          | -        |
+| columns       | 定义表格列；传函数可跟随响应式数据重算                                                                    | MaybeRefOrGetter\<[TableColumnProps](#tablecolumnprops)[]>                 | []       |
+| actionColumn  | 定义表格操作列                                                                                            | MaybeRefOrGetter\<[TableColumnProps](#tablecolumnprops)>                   | -        |
+| formSchemes   | 筛选表单的方案；各项的 `modelValue` 即该字段初值                                                          | [TableSchemes](#tableschemes)                                              | -        |
+| urlFields     | 与 url 双向同步的筛选字段                                                                                 | Partial\<Record\<keyof T & string, [QueryFieldConfig](#queryfieldconfig)>> | -        |
+| onQueryChange | url 上的筛选条件变化后怎么重查：`'submit'` 回到第 1 页、`'reload'` 保留当前页                             | `'submit' \| 'reload'`                                                     | 'submit' |
+| formProps     | 查询表单的其它配置；`model` / `resetValues` 由内部接管，`schemes` 也可写在这里（顶层 `formSchemes` 优先） | [TableQueryProps](#tablequeryprops)                                        | -        |
+| 其它          | 透传给 `co-table`，如 `pagination` / `toolbarConfig` / `height`                                           | -                                                                          | -        |
+
+返回 `UseTableResult`（元组）：
+
+| 位置 | 属性        | 描述                                                                       | 类型                        |
+| ---- | ----------- | -------------------------------------------------------------------------- | --------------------------- |
+| 0    | tableProps  | 表格属性，`v-bind` 给 `co-table`                                           | ComputedRef\<TableProps>    |
+| 1    | model       | 筛选模型                                                                   | T                           |
+| 1    | queryFilter | url 同步能力（`fieldKeys` / `queryParams` / `onChange`）                   | [QueryFilter](#queryfilter) |
+| 1    | 其它        | 展开 [TableExpose](#tableexpose)，如 `reload` / `submit` / `getPagination` | TableExpose                 |
+
+> 兼容：`formProps.model` 仍可传入，此时模型由调用方提供（必须是 `reactive` 对象），
+> 同名 `formSchemes` 项的 `modelValue` 不再生效；正常用法不需要传，控制台会给出提示。
+
+### TableSchemes
+
+```ts
+type TableSchemes<T> =
+  | TableQueryScheme[] // 静态
+  | MaybeRefOrGetter<TableQueryScheme[]> // 跟随响应式数据
+  | ((model: T) => TableQueryScheme[]); // 推荐：能拿到筛选模型
+```
+
+### QueryFieldConfig
+
+```ts
+type QueryFieldConfig<T = any> =
+  | ((value: RawQueryValue) => T | undefined) // 解析函数
+  | {
+      parse?: (value: RawQueryValue) => T | undefined; // url → 模型
+      format?: (value: T) => QueryInput; // 模型 → url
+      param?: string | string[]; // url 参数名，数组表示兼容多个别名
+    };
+```
+
+内置解析器：`parseNumber`、`parseString`、`parseStringArray`。
+
+### QueryFilter
+
+| 属性        | 描述                                                      | 类型                                            |
+| ----------- | --------------------------------------------------------- | ----------------------------------------------- |
+| fieldKeys   | 受 url 管辖的字段名（模型字段名）                         | (keyof T & string)[]                            |
+| queryParams | 模型字段名 → url 主参数名                                 | Partial\<Record\<keyof T & string, string>>     |
+| onChange    | 注册「url 上的条件变了」之后的回调，通常传表格的 `submit` | (handler: () => void \| Promise\<void>) => void |
+| resetValues | 交给 `formProps.resetValues`，点「重置」时连 url 一起清空 | () => Record\<string, undefined>                |
+
+### pinnedSelectScheme
+
+生成关联筛选字段的 scheme，让「当前值不在选项里」时也能正确显示标签。
+
+| 属性   | 描述                         | 类型                                     |
+| ------ | ---------------------------- | ---------------------------------------- |
+| prop   | 字段名，同时是筛选模型的 key | string                                   |
+| label  | 筛选栏里的标签               | string                                   |
+| select | 远程选择器配置               | object（含 `api` / `props` / `keys` 等） |
+| model  | 筛选模型                     | object                                   |
+
+### withPinnedValue
+
+给远程选择器配置包一层：挂载即加载一次，当前值不在结果里就单独取回来置顶。
+
+| 参数           | 描述                       | 类型                                                   |
+| -------------- | -------------------------- | ------------------------------------------------------ |
+| config         | 远程选择器配置             | object                                                 |
+| getPinnedValue | 读取当前值，支持数组       | () => string \| number \| (string \| number)[] \| null |
+| options        | `valueKey` / `matchParams` | object                                                 |
 
 ### TableProps
 
@@ -172,7 +307,7 @@ const defaultTableConfig = {
 
 | 属性               | 描述                           | 类型                                                  |
 | ------------------ | ------------------------------ | ----------------------------------------------------- |
-| reload             | 刷新表格数据                   | () => void                                            |
+| reload             | 刷新表格数据                   | () => Promise\<void>                                  |
 | expandAll          | 展开所有                       | () => void                                            |
 | collapseAll        | 折叠所有                       | () => void                                            |
 | getFetchParams     | 获取接口请求参数               | () => Record<string, any>                             |

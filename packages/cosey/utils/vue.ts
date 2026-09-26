@@ -51,27 +51,6 @@ export function createMergedExpose<T = any>(
   }
 
   return result;
-
-  // return new Proxy(
-  //   keys.reduce(
-  //     (obj, key) => ((obj[key] = undefined), obj),
-  //     {} as Record<string, any>,
-  //   ),
-  //   {
-  //     get: (_, key: string) => {
-  //       for (const expose of exposeList) {
-  //         const obj = typeof expose === 'function' ? expose() : expose;
-  //         if (obj && key in obj) {
-  //           let value = obj[key];
-  //           if (typeof value === 'function') {
-  //             value = value.bind(obj);
-  //           }
-  //           return value;
-  //         }
-  //       }
-  //     },
-  //   },
-  // ) as T;
 }
 
 /**

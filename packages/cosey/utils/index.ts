@@ -21,3 +21,4 @@ export * from './tree';
 export * from './message-box';
 export * from './env';
 export * from './components';
+export * from './query';

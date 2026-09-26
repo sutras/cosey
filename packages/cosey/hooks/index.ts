@@ -22,3 +22,4 @@ export * from './useDir';
 export * from './useProps';
 export * from './useSingleUpload';
 export * from './useObjectUrl';
+export * from './useQueryFilter';
