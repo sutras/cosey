@@ -24,6 +24,47 @@ table/basic
 
 :::
 
+### 操作按钮的声明
+
+操作列上的按钮可以直接用 `actions` 声明，不必再开一个插槽手写 `<co-table-action>`——底层渲染的就是它，所以 `TableActionItemProps` 的字段（`label` / `icon` / `type` / `popconfirm` / `dropdown` …）全都照旧。
+
+`actions` 推荐写成工厂 `(row, $index) => [...]`：**它在每次渲染时求值**，每一项都能按当前行决定，工厂里读到的响应式值（权限码、开关状态…）也会被收集、跟着更新。
+
+```ts
+actionColumn: {
+  label: '操作',
+  fixed: 'right',
+  minWidth: 210,
+  actions: (row) => [
+    {
+      visible: hasCode(AuthCode.USER_UPDATE),
+      label: '编辑',
+      icon: 'bi bi-pencil',
+      onClick: () => upsert.edit(row),
+    },
+    {
+      label: '删除',
+      icon: 'bi bi-trash',
+      type: 'danger',
+      popconfirm: {
+        title: `确定删除「${row.nickname}」？`,
+        confirm: () => deleteUser(row.id).then(reload),
+      },
+    },
+  ],
+}
+```
+
+::: demo
+
+table/actions
+
+:::
+
+> 写成静态数组（`actions: [...]`）也能用，但数组只在 setup 阶段求值一次：`visible: hasCode(...)` 会变成快照，权限后到时不会重算。确实不需要行数据时再这么写。
+
+按钮之间的分割线默认显示，用 `divider: false` 关掉；不传则走全局配置 `config.tableAction.divider`。
+
 ### 筛选条件与 url 同步
 
 `useTable` 把「筛选模型 → 请求参数 → url」这条链路收在一起，顺序由内部保证（模型先于首次请求存在、`formSchemes` 在 `computed` 里求值、重查回调等表格挂载之后再注册）：
@@ -322,14 +363,26 @@ const defaultTableConfig = {
 
 继承 `element-plus` 的 [Table-column 属性](https://element-plus.org/zh-CN/component/table#table-column-%E5%B1%9E%E6%80%A7)，并支持以下属性。
 
-| 属性     | 描述                   | 类型                                                                                       | 默认值 |
-| -------- | ---------------------- | ------------------------------------------------------------------------------------------ | ------ |
-| slots    | 定义插槽或声明插槽名称 | TableColumnPropsSlots                                                                      | -      |
-| renderer | 使用内置渲染器进行渲染 | RendererType                                                                               | 'text' |
-| hidden   | 是否隐藏当前列         | boolean                                                                                    | false  |
-| columns  | 定义嵌套的表格列       | TableColumnProps[]                                                                         | -      |
-| tooltip  | 设置列头提示框         | string                                                                                     | -      |
-| format   | 格式化数据             | (cellValue: any, row: any, column: TableColumnCtx\<any>, index: number) => VNode \| string | -      |
+| 属性     | 描述                                        | 类型                                                                                       | 默认值 |
+| -------- | ------------------------------------------- | ------------------------------------------------------------------------------------------ | ------ |
+| slots    | 定义插槽或声明插槽名称                      | TableColumnPropsSlots                                                                      | -      |
+| renderer | 使用内置渲染器进行渲染                      | RendererType                                                                               | 'text' |
+| hidden   | 是否隐藏当前列                              | boolean                                                                                    | false  |
+| columns  | 定义嵌套的表格列                            | TableColumnProps[]                                                                         | -      |
+| tooltip  | 设置列头提示框                              | string                                                                                     | -      |
+| format   | 格式化数据                                  | (cellValue: any, row: any, column: TableColumnCtx\<any>, index: number) => VNode \| string | -      |
+| actions  | 操作按钮，与 `slots` 同时存在时以它为准     | [TableColumnActions](#tablecolumnactions)                                                  | -      |
+| divider  | 操作按钮之间的分割线，仅在 `actions` 下生效 | boolean                                                                                    | -      |
+
+### TableColumnActions
+
+```ts
+type TableColumnActions =
+  | TableActionProps['actions'] // 数组：直接渲染
+  | ((row: any, $index: number) => TableActionProps['actions']); // 工厂：推荐，可按行决定
+```
+
+工厂在每次渲染时求值，因此 `visible` / `onClick` / `popconfirm` 里都能用当前行，读到的响应式值也会跟着更新。
 
 ### TableColumnPropsSlots
 

@@ -1,6 +1,7 @@
 import { type VNode, type ExtractPropTypes, type PropType } from 'vue';
 import { type TableColumnCtx } from 'element-plus';
 import elTableColumnProps from 'element-plus/es/components/table/src/table-column/defaults.mjs';
+import { type TableActionProps } from '../../table-action/table-action.api';
 import { type RendererType } from './renderer';
 
 export type TableColumnPropsSlots =
@@ -11,6 +12,10 @@ export type TableColumnPropsSlots =
       header?: string | ((props: { column: any; $index: number }) => any);
       filterIcon?: string | ((props: { filterOpened: boolean }) => any);
     };
+
+export type TableColumnActions =
+  | TableActionProps['actions']
+  | ((row: any, $index: number) => TableActionProps['actions']);
 
 // 能用于递归
 export type TableColumnProps<T = any> = Partial<
@@ -26,6 +31,10 @@ export type TableColumnProps<T = any> = Partial<
   };
   tooltip?: string;
   format?: (cellValue: any, row: any, column: TableColumnCtx<any>, index: number) => VNode | string;
+  /** 操作按钮，见 `TableColumnActions`；与 `slots` 同时存在时以它为准 */
+  actions?: TableColumnActions;
+  /** 操作按钮之间的分割线，仅在 `actions` 下生效；不传时走全局 `config.tableAction.divider` */
+  divider?: boolean;
 };
 
 export type MayBeTableColumnProps = TableColumnProps | null | undefined | boolean;
@@ -57,6 +66,15 @@ export const tableColumnProps = {
   },
   format: {
     type: Function,
+  },
+  actions: {
+    type: [Array, Function] as PropType<TableColumnProps['actions']>,
+  },
+  divider: {
+    type: Boolean,
+    // 必须显式给 `undefined`：Boolean 的默认值是 `false`，
+    // 会把全局配置里的 `tableAction.divider` 一起盖掉
+    default: undefined,
   },
 };
 
