@@ -4,13 +4,14 @@
 
 <script setup lang="tsx">
 import { computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { ElMenu, ElMenuItem, ElMenuItemGroup, ElSubMenu } from 'element-plus';
 import { type MenuItem } from '../../router';
 import { useLayoutStore } from '../../store';
 import { defineTemplate } from '../../utils';
 import { Icon } from '../../components';
 import { createBem } from '../../utils';
+import { useRouteNavigate } from '../use-route-navigate';
 
 import { useI18n } from 'vue-i18n';
 
@@ -32,7 +33,7 @@ const props = withDefaults(
 const bem = createBem('layout-menu');
 
 const route = useRoute();
-const router = useRouter();
+const navigate = useRouteNavigate();
 
 const layoutStore = useLayoutStore();
 
@@ -55,9 +56,7 @@ const onMenuItemClick = (item: MenuItem) => {
   if (item._externalLink) {
     window.open(item.path, '_blank');
   } else {
-    router.push({
-      name: item.name,
-    });
+    navigate(item.name);
   }
 };
 

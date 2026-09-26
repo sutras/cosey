@@ -69,13 +69,13 @@
 
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import { throttle } from 'lodash-es';
 import { type MenuItem } from '../../router';
 import { useLayoutStore } from '../../store';
 import { useDocumentEvent } from '../../hooks';
 import { getControlKey } from '../../utils';
 import { Icon } from '../../components';
+import { useRouteNavigate } from '../use-route-navigate';
 
 import { type InputInstance, ElButton } from 'element-plus';
 import { useTimeoutFn } from '@vueuse/core';
@@ -96,7 +96,7 @@ const bem = createBem('layout-search');
 
 const controlKey = getControlKey();
 
-const router = useRouter();
+const navigate = useRouteNavigate();
 
 const layoutStore = useLayoutStore();
 
@@ -239,7 +239,7 @@ const onMouseEnter = (index: number) => {
 };
 
 const onSelect = (item: Option) => {
-  router.push({ name: item.name });
+  navigate(item.name);
   open.value = false;
 };
 </script>
