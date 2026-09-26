@@ -7,6 +7,7 @@ import classNames from 'classnames';
 
 import { useLocale } from '../../../hooks';
 import { Icon } from '../../icon';
+import { TableAction } from '../../table-action';
 import { getCssVar } from '../../../utils';
 import { RtiHelp } from 'richtext-icons';
 
@@ -78,6 +79,33 @@ const TableColumn = defineComponent({
       return result;
     });
 
+    /**
+     * `actions` 声明的操作按钮，渲染成 `co-table-action`。
+     * 返回 `undefined` 表示该列没有用 `actions`，交回给 `slots` 处理。
+     */
+    const renderActions = computed(() => {
+      const { actions, divider } = mergedProps.value;
+
+      if (!actions) {
+        return undefined;
+      }
+
+      return (slotProps: { row: any; $index: number }) => {
+        // element-plus 会先用 `{ row: {}, $index: -1 }` 调一次默认插槽来收集嵌套列，
+        // 那一次不渲染内容：免得把假 row 交给 `actions` 工厂（尤其别让它抛错）
+        if (slotProps.$index < 0) {
+          return [];
+        }
+
+        return [
+          <TableAction
+            actions={isFunction(actions) ? actions(slotProps.row, slotProps.$index) : actions}
+            divider={divider}
+          />,
+        ];
+      };
+    });
+
     const renderLabel = () => <span class={bem.e('label')}>{mergedProps.value.label}</span>;
 
     const renderTooltip = () => (
@@ -106,7 +134,7 @@ const TableColumn = defineComponent({
             default: (slotProps: any) =>
               mergedProps.value.columns
                 ? mergedProps.value.columns.map((column) => <TableColumn {...column} />)
-                : slots.value.default?.(slotProps),
+                : (renderActions.value?.(slotProps) ?? slots.value.default?.(slotProps)),
           }}
         />
       );
