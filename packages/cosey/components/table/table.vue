@@ -470,7 +470,7 @@ const getFullFetchParams = () => ({
   ...getFetchParams(),
 });
 
-const { isFetching, execute } = useFetch(
+const { isFetching, promise, execute } = useFetch(
   () => {
     const params = getFullFetchParams();
     return Promise.all([
@@ -628,10 +628,12 @@ const mergedToolbarConfig = computed<false | ToolbarConfig>(() => {
 // reload
 const reloading = ref(false);
 
-const reload = () => {
-  if (!isFetching.value) {
+const reload = async () => {
+  if (isFetching.value) {
+    await promise.value;
+  } else {
     reloading.value = true;
-    validateExecute().finally(() => {
+    await validateExecute().finally(() => {
       reloading.value = false;
     });
   }

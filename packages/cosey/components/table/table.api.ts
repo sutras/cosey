@@ -142,7 +142,7 @@ export interface TableSlots {
 export const elSlotsName = ['default', 'append', 'empty'] as const;
 
 export interface TableCustomExpose {
-  reload: () => void;
+  reload: () => Promise<void>;
   expandAll: () => void;
   collapseAll: () => void;
   getFetchParams: () => Record<string, any>;
