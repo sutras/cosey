@@ -1,4 +1,17 @@
-## 0.0.0 (2026-09-23)
+## 0.0.0 (2026-09-26)
+
+## 1.2.0 (2026-09-26)
+
+- chore: 更新工作纪要 ([6a9d3ce](https://github.com/sutras/cosey/commit/6a9d3ce))
+- chore: 更新工作纪要 ([23c3bfd](https://github.com/sutras/cosey/commit/23c3bfd))
+- feat(editor): 新增功能裁剪与工具栏配置，开放实例方法 ([271e77e](https://github.com/sutras/cosey/commit/271e77e))
+- feat(table): 操作列支持声明式 actions ([1fa58b6](https://github.com/sutras/cosey/commit/1fa58b6))
+- feat(table): 筛选条件与 url 双向同步 ([5368103](https://github.com/sutras/cosey/commit/5368103))
+- refactor(demo): 示例页面适配 useTable 的新签名 ([9dea568](https://github.com/sutras/cosey/commit/9dea568))
+- refactor(table): reload 返回 Promise，请求进行中时等待当前请求 ([7033096](https://github.com/sutras/cosey/commit/7033096))
+- fix(layout): 菜单、标签、搜索切换页面时保留查询参数 ([33fe8be](https://github.com/sutras/cosey/commit/33fe8be))
+- fix(remote-select): 单页时隐藏分页，空 footer 不再占位 ([5ace5b8](https://github.com/sutras/cosey/commit/5ace5b8))
+- build: changelog ([7e0b1e5](https://github.com/sutras/cosey/commit/7e0b1e5))
 
 ## <small>1.1.1 (2026-09-23)</small>
 
