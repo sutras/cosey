@@ -233,6 +233,7 @@ export default defineComponent({
               ? () => (
                   <ElPagination
                     size="small"
+                    hideOnSinglePage
                     {...paginationProps.value}
                     v-model:current-page={page.value}
                     v-model:page-size={pageSize.value}

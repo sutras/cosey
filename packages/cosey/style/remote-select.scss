@@ -10,6 +10,10 @@
       height: 100%;
     }
 
+    .el-select-dropdown__footer:empty {
+      display: none;
+    }
+
     @include e(form) {
       .el-form-item {
         margin-bottom: 0;
