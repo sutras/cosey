@@ -72,6 +72,7 @@ import { useLayoutStore } from '../../store';
 import { ContextMenu, ContextMenuItem, Icon } from '../../components';
 import { RtiClose, RtiRotate360 } from 'richtext-icons';
 import Reload from './reload.vue';
+import { useRouteNavigate } from '../use-route-navigate';
 
 import { useLocale } from '../../hooks';
 import { useI18n } from 'vue-i18n';
@@ -168,15 +169,7 @@ const closeOtherTabs = (name: string) => {
 /**
  * 跳转到指定标签页，优先使用标签页自己记录的完整地址（保留 query / params）
  */
-const goto = (name: string) => {
-  const tab = layoutStore.tabList.find((item) => item.name === name);
-
-  if (tab?.fullPath) {
-    router.push(tab.fullPath);
-  } else {
-    router.push({ name });
-  }
-};
+const navigate = useRouteNavigate();
 
 watch(
   () => layoutStore.activeTab,
@@ -187,7 +180,7 @@ watch(
       return;
     }
 
-    goto(name);
+    navigate(name);
   },
 );
 

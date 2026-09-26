@@ -15,11 +15,11 @@
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router';
 import { type MenuItem } from '../../router';
 import { useLayoutStore } from '../../store';
 import { SnugMenu, SnugMenuItem } from '../../components';
 import { ElScrollbar } from 'element-plus';
+import { useRouteNavigate } from '../use-route-navigate';
 
 defineOptions({
   name: 'CoLayoutTopSnugMenu',
@@ -27,7 +27,7 @@ defineOptions({
 
 const layoutStore = useLayoutStore();
 
-const router = useRouter();
+const navigate = useRouteNavigate();
 
 const onClick = (item: MenuItem) => {
   if (item._externalLink) {
@@ -36,9 +36,7 @@ const onClick = (item: MenuItem) => {
     layoutStore.topActive = item.name;
 
     if (!item.children || item.children.length === 0) {
-      router.push({
-        name: item.name,
-      });
+      navigate(item.name);
     }
   }
 };
