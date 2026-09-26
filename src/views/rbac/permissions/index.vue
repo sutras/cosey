@@ -46,7 +46,6 @@ import { useOuterUpsert } from 'cosey/hooks';
 import { useTable } from 'cosey/components';
 import { ElMessage } from 'element-plus';
 import permissionsApi from '@/api/rbac/permissions';
-import { reactive } from 'vue';
 import { useAbility } from '@casl/vue';
 import { useI18n } from 'vue-i18n';
 
@@ -60,30 +59,28 @@ const { can, cannot } = useAbility();
 
 const { deletePermission, getPermissionTree } = permissionsApi;
 
-const [tableProps, { reload, expandAll, collapseAll }] = useTable(
-  reactive({
-    api: getPermissionTree,
-    keys: {
-      list: '',
-    },
-    rowKey: 'id',
-    columns: [
-      { prop: 'name', label: t('rbac.name'), minWidth: 200 },
-      { prop: 'subject', label: t('rbac.resource'), minWidth: 180 },
-      { prop: 'action', label: t('rbac.action') },
-      { prop: 'conditions', label: t('rbac.condition') },
-      { prop: 'order', label: t('common.sort') },
-    ],
-    actionColumn: {
-      label: t('common.actions'),
-      slots: 'action',
-      fixed: 'right',
-      minWidth: 140,
-    },
-    height: '100%',
-    pagination: false,
-  }),
-);
+const [tableProps, { reload, expandAll, collapseAll }] = useTable({
+  api: getPermissionTree,
+  keys: {
+    list: '',
+  },
+  rowKey: 'id',
+  columns: [
+    { prop: 'name', label: t('rbac.name'), minWidth: 200 },
+    { prop: 'subject', label: t('rbac.resource'), minWidth: 180 },
+    { prop: 'action', label: t('rbac.action') },
+    { prop: 'conditions', label: t('rbac.condition') },
+    { prop: 'order', label: t('common.sort') },
+  ],
+  actionColumn: {
+    label: t('common.actions'),
+    slots: 'action',
+    fixed: 'right',
+    minWidth: 140,
+  },
+  height: '100%',
+  pagination: false,
+});
 
 const upsert = useOuterUpsert({
   success() {

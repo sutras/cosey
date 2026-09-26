@@ -42,7 +42,7 @@ import configGroupsApi from '@/api/system/configs';
 import ConfigGroupUpsert from './config-group-upsert.vue';
 import { useOuterUpsert } from 'cosey/hooks';
 import { useTable } from 'cosey/components';
-import { computed, nextTick, ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { useAbility } from '@casl/vue';
 import { useI18n } from 'vue-i18n';
 
@@ -56,29 +56,27 @@ const { can, cannot } = useAbility();
 
 const { getConfigGroups, deleteConfigGroup } = configGroupsApi;
 
-const [tableProps, { reload }] = useTable(
-  computed(() => ({
-    api: getConfigGroups,
-    columns: [
-      { prop: 'id', label: 'ID' },
-      { prop: 'name', label: t('config.name') },
-      { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
-      { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
-    ],
-    actionColumn: {
-      label: t('common.actions'),
-      slots: 'action',
-      fixed: 'right',
-      minWidth: 220,
-    },
-    height: '100%',
-    formProps: {
-      schemes: [{ prop: 'name', label: t('config.name') }],
-    },
+const [tableProps, { reload }] = useTable(() => ({
+  api: getConfigGroups,
+  columns: [
+    { prop: 'id', label: 'ID' },
+    { prop: 'name', label: t('config.name') },
+    { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
+    { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
+  ],
+  actionColumn: {
+    label: t('common.actions'),
+    slots: 'action',
+    fixed: 'right',
+    minWidth: 220,
+  },
+  height: '100%',
+  formProps: {
+    schemes: [{ prop: 'name', label: t('config.name') }],
+  },
 
-    immediate: false,
-  })),
-);
+  immediate: false,
+}));
 
 const upsert = useOuterUpsert({
   success() {

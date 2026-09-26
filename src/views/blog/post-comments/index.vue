@@ -38,7 +38,6 @@ import { useTable } from 'cosey/components';
 import postCommentsApi from '@/api/blog';
 import { ElMessage } from 'element-plus';
 import { useAbility } from '@casl/vue';
-import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -51,26 +50,24 @@ const { cannot } = useAbility();
 
 const { getPostComments, deletePostComment } = postCommentsApi;
 
-const [tableProps, { reload }] = useTable(
-  computed(() => ({
-    api: getPostComments,
-    columns: [
-      { prop: 'id', label: 'ID' },
-      { prop: 'user.nickname', label: t('post.user') },
-      { prop: 'post.title', label: t('post.article') },
-      { prop: 'content', label: t('post.content') },
-      { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
-      { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
-    ],
-    actionColumn: {
-      label: t('common.actions'),
-      slots: 'action',
-      fixed: 'right',
-      minWidth: 140,
-    },
-    height: '100%',
-  })),
-);
+const [tableProps, { reload }] = useTable(() => ({
+  api: getPostComments,
+  columns: [
+    { prop: 'id', label: 'ID' },
+    { prop: 'user.nickname', label: t('post.user') },
+    { prop: 'post.title', label: t('post.article') },
+    { prop: 'content', label: t('post.content') },
+    { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
+    { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
+  ],
+  actionColumn: {
+    label: t('common.actions'),
+    slots: 'action',
+    fixed: 'right',
+    minWidth: 140,
+  },
+  height: '100%',
+}));
 
 const upsert = useOuterUpsert({
   success() {
