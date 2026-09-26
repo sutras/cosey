@@ -43,7 +43,7 @@ import Upsert from './enum-item-upsert.vue';
 import { useOuterUpsert } from 'cosey/hooks';
 import { useTable } from 'cosey/components';
 import { useRoute } from 'vue-router';
-import { computed, nextTick, ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { useAbility } from '@casl/vue';
 import { useI18n } from 'vue-i18n';
 
@@ -61,33 +61,31 @@ const route = useRoute();
 
 const { getEnumItems, deleteEnumItem } = enumsApi;
 
-const [tableProps, { reload }] = useTable(
-  computed(() => ({
-    api: (params) => getEnumItems(enumId.value!, params),
-    columns: [
-      { prop: 'id', label: 'ID' },
+const [tableProps, { reload }] = useTable(() => ({
+  api: (params) => getEnumItems(enumId.value!, params),
+  columns: [
+    { prop: 'id', label: 'ID' },
+    { prop: 'name', label: t('enum.name') },
+    { prop: 'value', label: t('enum.name') },
+    { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
+    { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
+  ],
+  actionColumn: {
+    label: t('common.actions'),
+    slots: 'action',
+    fixed: 'right',
+    minWidth: 280,
+  },
+  height: '100%',
+  formProps: {
+    schemes: [
       { prop: 'name', label: t('enum.name') },
       { prop: 'value', label: t('enum.name') },
-      { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
-      { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
     ],
-    actionColumn: {
-      label: t('common.actions'),
-      slots: 'action',
-      fixed: 'right',
-      minWidth: 280,
-    },
-    height: '100%',
-    formProps: {
-      schemes: [
-        { prop: 'name', label: t('enum.name') },
-        { prop: 'value', label: t('enum.name') },
-      ],
-    },
+  },
 
-    immediate: false,
-  })),
-);
+  immediate: false,
+}));
 
 const upsert = useOuterUpsert<object, number>({
   success() {

@@ -53,7 +53,7 @@ import PostsUpsert from './post-upsert.vue';
 import { useOuterUpsert } from 'cosey/hooks';
 import { useTable } from 'cosey/components';
 import PostComments from './post-comments.vue';
-import { computed, useTemplateRef } from 'vue';
+import { useTemplateRef } from 'vue';
 import { useAbility } from '@casl/vue';
 import { useI18n } from 'vue-i18n';
 
@@ -67,32 +67,30 @@ const { can, cannot } = useAbility();
 
 const { getPosts, deletePost } = postsApi;
 
-const [tableProps, { reload }] = useTable(
-  computed(() => ({
-    api: getPosts,
-    columns: [
-      { prop: 'id', label: 'ID' },
-      { prop: 'postType.name', label: t('post.categoryName') },
+const [tableProps, { reload }] = useTable(() => ({
+  api: getPosts,
+  columns: [
+    { prop: 'id', label: 'ID' },
+    { prop: 'postType.name', label: t('post.categoryName') },
+    { prop: 'title', label: t('post.title') },
+    { prop: 'digest', label: t('post.summary') },
+    { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
+    { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
+  ],
+  actionColumn: {
+    label: t('common.actions'),
+    slots: 'action',
+    fixed: 'right',
+    minWidth: 200,
+  },
+  height: '100%',
+  formProps: {
+    schemes: [
+      { prop: 'postTypeName', label: t('post.categoryName') },
       { prop: 'title', label: t('post.title') },
-      { prop: 'digest', label: t('post.summary') },
-      { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
-      { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
     ],
-    actionColumn: {
-      label: t('common.actions'),
-      slots: 'action',
-      fixed: 'right',
-      minWidth: 200,
-    },
-    height: '100%',
-    formProps: {
-      schemes: [
-        { prop: 'postTypeName', label: t('post.categoryName') },
-        { prop: 'title', label: t('post.title') },
-      ],
-    },
-  })),
-);
+  },
+}));
 
 const upsert = useOuterUpsert({
   success() {

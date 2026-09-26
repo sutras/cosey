@@ -43,7 +43,6 @@ import { useTable } from 'cosey/components';
 import posttypesApi from '@/api/blog';
 import { ElMessage } from 'element-plus';
 import { useAbility } from '@casl/vue';
-import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -56,25 +55,23 @@ const { can, cannot } = useAbility();
 
 const { getPosttypes, deletePosttype } = posttypesApi;
 
-const [tableProps, { reload }] = useTable(
-  computed(() => ({
-    api: getPosttypes,
-    columns: [
-      { prop: 'id', label: 'ID' },
-      { prop: 'name', label: t('post.categoryName') },
-      { prop: 'description', label: t('post.description') },
-      { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
-      { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
-    ],
-    actionColumn: {
-      label: t('common.actions'),
-      slots: 'action',
-      fixed: 'right',
-      minWidth: 140,
-    },
-    height: '100%',
-  })),
-);
+const [tableProps, { reload }] = useTable(() => ({
+  api: getPosttypes,
+  columns: [
+    { prop: 'id', label: 'ID' },
+    { prop: 'name', label: t('post.categoryName') },
+    { prop: 'description', label: t('post.description') },
+    { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
+    { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
+  ],
+  actionColumn: {
+    label: t('common.actions'),
+    slots: 'action',
+    fixed: 'right',
+    minWidth: 140,
+  },
+  height: '100%',
+}));
 
 const upsert = useOuterUpsert({
   success() {

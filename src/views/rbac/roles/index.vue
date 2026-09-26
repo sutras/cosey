@@ -53,7 +53,6 @@ import { useTable } from 'cosey/components';
 import PermissionsUpsert from './permissions-upsert.vue';
 import RoleUpsert from './role-upsert.vue';
 import { useAbility } from '@casl/vue';
-import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -66,24 +65,22 @@ const { can, cannot } = useAbility();
 
 const { deleteRole, getRoles } = rolesApi;
 
-const [tableProps, { reload }] = useTable(
-  computed(() => ({
-    api: getRoles,
-    columns: [
-      { prop: 'id', label: 'ID' },
-      { prop: 'name', label: t('rbac.roleName') },
-      { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
-      { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
-    ],
-    actionColumn: {
-      label: t('common.actions'),
-      slots: 'action',
-      minWidth: 200,
-      fixed: 'right',
-    },
-    height: '100%',
-  })),
-);
+const [tableProps, { reload }] = useTable(() => ({
+  api: getRoles,
+  columns: [
+    { prop: 'id', label: 'ID' },
+    { prop: 'name', label: t('rbac.roleName') },
+    { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
+    { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
+  ],
+  actionColumn: {
+    label: t('common.actions'),
+    slots: 'action',
+    minWidth: 200,
+    fixed: 'right',
+  },
+  height: '100%',
+}));
 
 const roleUpsert = useOuterUpsert({
   success() {

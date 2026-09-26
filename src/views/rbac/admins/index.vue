@@ -43,7 +43,6 @@ import { useOuterUpsert } from 'cosey/hooks';
 import { useUserStore } from 'cosey';
 import { useTable } from 'cosey/components';
 import { useAbility } from '@casl/vue';
-import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import adminApi from '@/api/rbac/admins';
 
@@ -59,34 +58,32 @@ const { getAdmins, deleteAdmin } = adminApi;
 
 const userStore = useUserStore();
 
-const [tableProps, { reload }] = useTable(
-  computed(() => ({
-    api: getAdmins,
-    columns: [
-      { prop: 'id', label: 'ID' },
-      { prop: 'username', label: t('rbac.username') },
-      { prop: 'nickname', label: t('rbac.nickname') },
-      { prop: 'avatar', label: t('rbac.avatar'), renderer: 'media' },
-      {
-        prop: 'roles',
-        label: t('rbac.role'),
-        renderer: {
-          type: 'tag',
-          path: 'name',
-        },
+const [tableProps, { reload }] = useTable(() => ({
+  api: getAdmins,
+  columns: [
+    { prop: 'id', label: 'ID' },
+    { prop: 'username', label: t('rbac.username') },
+    { prop: 'nickname', label: t('rbac.nickname') },
+    { prop: 'avatar', label: t('rbac.avatar'), renderer: 'media' },
+    {
+      prop: 'roles',
+      label: t('rbac.role'),
+      renderer: {
+        type: 'tag',
+        path: 'name',
       },
-      { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
-      { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
-    ],
-    actionColumn: {
-      label: t('common.actions'),
-      slots: 'action',
-      fixed: 'right',
-      minWidth: 140,
     },
-    height: '100%',
-  })),
-);
+    { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
+    { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
+  ],
+  actionColumn: {
+    label: t('common.actions'),
+    slots: 'action',
+    fixed: 'right',
+    minWidth: 140,
+  },
+  height: '100%',
+}));
 
 const upsert = useOuterUpsert({
   success() {

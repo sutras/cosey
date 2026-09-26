@@ -60,7 +60,6 @@ import * as mock from '@gunny/mock';
 import { useAbility } from '@casl/vue';
 import { warningConfirm } from 'cosey/utils';
 import { useI18n } from 'vue-i18n';
-import { computed } from 'vue';
 
 const { t } = useI18n();
 
@@ -72,81 +71,79 @@ const { can, cannot } = useAbility();
 
 const { getUsers, deleteUser, updateUser, updateBulkSilent } = usersApi;
 
-const [tableProps, { reload, getSelectionRows }] = useTable(
-  computed(() => ({
-    api: getUsers,
-    columns: [
-      { type: 'selection' },
-      { prop: 'id', label: 'ID' },
-      { prop: 'nickname', label: t('user.nickname'), tooltip: t('user.nickname') },
-      {
-        label: t('user.contact'),
-        columns: [
-          { prop: 'name', label: t('user.name') },
-          { prop: 'mobile', label: t('user.phone') },
-          { prop: 'address', label: t('user.address'), renderer: 'longtext', minWidth: 120 },
-        ],
+const [tableProps, { reload, getSelectionRows }] = useTable(() => ({
+  api: getUsers,
+  columns: [
+    { type: 'selection' },
+    { prop: 'id', label: 'ID' },
+    { prop: 'nickname', label: t('user.nickname'), tooltip: t('user.nickname') },
+    {
+      label: t('user.contact'),
+      columns: [
+        { prop: 'name', label: t('user.name') },
+        { prop: 'mobile', label: t('user.phone') },
+        { prop: 'address', label: t('user.address'), renderer: 'longtext', minWidth: 120 },
+      ],
+    },
+    { prop: 'gender', label: t('user.gender') },
+    {
+      prop: 'silent',
+      label: t('user.mute'),
+      renderer: {
+        type: 'switch',
+        api: (value, row) =>
+          updateUser(row.id, { silent: value }).then(() => {
+            reload();
+          }),
+        props: { activeValue: 1, inactiveValue: 0 },
       },
-      { prop: 'gender', label: t('user.gender') },
+    },
+    { prop: 'birthday', label: t('user.birthday'), renderer: 'date', sortable: 'custom' },
+    { prop: 'constellation', label: t('user.zodiac') },
+    { prop: 'height', label: t('user.height'), sortable: 'custom' },
+    { prop: 'weight', label: t('user.weight'), sortable: 'custom' },
+    { prop: 'avatar', label: t('user.avatar'), renderer: 'media' },
+    { prop: 'qualification', label: t('user.education') },
+    { prop: 'trait', label: t('user.traits') },
+    { prop: 'friendshipType', label: t('user.datingType') },
+    { prop: 'hobbies', label: t('user.hobbies'), renderer: 'tag' },
+    { prop: 'signature', label: t('user.signature') },
+    { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
+    { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
+  ],
+  formProps: {
+    schemes: [
+      { prop: 'nickname', label: t('user.nickname') },
+      { prop: 'mobile', label: t('user.phone') },
+      { prop: 'name', label: t('user.name') },
+      {
+        prop: 'gender',
+        label: t('user.gender'),
+        fieldType: 'select',
+        fieldProps: { options: mock.genders },
+      },
+      { prop: 'birthday', label: t('user.birthday'), fieldType: 'daterange' },
       {
         prop: 'silent',
         label: t('user.mute'),
-        renderer: {
-          type: 'switch',
-          api: (value, row) =>
-            updateUser(row.id, { silent: value }).then(() => {
-              reload();
-            }),
-          props: { activeValue: 1, inactiveValue: 0 },
+        fieldType: 'select',
+        fieldProps: {
+          options: [
+            { label: t('common.yes'), value: 1 },
+            { label: t('common.no'), value: 0 },
+          ],
         },
       },
-      { prop: 'birthday', label: t('user.birthday'), renderer: 'date', sortable: 'custom' },
-      { prop: 'constellation', label: t('user.zodiac') },
-      { prop: 'height', label: t('user.height'), sortable: 'custom' },
-      { prop: 'weight', label: t('user.weight'), sortable: 'custom' },
-      { prop: 'avatar', label: t('user.avatar'), renderer: 'media' },
-      { prop: 'qualification', label: t('user.education') },
-      { prop: 'trait', label: t('user.traits') },
-      { prop: 'friendshipType', label: t('user.datingType') },
-      { prop: 'hobbies', label: t('user.hobbies'), renderer: 'tag' },
-      { prop: 'signature', label: t('user.signature') },
-      { prop: 'createdAt', label: t('common.creationTime'), renderer: 'datetime' },
-      { prop: 'updatedAt', label: t('common.updateTime'), renderer: 'datetime' },
     ],
-    formProps: {
-      schemes: [
-        { prop: 'nickname', label: t('user.nickname') },
-        { prop: 'mobile', label: t('user.phone') },
-        { prop: 'name', label: t('user.name') },
-        {
-          prop: 'gender',
-          label: t('user.gender'),
-          fieldType: 'select',
-          fieldProps: { options: mock.genders },
-        },
-        { prop: 'birthday', label: t('user.birthday'), fieldType: 'daterange' },
-        {
-          prop: 'silent',
-          label: t('user.mute'),
-          fieldType: 'select',
-          fieldProps: {
-            options: [
-              { label: t('common.yes'), value: 1 },
-              { label: t('common.no'), value: 0 },
-            ],
-          },
-        },
-      ],
-    },
-    actionColumn: {
-      label: t('common.actions'),
-      slots: 'action',
-      fixed: 'right',
-      minWidth: 150,
-    },
-    height: '100%',
-  })),
-);
+  },
+  actionColumn: {
+    label: t('common.actions'),
+    slots: 'action',
+    fixed: 'right',
+    minWidth: 150,
+  },
+  height: '100%',
+}));
 
 const upsert = useOuterUpsert({
   success() {
