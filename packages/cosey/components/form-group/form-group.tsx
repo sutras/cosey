@@ -4,6 +4,7 @@ import { reactiveOmit } from '@vueuse/core';
 import { Icon } from '../icon';
 import { ElTooltip } from 'element-plus';
 import { createBem } from '../../utils';
+import { locateInvalidContainer, useInvalidResponse } from '../form';
 import { RtiCaretDown, RtiCaretUp, RtiHelp } from 'richtext-icons';
 
 export default defineComponent({
@@ -21,11 +22,14 @@ export default defineComponent({
       'position',
       'collapsible',
       'collapsed',
+      'switchToInvalid',
     ]);
+
+    const rootRef = ref<HTMLElement>();
 
     const innerCollapsed = ref(false);
 
-    const isBordered = computed(() => !!props.title);
+    const isBordered = computed(() => !!(props.title || slots.title));
 
     watch(
       () => props.collapsed,
@@ -44,9 +48,29 @@ export default defineComponent({
       }
     };
 
+    // 收起状态下出错字段是 display:none，红字完全看不见 —— 校验失败时自动展开
+    useInvalidResponse(({ invalidFields, fields }) => {
+      if (!props.switchToInvalid || !innerCollapsed.value) {
+        return;
+      }
+
+      const isInvalid = locateInvalidContainer(invalidFields, fields, [
+        {
+          value: true,
+          getEl: () => rootRef.value,
+        },
+      ]);
+
+      if (isInvalid) {
+        innerCollapsed.value = false;
+        emit('update:collapsed', false);
+      }
+    });
+
     return () => {
       return (
         <div
+          ref={rootRef}
           class={[
             bem.b(),
             bem.is('bordered', isBordered.value),

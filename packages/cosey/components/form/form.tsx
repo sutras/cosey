@@ -1,4 +1,4 @@
-import { defineComponent, inject, reactive, ref, toRef, watch } from 'vue';
+import { computed, defineComponent, inject, reactive, toRef } from 'vue';
 import {
   type FormProps,
   type FormBubbleContext,
@@ -26,8 +26,17 @@ export default defineComponent({
 
     const { t } = useLocale();
 
-    const { elFormProps, expose, reset, resetFields, submit, clearValidate, submitting } =
-      useFormTemplate<FormProps>(props);
+    const {
+      elFormProps,
+      expose,
+      reset,
+      resetFields,
+      submit,
+      clearValidate,
+      submitting,
+      notifyOpen,
+      formContext,
+    } = useFormTemplate<FormProps>(props);
 
     const formBubbleContext = inject<FormBubbleContext | null>(formBubbleContextSymbol, null);
 
@@ -39,22 +48,15 @@ export default defineComponent({
         resetFields,
         clearValidate,
         submit,
+        notifyOpen,
       }),
     );
 
-    const innerInline = ref(props.inline);
-
     const layoutStore = useLayoutStore();
 
-    watch(
-      () => layoutStore.isMobile,
-      (isMobile) => {
-        innerInline.value = isMobile ? false : props.inline;
-      },
-      {
-        immediate: true,
-      },
-    );
+    const innerInline = computed(() => {
+      return layoutStore.isMobile ? false : props.inline;
+    });
 
     _expose(expose);
 
@@ -79,42 +81,45 @@ export default defineComponent({
         >
           <OptionalWrapper when={props.grid} component={Row} props={props.rowProps}>
             {slots.default?.({})}
-            {!props.readonly && !formBubbleContext && !props.hideButtons && (
-              <FormItem class={bem.bem('form', 'form-item-buttons')}>
-                {{
-                  label: () => {},
-                  default: () => (
-                    <div>
-                      {slots.button ? (
-                        slots.button({
-                          reset,
-                          submit,
-                          submitting: submitting.value,
-                        })
-                      ) : (
-                        <>
-                          {!props.hideSubmit && (
-                            <ElButton
-                              type="primary"
-                              {...props.submitProps}
-                              loading={submitting.value}
-                              onClick={() => submit()}
-                            >
-                              {t(props.submitText)}
-                            </ElButton>
-                          )}
-                          {!props.hideReset && (
-                            <ElButton {...props.resetProps} onClick={() => reset()}>
-                              {t(props.resetText)}
-                            </ElButton>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  ),
-                }}
-              </FormItem>
-            )}
+            {!props.readonly &&
+              !formBubbleContext &&
+              !props.hideButtons &&
+              !formContext.hasSteps && (
+                <FormItem class={bem.bem('form', 'form-item-buttons')}>
+                  {{
+                    label: () => {},
+                    default: () => (
+                      <div>
+                        {slots.button ? (
+                          slots.button({
+                            reset,
+                            submit,
+                            submitting: submitting.value,
+                          })
+                        ) : (
+                          <>
+                            {!props.hideSubmit && (
+                              <ElButton
+                                type="primary"
+                                {...props.submitProps}
+                                loading={submitting.value}
+                                onClick={() => submit()}
+                              >
+                                {t(props.submitText)}
+                              </ElButton>
+                            )}
+                            {!props.hideReset && (
+                              <ElButton {...props.resetProps} onClick={() => reset()}>
+                                {t(props.resetText)}
+                              </ElButton>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    ),
+                  }}
+                </FormItem>
+              )}
           </OptionalWrapper>
         </ElForm>
       );

@@ -1,0 +1,20 @@
+@use './base/index' as *;
+
+@include b(form-steps) {
+  @include e(body) {
+    margin-block-start: css-var(margin-lg);
+  }
+
+  @include e(actions) {
+    display: flex;
+    justify-content: flex-end;
+    margin-block-start: css-var(margin-lg);
+  }
+
+  @include is(clickable) {
+    .el-step__head,
+    .el-step__main {
+      cursor: pointer;
+    }
+  }
+}

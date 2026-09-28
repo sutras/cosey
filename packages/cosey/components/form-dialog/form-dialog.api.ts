@@ -1,5 +1,6 @@
 import { type DialogInstance, type ButtonProps, dialogProps, dialogEmits } from 'element-plus';
 import type { PropType, ExtractPropTypes, SlotsType } from 'vue';
+import { type FormBubbleSteps } from '../form';
 
 export const formDialogButtonProps = {
   confirmText: {
@@ -67,6 +68,8 @@ export interface FormDialogSlots extends ElDialogSlots {
     submitting: boolean;
     confirm: () => any | Promise<any>;
     cancel: () => any;
+    /** 分步表单（`co-form-steps`）的控制接口；没有分步时为 null */
+    steps: FormBubbleSteps | null;
   };
 }
 

@@ -33,6 +33,14 @@ export const formQueryProps = {
   resetValues: {
     type: Function as PropType<() => Record<string, any>>,
   },
+  /**
+   * 收起状态下的字段仍在 el-form 里参与校验（只是 `display:none`），
+   * 校验失败时自动展开，否则用户只会看到「点了查询没反应」
+   */
+  switchToInvalid: {
+    type: Boolean,
+    default: true,
+  },
 };
 
 export type FormQueryProps = ExtractPublicPropTypes<typeof formQueryProps>;

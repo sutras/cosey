@@ -7,7 +7,13 @@ import {
   formQueryEmits,
 } from './form-query.api';
 import { ElButton, ElForm } from 'element-plus';
-import { useFormTemplate, FormItem, FormProps } from '../form';
+import {
+  useFormTemplate,
+  FormItem,
+  FormProps,
+  locateInvalidContainer,
+  useInvalidResponse,
+} from '../form';
 import { type RowSize, Row } from '../row';
 import { Toggle } from '../toggle';
 import {
@@ -20,8 +26,8 @@ import {
   defineComponent,
   type VNodeArrayChildren,
   unref,
+  useModel,
 } from 'vue';
-import { useTwoWayBinding } from '../../hooks';
 import { useLocale } from '../../hooks';
 import { createBem } from '../../utils';
 import { RtiSearch } from 'richtext-icons';
@@ -31,15 +37,14 @@ export default defineComponent({
   props: formQueryProps,
   slots: formQuerySlots,
   emits: formQueryEmits,
-  setup(props, { slots, emit, expose: _expose }) {
+  setup(props, { slots, expose: _expose }) {
     const bem = createBem('form-query');
 
     const { t } = useLocale();
 
     // main
-    const { elFormProps, expose, reset, submit, submitting } = useFormTemplate<FormProps>(
-      props as FormProps,
-    );
+    const { elFormProps, elFormRef, formContext, expose, reset, submit, submitting } =
+      useFormTemplate<FormProps>(props as FormProps);
 
     const mergedRowProps = computed(() => {
       return Object.assign(
@@ -51,7 +56,9 @@ export default defineComponent({
     });
 
     // collapsed
-    const innerCollapsed = useTwoWayBinding(props, emit, 'collapsed');
+    // 用 vue 内置的 `useModel`：父级绑了 `v-model:collapsed` 时受控，
+    // 没绑时退回组件内部状态 —— 否则下面「校验失败自动展开」会写不动。
+    const innerCollapsed = useModel(props, 'collapsed');
 
     const mapSizeColNumber = computed(() => {
       return Object.assign(defaultMapSizeColNumber, props.colProps);
@@ -95,6 +102,31 @@ export default defineComponent({
         return indexToShow < 0 ? index > 0 : index > indexToShow;
       },
     });
+
+    // 收起时被隐藏的字段仍在 el-form 里参与校验（只是 display:none），
+    // 报错却完全看不见 → 校验失败时自动展开。
+    // 注意要显式传入 formContext：这里是 form-query 自己 provide 的表单上下文，
+    // inject 查的是父级组件，拿不到自己 provide 的值。
+    useInvalidResponse(
+      ({ invalidFields, fields }) => {
+        if (!props.switchToInvalid || !innerCollapsed.value) {
+          return;
+        }
+
+        const isInvalid = locateInvalidContainer(invalidFields, fields, [
+          {
+            value: true,
+            getEl: () => elFormRef.value?.$el as HTMLElement | undefined,
+          },
+        ]);
+
+        if (isInvalid) {
+          innerCollapsed.value = false;
+        }
+      },
+      ['validate'],
+      formContext,
+    );
 
     const mapChildren = () => {
       const content = slots.default?.({}) || [];

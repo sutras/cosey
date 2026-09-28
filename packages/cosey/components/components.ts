@@ -19,6 +19,8 @@ import { FormDrawer } from './form-drawer';
 import { FormGroup } from './form-group';
 import { FormList } from './form-list';
 import { FormQuery } from './form-query';
+import { FormSteps, FormStep } from './form-steps';
+import { FormTabs, FormTabPanel } from './form-tabs';
 import { Highlight } from './highlight';
 import { HorizontalTree } from './horizontal-tree';
 import { Icon } from './icon';
@@ -85,6 +87,10 @@ declare module 'vue' {
     CoFormItem: typeof FormItem;
     CoFormList: typeof FormList;
     CoFormQuery: typeof FormQuery;
+    CoFormStep: typeof FormStep;
+    CoFormSteps: typeof FormSteps;
+    CoFormTabPanel: typeof FormTabPanel;
+    CoFormTabs: typeof FormTabs;
     CoHighlight: typeof Highlight;
     CoHorizontalTree: typeof HorizontalTree;
     CoIcon: typeof Icon;
@@ -154,6 +160,10 @@ export const registerGlobalComponents = {
       FormItem,
       FormList,
       FormQuery,
+      FormStep,
+      FormSteps,
+      FormTabPanel,
+      FormTabs,
       Highlight,
       HorizontalTree,
       Icon,

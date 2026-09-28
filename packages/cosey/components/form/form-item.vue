@@ -47,7 +47,7 @@
  * 理论上使用方式2可以用jsx灵活地传递插槽和属性到子组件，但泛型参数无法传递到插槽类型，且所有属性都变为必传，因此只能选择方式 1。
  */
 
-import { computed, inject, mergeProps, ref, useAttrs } from 'vue';
+import { computed, inject, mergeProps, ref, useAttrs, watch } from 'vue';
 import {
   type FormItemSlots,
   type FormItemEmits,
@@ -114,6 +114,15 @@ const formContext = inject<FormContext | null>(formContextSymbol, null);
 const formItemRef = ref();
 
 defineExpose<FormItemInstance>(createMergedExpose(formItemExposeKeys, () => formItemRef.value));
+
+// 字段自身的校验状态变化（blur / change 触发的实时校验）也要上报，
+// 否则表单内部的错误徽标、完成度这类状态展示不会实时更新
+watch(
+  () => formItemRef.value?.validateState,
+  () => {
+    formContext?.reportFieldChange();
+  },
+);
 
 // form query
 const formQueryContext = inject<FormQueryContext | null>(formQueryContextSymbol, null);

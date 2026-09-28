@@ -33,6 +33,8 @@ export default {
       search: 'Pesquisar',
       required: 'obrigatório',
       isRequired: '{label} é obrigatório',
+      next: 'Seguinte',
+      prev: 'Anterior',
     },
     colorPicker: {
       preset: 'Predefinições',

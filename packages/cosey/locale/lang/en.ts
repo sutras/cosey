@@ -33,6 +33,8 @@ export default {
       search: 'Search',
       required: 'required',
       isRequired: '{label} is required',
+      next: 'Next',
+      prev: 'Previous',
     },
     colorPicker: {
       preset: 'Preset',

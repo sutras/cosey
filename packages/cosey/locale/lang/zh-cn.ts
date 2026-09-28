@@ -33,6 +33,8 @@ export default {
       search: '查询',
       required: '必填',
       isRequired: '{label}是必填项',
+      next: '下一步',
+      prev: '上一步',
     },
     colorPicker: {
       preset: '预设',

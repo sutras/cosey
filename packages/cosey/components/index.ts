@@ -19,6 +19,8 @@ export * from './form-drawer';
 export * from './form-group';
 export * from './form-list';
 export * from './form-query';
+export * from './form-steps';
+export * from './form-tabs';
 export * from './highlight';
 export * from './horizontal-tree';
 export * from './icon';

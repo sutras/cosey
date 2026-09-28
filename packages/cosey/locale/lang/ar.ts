@@ -33,6 +33,8 @@ export default {
       search: 'بحث',
       required: 'مطلوب',
       isRequired: 'مطلوب',
+      next: 'التالي',
+      prev: 'السابق',
     },
     colorPicker: {
       preset: 'إعدادات مسبقة',

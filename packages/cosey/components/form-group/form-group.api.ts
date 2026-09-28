@@ -38,6 +38,11 @@ export const formGroupProps = {
   collapsed: {
     type: Boolean,
   },
+  /** 校验失败时自动展开包含出错字段的折叠组 */
+  switchToInvalid: {
+    type: Boolean,
+    default: true,
+  },
 };
 
 export type FormGroupProps = ExtractPropTypes<typeof formGroupProps>;
