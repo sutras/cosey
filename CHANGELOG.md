@@ -1,4 +1,10 @@
-## 0.0.0 (2026-09-26)
+## 0.0.0 (2026-09-28)
+
+## 1.3.0 (2026-09-28)
+
+- chore: 更新工作纪要 ([d26b3f8](https://github.com/sutras/cosey/commit/d26b3f8))
+- feat(form): 新增分步与页签容器，统一校验定位契约 ([10c3331](https://github.com/sutras/cosey/commit/10c3331))
+- build: changelog ([52f1b50](https://github.com/sutras/cosey/commit/52f1b50))
 
 ## 1.2.0 (2026-09-26)
 
