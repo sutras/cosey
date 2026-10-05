@@ -40,6 +40,7 @@ export const EDITOR_TOOLS = [
   'video',
   'table',
   'formula',
+  'divider',
   // 其他
   'clear',
   'source',
@@ -57,7 +58,7 @@ export const DEFAULT_EDITOR_TOOLBAR = [
   'indent-decrease,indent-increase',
   'align-left,align-center,align-right,align-justify',
   'blockquote,code-block',
-  'link,image,video,table,formula',
+  'link,image,video,table,formula,divider',
   'clear',
   'source',
 ].join('|');

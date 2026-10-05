@@ -40,6 +40,7 @@ import {
   getNodePosAt,
   getTextStyleValue,
   insertAtomNode,
+  insertHorizontalRule,
   isBlockStyleActive,
   isInBlockquote,
   isInCodeBlock,
@@ -515,6 +516,13 @@ export class EditorFacade {
 
   getFormulaAttrs() {
     return getNodeAttrsAt(this.state, 'formula');
+  }
+
+  // ===== divider =====
+
+  /** 在光标所在块级元素之后插入分割线 */
+  insertDivider() {
+    this.exec(insertHorizontalRule());
   }
 
   // ===== table =====

@@ -34,6 +34,7 @@ import FormatImage from './formats/format-image';
 import FormatVideo from './formats/format-video';
 import FormatTable from './formats/format-table';
 import FormatFormula from './formats/format-formula';
+import FormatDivider from './formats/format-divider';
 import FormatClear from './formats/format-clear';
 import FormatSource from './formats/format-source';
 
@@ -77,6 +78,7 @@ const toolRenderers: Record<EditorTool, (key: EditorTool) => VNode> = {
   video: (key) => <FormatVideo key={key} />,
   table: (key) => <FormatTable key={key} />,
   formula: (key) => <FormatFormula key={key} />,
+  divider: (key) => <FormatDivider key={key} />,
 
   clear: (key) => <FormatClear key={key} />,
   source: (key) => <FormatSource key={key} />,

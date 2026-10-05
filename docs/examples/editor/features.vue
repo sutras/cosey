@@ -35,6 +35,7 @@ const options = [
   { label: '链接', value: 'link' },
   { label: '图片', value: 'image' },
   { label: '表格', value: 'table' },
+  { label: '分割线', value: 'divider' },
   { label: '源码', value: 'source' },
 ];
 

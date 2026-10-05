@@ -58,6 +58,7 @@ export function createEditorExpose(facade: EditorFacade): EditorExpose {
     isFormulaActive: () => facade.isFormulaActive(),
     getFormulaAttrs: () => facade.getFormulaAttrs(),
     insertTable: (rows, columns) => facade.insertTable(rows, columns),
+    insertDivider: () => facade.insertDivider(),
 
     insertRowAbove: () => facade.insertRowAbove(),
     insertRowBelow: () => facade.insertRowBelow(),

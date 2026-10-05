@@ -75,6 +75,7 @@ export default {
       codeBlock: 'Bloco de código',
       table: 'Tabela',
       formula: 'Fórmula',
+      divider: 'Separador',
       bold: 'Negrito',
       italic: 'Itálico',
       underline: 'Sublinhado',

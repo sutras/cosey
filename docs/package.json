@@ -42,7 +42,7 @@
     "cosey": "workspace:^",
     "element-plus": "^2.14.3",
     "pinia": "^3.0.2",
-    "richtext-icons": "^0.3.0",
+    "richtext-icons": "^0.3.1",
     "vue-i18n": "^11.1.10"
   }
 }

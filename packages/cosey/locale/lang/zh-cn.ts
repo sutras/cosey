@@ -75,6 +75,7 @@ export default {
       codeBlock: '代码块',
       table: '表格',
       formula: '公式',
+      divider: '分割线',
       bold: '加粗',
       italic: '斜体',
       underline: '下划线',

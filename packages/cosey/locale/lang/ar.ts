@@ -75,6 +75,7 @@ export default {
       codeBlock: 'كتلة كود',
       table: 'جدول',
       formula: 'صيغة',
+      divider: 'خط فاصل',
       bold: 'عريض',
       italic: 'مائل',
       underline: 'تسطير',

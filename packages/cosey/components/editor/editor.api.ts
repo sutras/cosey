@@ -171,6 +171,8 @@ export interface EditorExpose {
   getFormulaAttrs(): Record<string, any> | null;
   /** 插入表格，并在表格后补一个可落脚的段落 */
   insertTable(rows: number, columns: number): void;
+  /** 在光标所在块级元素之后插入分割线 */
+  insertDivider(): void;
 
   // ===== 表格 =====
   insertRowAbove(): void;

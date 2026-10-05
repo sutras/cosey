@@ -7,6 +7,7 @@
   ul,
   pre,
   blockquote,
+  hr,
   h1,
   h2,
   h3,
@@ -120,6 +121,17 @@
   blockquote {
     border-left: 4px solid css-var(border-color);
     padding-left: 16px;
+  }
+
+  // 分割线：抹掉 <hr> 的默认立体边框，统一成一条细线
+  hr {
+    border-style: solid;
+    border-color: css-var(border-color);
+    border-width: 1px 0 0;
+
+    &.ProseMirror-selectednode {
+      outline: 2px solid css-var(color-primary-light-5);
+    }
   }
 
   code {

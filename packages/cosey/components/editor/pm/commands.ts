@@ -443,6 +443,44 @@ export function insertNewlineInCode(
   return true;
 }
 
+// ===== horizontal rule =====
+
+/**
+ * 在光标所在块级元素之后插入一条分割线，光标落到分割线下方。
+ *
+ * 光标所在的块是空段落时直接把它替换掉 —— 否则点一下按钮就留下一个空段落，
+ * 连点几下等于在文档里堆一串空行。分割线后面得有个可落脚的文本块（文档末尾、
+ * 或后面紧跟表格这类 isolating 块时补一个空段落），光标才不会掉进表格里。
+ */
+export function insertHorizontalRule(): Command {
+  return (state, dispatch) => {
+    const { $from } = state.selection;
+    const parent = $from.parent;
+
+    // 分割线是块级节点：代码块的内容只能是文本，放不下
+    if (!parent.isTextblock || parent.type.spec.code) return false;
+
+    const rule = schema.nodes.horizontal_rule.create();
+    const isEmptyBlock = parent.content.size === 0;
+
+    // 空块被分割线顶替，非空块则保留在分割线上方
+    const from = isEmptyBlock ? $from.before() : $from.after();
+    const to = isEmptyBlock ? $from.after() : from;
+
+    const tr = state.tr.replaceWith(from, to, rule);
+    const after = from + rule.nodeSize;
+
+    if (!tr.doc.resolve(after).nodeAfter?.isTextblock) {
+      tr.insert(after, schema.nodes.paragraph.create());
+    }
+
+    tr.setSelection(TextSelection.near(tr.doc.resolve(after + 1), 1));
+
+    if (dispatch) dispatch(tr.scrollIntoView());
+    return true;
+  };
+}
+
 // ===== atom nodes =====
 
 export function isNodeSelected(state: EditorState, name: string): boolean {

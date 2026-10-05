@@ -21,6 +21,7 @@ import {
   RtiAlignRight,
   RtiBulletList,
   RtiCodeBlock,
+  RtiDivider,
   RtiHeading1,
   RtiHeading2,
   RtiHeading3,
@@ -46,7 +47,8 @@ type BlockCommand =
   | { type: 'list'; value: ListType }
   | { type: 'align'; value: FormatAlign }
   | { type: 'blockQuote' }
-  | { type: 'codeBlock' };
+  | { type: 'codeBlock' }
+  | { type: 'divider' };
 
 /** 块级元素左上角放一个零尺寸的虚拟锚点，入口按钮/菜单贴在它左侧、与块顶部对齐。
  *  用 top 而非垂直中点：长段落光标在上方时，入口按钮若钉在段落垂直中点会跑到很下面。 */
@@ -77,8 +79,9 @@ function createVirtualRef(rect: BlockRect) {
  *
  * 样式类操作（标题/列表/对齐/引用/代码块）用 `ContextMenuItem` 的 `icon` 插槽 +
  * `title` + `command` 声明式表达，由 `onCommand` 统一派发到 editor，不再内嵌
- * formats/* 组件；只有插入类（图片/视频/表格/公式）因承载了弹窗/网格选择器，
- * 仍复用 Format 组件（配合 `close-on-select=false` 保持菜单不关闭）。
+ * formats/* 组件；只有承载了弹窗/网格选择器的插入类（图片/视频/表格/公式）
+ * 仍复用 Format 组件（配合 `close-on-select=false` 保持菜单不关闭），
+ * 分割线即点即插，也用 `ContextMenuItem` 声明。
  *
  * 菜单项按 `features` 过滤：功能没开启的项不出现；子菜单里的项被过滤空之后连子菜单一起隐藏，
  * 整个菜单都没有可用项时入口按钮也不显示。
@@ -123,6 +126,9 @@ export default defineComponent({
         case 'codeBlock':
           editor.formatCodeBlock();
           break;
+        case 'divider':
+          editor.insertDivider();
+          break;
       }
     };
 
@@ -154,6 +160,10 @@ export default defineComponent({
         ] as const
       ).filter(([tool]) => editor.hasTool(tool));
 
+      // 分割线即点即插、不带弹窗，直接用菜单项声明，不需要走 Format 组件
+      const canInsertDivider = editor.hasTool('divider');
+      const hasInsertTools = insertItems.length > 0 || canInsertDivider;
+
       const hasListTools = editor.hasTool('ordered-list') || editor.hasTool('bulleted-list');
 
       // 一个可用项都没有时，入口按钮也不显示
@@ -163,7 +173,7 @@ export default defineComponent({
         editor.hasTool('blockquote') ||
         editor.hasTool('code-block') ||
         alignItems.length > 0 ||
-        insertItems.length > 0;
+        hasInsertTools;
 
       if (!anchor || !hasAnyTool) return null;
 
@@ -295,12 +305,19 @@ export default defineComponent({
             )}
 
             {/* 子菜单：插入元素。图片/视频/公式点击后即关闭菜单（弹窗独立挂 body）；
-                表格网格锚定菜单项，选定格子插入后才关闭菜单 */}
-            {insertItems.length > 0 && (
+                表格网格锚定菜单项，选定格子插入后才关闭菜单；分割线插入完就结束，不弹窗 */}
+            {hasInsertTools && (
               <ContextSubMenu title={t('co.editor.insert')} v-slots={{ icon: () => <RtiPlus /> }}>
                 {insertItems.map(([tool, InsertFormat, label]) => (
                   <InsertFormat key={tool} embedded label={label} onTrigger={closeMenu} />
                 ))}
+                {canInsertDivider && (
+                  <ContextMenuItem
+                    command={{ type: 'divider' }}
+                    title={t('co.editor.divider')}
+                    v-slots={{ icon: () => <RtiDivider /> }}
+                  />
+                )}
               </ContextSubMenu>
             )}
           </ContextMenu>

@@ -271,6 +271,16 @@ const nodes: Record<string, NodeSpec> = {
     },
   },
 
+  // 分割线：块级叶子节点，没有内容也没有属性，读写 HTML 就是 <hr>
+  horizontal_rule: {
+    group: 'block',
+    atom: true,
+    parseDOM: [{ tag: 'hr' }],
+    toDOM() {
+      return ['hr'];
+    },
+  },
+
   table: {
     content: 'table_row+',
     tableRole: 'table',

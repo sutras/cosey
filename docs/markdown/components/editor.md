@@ -174,6 +174,7 @@ editor/expose
 | insertVideo(url, width, height)                       | 插入视频                                | -                           |
 | insertFormula(value)                                  | 插入公式；光标在公式上时改为更新它      | -                           |
 | insertTable(rows, columns)                            | 插入表格，并在表格后补一个可落脚的段落  | -                           |
+| insertDivider()                                       | 在光标所在块级元素之后插入分割线        | -                           |
 | updateImage(attrs) / updateVideo(attrs)               | 更新图片 / 视频节点的属性               | -                           |
 | isImageActive() / isVideoActive() / isFormulaActive() | 光标是否在对应节点上                    | boolean                     |
 | getImageAttrs() / getVideoAttrs() / getFormulaAttrs() | 取对应节点的属性，不在节点上返回 `null` | Record<string, any> \| null |
@@ -234,6 +235,7 @@ editor/expose
 | video           | 插入 | 视频             |
 | table           | 插入 | 表格             |
 | formula         | 插入 | 公式             |
+| divider         | 插入 | 分割线           |
 | clear           | 其他 | 清除格式         |
 | source          | 其他 | 源码模式         |
 
