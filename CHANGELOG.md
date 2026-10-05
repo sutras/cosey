@@ -1,4 +1,9 @@
-## 0.0.0 (2026-09-28)
+## 0.0.0 (2026-10-05)
+
+## <small>1.3.1 (2026-10-05)</small>
+
+- feat(editor): 新增 hr ([6bf423e](https://github.com/sutras/cosey/commit/6bf423e))
+- build: changelog ([135e78b](https://github.com/sutras/cosey/commit/135e78b))
 
 ## 1.3.0 (2026-09-28)
 
