@@ -1,44 +1,48 @@
-## 0.0.0 (2026-10-05)
+## 0.0.0 (2026-10-06)
+
+## <small>1.3.2 (2026-10-06)</small>
+
+- chore(menu,table): 缩小图标尺寸 ([3c64937](https://github.com/sutras/cosey/commit/3c64937))
+- chore(editor): 缩小图标尺寸 ([944b1d9](https://github.com/sutras/cosey/commit/944b1d9))
+- chore(menu): 缩小图标尺寸 ([8bc97c1](https://github.com/sutras/cosey/commit/8bc97c1))
+- build: changelog ([89141c2](https://github.com/sutras/cosey/commit/89141c2))
 
 ## <small>1.3.1 (2026-10-05)</small>
 
-- feat(editor): 新增 hr ([6bf423e](https://github.com/sutras/cosey/commit/6bf423e))
-- build: changelog ([135e78b](https://github.com/sutras/cosey/commit/135e78b))
+- feat(editor): 新增 hr ([e5b678b](https://github.com/sutras/cosey/commit/e5b678b))
+- build: changelog ([e9d564f](https://github.com/sutras/cosey/commit/e9d564f))
 
 ## 1.3.0 (2026-09-28)
 
-- chore: 更新工作纪要 ([d26b3f8](https://github.com/sutras/cosey/commit/d26b3f8))
-- feat(form): 新增分步与页签容器，统一校验定位契约 ([10c3331](https://github.com/sutras/cosey/commit/10c3331))
-- build: changelog ([52f1b50](https://github.com/sutras/cosey/commit/52f1b50))
+- feat(form): 新增分步与页签容器，统一校验定位契约 ([b11e2fd](https://github.com/sutras/cosey/commit/b11e2fd))
+- build: changelog ([9353c2f](https://github.com/sutras/cosey/commit/9353c2f))
 
 ## 1.2.0 (2026-09-26)
 
-- chore: 更新工作纪要 ([6a9d3ce](https://github.com/sutras/cosey/commit/6a9d3ce))
-- chore: 更新工作纪要 ([23c3bfd](https://github.com/sutras/cosey/commit/23c3bfd))
-- feat(editor): 新增功能裁剪与工具栏配置，开放实例方法 ([271e77e](https://github.com/sutras/cosey/commit/271e77e))
-- feat(table): 操作列支持声明式 actions ([1fa58b6](https://github.com/sutras/cosey/commit/1fa58b6))
-- feat(table): 筛选条件与 url 双向同步 ([5368103](https://github.com/sutras/cosey/commit/5368103))
-- refactor(demo): 示例页面适配 useTable 的新签名 ([9dea568](https://github.com/sutras/cosey/commit/9dea568))
-- refactor(table): reload 返回 Promise，请求进行中时等待当前请求 ([7033096](https://github.com/sutras/cosey/commit/7033096))
-- fix(layout): 菜单、标签、搜索切换页面时保留查询参数 ([33fe8be](https://github.com/sutras/cosey/commit/33fe8be))
-- fix(remote-select): 单页时隐藏分页，空 footer 不再占位 ([5ace5b8](https://github.com/sutras/cosey/commit/5ace5b8))
-- build: changelog ([7e0b1e5](https://github.com/sutras/cosey/commit/7e0b1e5))
+- feat(editor): 新增功能裁剪与工具栏配置，开放实例方法 ([283c7fc](https://github.com/sutras/cosey/commit/283c7fc))
+- feat(table): 操作列支持声明式 actions ([bea9e64](https://github.com/sutras/cosey/commit/bea9e64))
+- feat(table): 筛选条件与 url 双向同步 ([49c46f2](https://github.com/sutras/cosey/commit/49c46f2))
+- refactor(demo): 示例页面适配 useTable 的新签名 ([659b774](https://github.com/sutras/cosey/commit/659b774))
+- refactor(table): reload 返回 Promise，请求进行中时等待当前请求 ([c384723](https://github.com/sutras/cosey/commit/c384723))
+- fix(layout): 菜单、标签、搜索切换页面时保留查询参数 ([15d59e0](https://github.com/sutras/cosey/commit/15d59e0))
+- fix(remote-select): 单页时隐藏分页，空 footer 不再占位 ([2ceddc2](https://github.com/sutras/cosey/commit/2ceddc2))
+- build: changelog ([2507661](https://github.com/sutras/cosey/commit/2507661))
 
 ## <small>1.1.1 (2026-09-23)</small>
 
-- fix: 修复esm中使用prism的模块问题 ([af7fc7a](https://github.com/sutras/cosey/commit/af7fc7a))
-- build: changelog ([f14127a](https://github.com/sutras/cosey/commit/f14127a))
+- fix: 修复esm中使用prism的模块问题 ([10938a1](https://github.com/sutras/cosey/commit/10938a1))
+- build: changelog ([a3be418](https://github.com/sutras/cosey/commit/a3be418))
 
 ## 1.1.0 (2026-09-23)
 
-- chore: update version ([085d459](https://github.com/sutras/cosey/commit/085d459))
-- fix: 修复xlsx文件导出兼容性问题 ([a90b241](https://github.com/sutras/cosey/commit/a90b241))
-- fix: 修复标签页切换导致参数丢失问题 ([95fbb81](https://github.com/sutras/cosey/commit/95fbb81))
-- fix: 修复类型报错 ([44b681b](https://github.com/sutras/cosey/commit/44b681b))
-- refactor: 优化useUpsert配置参数 ([f613472](https://github.com/sutras/cosey/commit/f613472))
-- refactor: 更换图标 ([f6e6ba0](https://github.com/sutras/cosey/commit/f6e6ba0))
+- chore: update version ([d745008](https://github.com/sutras/cosey/commit/d745008))
+- fix: 修复xlsx文件导出兼容性问题 ([80a73b7](https://github.com/sutras/cosey/commit/80a73b7))
+- fix: 修复标签页切换导致参数丢失问题 ([503d690](https://github.com/sutras/cosey/commit/503d690))
+- fix: 修复类型报错 ([54ba9a2](https://github.com/sutras/cosey/commit/54ba9a2))
+- refactor: 优化useUpsert配置参数 ([55e6e6b](https://github.com/sutras/cosey/commit/55e6e6b))
+- refactor: 更换图标 ([638ed99](https://github.com/sutras/cosey/commit/638ed99))
 - refactor: 重构 editor 组件 ([8b68809](https://github.com/sutras/cosey/commit/8b68809))
-- feat(editor): 新增float菜单模式 ([951e2ad](https://github.com/sutras/cosey/commit/951e2ad))
+- feat(editor): 新增float菜单模式 ([d7f4153](https://github.com/sutras/cosey/commit/d7f4153))
 - build: changelog ([18dc3b0](https://github.com/sutras/cosey/commit/18dc3b0))
 
 ## <small>1.0.7 (2026-09-09)</small>
