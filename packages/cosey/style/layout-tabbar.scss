@@ -18,7 +18,7 @@ $contrarotation: 'co-ani-contrarotation';
 
   @include e(icon) {
     margin-inline-end: css-var(margin-xxs);
-    font-size: 18px;
+    font-size: css-var(font-size-medium);
   }
 
   .el-tabs {

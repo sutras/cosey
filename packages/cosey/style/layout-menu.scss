@@ -14,11 +14,11 @@
     justify-content: center;
     align-items: center;
     margin-inline-end: css-var(margin-xxs);
-    width: var(--el-menu-icon-width);
+    width: css-var(menu-icon-width);
     flex: none;
     text-align: center;
     vertical-align: middle;
-    font-size: 18px;
+    font-size: css-var(font-size-medium);
   }
 
   @include e(title) {
