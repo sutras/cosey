@@ -48,7 +48,7 @@
       display: flex;
       margin-inline-end: css-var(margin-xs);
       width: css-var(size);
-      font-size: css-var(font-size-large);
+      font-size: css-var(font-size-medium);
     }
 
     @include e(content-title) {

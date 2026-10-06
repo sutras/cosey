@@ -4,10 +4,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   flex: none;
-  font-size: 20px;
+  font-size: 16px;
   white-space: nowrap;
   border-radius: css-var(border-radius-small);
   border: css-var(border-width) css-var(border-style) transparent;
@@ -78,7 +78,7 @@
 
   @include e(group-list) {
     display: flex;
-    column-gap: css-var(size-lg);
+    column-gap: css-var(size-ms);
     row-gap: css-var(size-xxs);
 
     @include is(wrap) {
@@ -90,7 +90,7 @@
     width: 130px;
     justify-content: space-between;
     padding-inline: css-var(padding-xs);
-    font-size: css-var(font-size-base);
+    font-size: css-var(font-size-small);
     background-color: css-var(fill-color-light);
     column-gap: css-var(size-xs);
   }

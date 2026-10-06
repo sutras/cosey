@@ -44,7 +44,7 @@ export default defineComponent({
             onClick={onBtnClick}
             onChevron-click={onChevronClick}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24">
+            <svg width="1em" height="1em" viewBox="0 0 24 24">
               <g fill-rule="evenodd">
                 <path d="M3 18h18v3H3z" fill={current.value}></path>
                 <path

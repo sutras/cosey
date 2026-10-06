@@ -52,15 +52,15 @@ export type EditorTool = (typeof EDITOR_TOOLS)[number];
 export const DEFAULT_EDITOR_TOOLBAR = [
   'undo,redo',
   'heading,font,size',
-  'bold,italic,underline,strikethrough,code,color,background',
+  'bold,italic,underline,strikethrough,code',
+  'color,background',
   'superscript,subscript',
   'ordered-list,bulleted-list',
   'indent-decrease,indent-increase',
   'align-left,align-center,align-right,align-justify',
   'blockquote,code-block',
   'link,image,video,table,formula,divider',
-  'clear',
-  'source',
+  'clear,source',
 ].join('|');
 
 /**
