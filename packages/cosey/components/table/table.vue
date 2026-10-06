@@ -45,7 +45,7 @@
                   :hide-after="0"
                 >
                   <el-button circle @click="reload">
-                    <Icon size="lg" :class="[bem.e('refresh-icon'), bem.is('spinning', reloading)]">
+                    <Icon size="md" :class="[bem.e('refresh-icon'), bem.is('spinning', reloading)]">
                       <RtiRotate360 />
                     </Icon>
                   </el-button>
@@ -60,7 +60,7 @@
                   :hide-after="0"
                 >
                   <el-button circle @click="exportVisible = true">
-                    <Icon size="lg"><RtiDownload /></Icon>
+                    <Icon size="md"><RtiDownload /></Icon>
                   </el-button>
                 </el-tooltip>
 
@@ -82,7 +82,7 @@
                   :hide-after="0"
                 >
                   <el-button circle @click="onFullScreen">
-                    <Icon size="lg">
+                    <Icon size="md">
                       <component :is="isFullPage ? RtiFullscreenExit : RtiFullscreen" />
                     </Icon>
                   </el-button>
@@ -97,7 +97,7 @@
                   :hide-after="0"
                 >
                   <el-button ref="setting-ref" circle>
-                    <Icon size="lg"><RtiSettingsAdjust /></Icon>
+                    <Icon size="md"><RtiSettingsAdjust /></Icon>
                   </el-button>
                 </el-tooltip>
 
