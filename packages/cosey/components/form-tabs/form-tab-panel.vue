@@ -2,9 +2,10 @@
   <ElTabPane v-bind="mergedProps" ref="paneRef">
     <template v-if="labelSlotVisible" #label>
       <slot name="label">
-        <span :class="bem.e('label')">{{ label }}</span>
+        <ElBadge :value="errorCount" :show-zero="false">
+          <span :class="bem.e('label')">{{ label }}</span>
+        </ElBadge>
       </slot>
-      <span v-if="errorCount > 0" :class="bem.e('badge')">{{ errorCount }}</span>
     </template>
     <slot></slot>
   </ElTabPane>
@@ -12,7 +13,7 @@
 
 <script lang="ts" setup>
 import { computed, inject, onBeforeUnmount, ref, useSlots } from 'vue';
-import { ElTabPane } from 'element-plus';
+import { ElBadge, ElTabPane } from 'element-plus';
 import { auid, createBem } from '../../utils';
 import {
   type FormTabName,

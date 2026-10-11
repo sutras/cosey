@@ -2,7 +2,6 @@
 
 @include b(editor-content-image) {
   display: inline-flex;
-  margin: 1px;
 
   @include is(active) {
     outline: 2px solid css-var(color-primary-light-5);
@@ -11,5 +10,9 @@
   @include e(wrapper) {
     position: relative;
     display: inline-flex;
+
+    img {
+      margin: 1px;
+    }
   }
 }

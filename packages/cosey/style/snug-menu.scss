@@ -38,10 +38,6 @@
 
   &:not(.is-disabled):hover {
     background: css-var(fill-color-light);
-
-    @include e(icon) {
-      transform: scale(1.15);
-    }
   }
 
   @include e(title) {

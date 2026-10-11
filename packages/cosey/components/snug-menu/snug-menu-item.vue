@@ -8,7 +8,7 @@
     ]"
     @click="onClick"
   >
-    <Icon v-if="icon" :name="icon" size="xl" :class="bem.e('icon')" />
+    <Icon v-if="icon" :name="icon" size="lg" :class="bem.e('icon')" />
     <div :class="bem.e('title')" :title="title">
       {{ title }}
     </div>
