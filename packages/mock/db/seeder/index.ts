@@ -110,6 +110,17 @@ export async function seed(db: DB) {
     [59, 57,   'read',   'system_config_group', null, '查看配置组', 59, date, date],
     [60, 57,   'update', 'system_config_group', null, '修改配置组', 60, date, date],
     [61, 57,   'delete', 'system_config_group', null, '删除配置组', 61, date, date],
+
+    [62, null, 'manage', 'product',              null, '商品管理',  62, date, date],
+    [63, 62,   'create', 'product',              null, '创建商品',  63, date, date],
+    [64, 62,   'read',   'product',              null, '查看商品',  64, date, date],
+    [65, 62,   'update', 'product',              null, '修改商品',  65, date, date],
+    [66, 62,   'delete', 'product',              null, '删除商品',  66, date, date],
+    [67, 62,   'manage', 'product_category',     null, '商品分类',  67, date, date],
+    [68, 67,   'create', 'product_category',     null, '创建商品分类', 68, date, date],
+    [69, 67,   'read',   'product_category',     null, '查看商品分类', 69, date, date],
+    [70, 67,   'update', 'product_category',     null, '修改商品分类', 70, date, date],
+    [71, 67,   'delete', 'product_category',     null, '删除商品分类', 71, date, date],
   ]
 
   await db.permissions.bulkAdd(
@@ -405,4 +416,131 @@ export async function seed(db: DB) {
       }),
     );
   }
+
+  await seedProducts(db);
+}
+
+interface CatalogGroup {
+  name: string;
+  description: string;
+  brands: string[];
+  items: string[];
+  specs: string[];
+  unit: string;
+  basePrice: number;
+}
+
+// prettier-ignore
+const productCatalog: CatalogGroup[] = [
+  {
+    name: '饮用水',
+    description: '瓶装水、气泡水与矿泉水',
+    brands: ['农夫山泉', '怡宝'],
+    items: ['天然饮用水', '苏打气泡水', '饮用矿泉水'],
+    specs: ['350ml×24', '550ml×24', '1.5L×12'],
+    unit: '箱',
+    basePrice: 36,
+  },
+  {
+    name: '乳制品',
+    description: '常温奶、低温奶与酸奶',
+    brands: ['伊利', '蒙牛'],
+    items: ['纯牛奶', '低脂酸奶', '儿童成长奶'],
+    specs: ['200ml×12', '250ml×16', '1L×6'],
+    unit: '箱',
+    basePrice: 59,
+  },
+  {
+    name: '休闲零食',
+    description: '坚果、烘焙与膨化食品',
+    brands: ['三只松鼠', '良品铺子'],
+    items: ['每日坚果', '手撕面包', '原味薯片'],
+    specs: ['500g', '750g', '1kg'],
+    unit: '袋',
+    basePrice: 29,
+  },
+  {
+    name: '粮油调味',
+    description: '食用油、酱油与米面',
+    brands: ['金龙鱼', '海天'],
+    items: ['一级压榨花生油', '特级金标生抽', '五常长粒香米'],
+    specs: ['1.8L', '500ml', '5kg'],
+    unit: '件',
+    basePrice: 45,
+  },
+  {
+    name: '个护清洁',
+    description: '洗护、纸品与家清用品',
+    brands: ['立白', '舒肤佳'],
+    items: ['深层洁净洗衣液', '纯白清香沐浴露', '原木抽纸'],
+    specs: ['3kg', '750ml', '24包'],
+    unit: '件',
+    basePrice: 39,
+  },
+  {
+    name: '家用电器',
+    description: '厨房小家电与生活电器',
+    brands: ['美的', '苏泊尔'],
+    items: ['电热水壶', '超薄电磁炉', '高速破壁机'],
+    specs: ['1.7L', '2200W', '1.5L'],
+    unit: '台',
+    basePrice: 199,
+  },
+];
+
+/**
+ * 商品分类与商品
+ */
+export async function seedProducts(db: DB) {
+  const date = new Date();
+  const assets = await db.assets.toArray();
+
+  const categories = productCatalog.map((group, index) => {
+    const id = index + 1;
+
+    return {
+      id,
+      name: group.name,
+      description: group.description,
+      sort: id,
+      createdAt: date,
+      updatedAt: date,
+    };
+  });
+
+  await db.productCategories.bulkPut(categories);
+
+  const products = productCatalog
+    .flatMap((group, groupIndex) => {
+      const categoryId = groupIndex + 1;
+
+      return group.brands.flatMap((brand) =>
+        group.items.flatMap((item) =>
+          group.specs.map((spec, specIndex) => ({
+            categoryId,
+            name: `${brand} ${item} ${spec}`,
+            spec,
+            price: Number((group.basePrice * (1 + specIndex * 0.4)).toFixed(2)),
+            unit: group.unit,
+            description: `${brand}${item}，${group.name}类商品，规格 ${spec}。`,
+          })),
+        ),
+      );
+    })
+    .map((row, index) => {
+      const id = index + 1;
+
+      return {
+        ...row,
+        id,
+        code: `SKU-${String(10000 + id)}`,
+        stock: (id * 37) % 260,
+        status: id % 11 === 0 ? 0 : 1,
+        cover: assets[(id - 1) % assets.length]?.url ?? '',
+        createdAt: new Date(date.getTime() - (id % 180) * 864e5),
+        updatedAt: date,
+      };
+    });
+
+  await db.products.bulkPut(products);
 }

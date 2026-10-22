@@ -1,11 +1,11 @@
 import Dexie from 'dexie';
 
 import { type DB } from './types';
-import { seed } from './seeder';
+import { seed, seedProducts } from './seeder';
 
 export const db = new Dexie('CoseyAdminDB') as DB;
 
-export const schema = {
+const schemaV1 = {
   admins: '++id, username, password, nickname, avatar, superAdmin, createdAt, updatedAt',
   roles: '++id, name, createdAt, updatedAt',
   permissions: '++id, pid, action, subject, conditions, name, order, createdAt, updatedAt',
@@ -24,8 +24,15 @@ export const schema = {
   configs: '++id, groupId, type, name, value, key, createdAt, updatedAt',
 };
 
+export const schema = {
+  ...schemaV1,
+  productCategories: '++id, name, sort, createdAt, updatedAt',
+  products: '++id, name, code, categoryId, spec, price, stock, status, createdAt, updatedAt',
+};
+
 // 数据库表设计
-db.version(1).stores(schema);
+db.version(1).stores(schemaV1);
+db.version(2).stores(schema);
 
 /**
  * 重置数据库
@@ -38,11 +45,28 @@ export async function resetDB() {
 
 /**
  * 初始化数据库
+ *
+ * 返回的 promise 在种子数据就绪后才 resolve，接口处理前应等待它，
+ * 否则首次访问时请求会撞上 `db.delete()` 而报 DatabaseClosedError。
  */
-export async function initSeed() {
-  if (!localStorage.getItem('mockSeeded')) {
-    resetDB().then(() => {
-      localStorage.setItem('mockSeeded', 'true');
-    });
+export function initSeed() {
+  if (!seedTask) {
+    seedTask = (async () => {
+      if (!localStorage.getItem('mockSeeded')) {
+        await resetDB();
+        localStorage.setItem('mockSeeded', 'true');
+        return;
+      }
+
+      // 老数据没有商品表，补一次种子数据，不重建整个库
+      const count = await db.products.count();
+      if (count === 0) {
+        await seedProducts(db);
+      }
+    })();
   }
+
+  return seedTask;
 }
+
+let seedTask: Promise<void> | null = null;

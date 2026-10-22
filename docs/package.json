@@ -36,7 +36,7 @@
     "vitepress": "^1.6.3"
   },
   "dependencies": {
-    "@cosey/mock": "^0.1.6",
+    "@cosey/mock": "workspace:^",
     "@iconify-json/ep": "^1.2.4",
     "bootstrap-icons": "^1.13.1",
     "cosey": "workspace:^",

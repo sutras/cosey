@@ -10,6 +10,8 @@ import { default as permissions } from './permissions';
 import { default as postComment } from './post-comment';
 import { default as postType } from './post-type';
 import { default as posts } from './posts';
+import { default as productCategories } from './product-categories';
+import { default as products } from './products';
 import { default as roles } from './roles';
 import { default as statistics } from './statistics';
 import { default as users } from './users';
@@ -25,6 +27,8 @@ const modules = [
   postComment,
   postType,
   posts,
+  productCategories,
+  products,
   roles,
   statistics,
   users,

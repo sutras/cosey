@@ -18,7 +18,7 @@ export type { ContentType, HttpMessage };
 export function createMock(
   options: { skipAuth?: boolean; requestInterceptorInit?: RequestInterceptorInit } = {},
 ) {
-  initSeed();
+  const ready = initSeed();
 
   const httpMessageManager = new HttpMessageManager();
 
@@ -30,6 +30,12 @@ export function createMock(
 
     // 注册路由
     register(interceptor);
+
+    // 种子数据就绪前不处理请求，避免首次访问撞上数据库重建
+    interceptor.addGuard(async () => {
+      await ready;
+      return true as const;
+    });
 
     // 添加拦截守卫，处理身份验证
     interceptor.addGuard(async ({ req, res, payload }) => {

@@ -14,6 +14,8 @@ import type { Posttype } from './models/post-type';
 import type { PostComment } from './models/post-comment';
 import type { ConfigGroup } from './models/config-group';
 import type { Config } from './models/config';
+import type { ProductCategory } from './models/product-category';
+import type { Product } from './models/product';
 
 export type DB = Dexie & {
   admins: Admin;
@@ -30,4 +32,6 @@ export type DB = Dexie & {
   postComments: PostComment;
   configGroups: ConfigGroup;
   configs: Config;
+  productCategories: ProductCategory;
+  products: Product;
 };
