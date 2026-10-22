@@ -29,10 +29,13 @@ export default function register(interceptor: RequestInterceptor) {
   new Resource(prefix, db.users, {
     list: {
       constrain(req, tableOrColl) {
-        const { nickname, mobile, name, gender, birthday, silent } = req.query;
+        const { nickname, mobile, name, gender, birthday, silent, createdAt } = req.query;
 
         const birthday_start = birthday && new Date(birthday[0]);
         const birthday_end = birthday && new Date(birthday[1]);
+
+        const createdAt_start = createdAt && new Date(createdAt[0]);
+        const createdAt_end = createdAt && new Date(createdAt[1]);
 
         return tableOrColl.filter((row) => {
           return (
@@ -41,6 +44,7 @@ export default function register(interceptor: RequestInterceptor) {
             (!name || row.name.includes(name)) &&
             (!gender || row.gender.includes(gender)) &&
             (!birthday || (row.birthday >= birthday_start && row.birthday <= birthday_end)) &&
+            (!createdAt || (row.createdAt >= createdAt_start && row.createdAt <= createdAt_end)) &&
             (!silent || row.silent === Number(silent))
           );
         });

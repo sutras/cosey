@@ -222,7 +222,7 @@ export async function seed(db: DB) {
             avatar: assets[i].url,
             address: mock.address(),
             silent: 0,
-            createdAt: date,
+            createdAt: new Date(date.getTime() - mock.random(0, 540) * 864e5),
             updatedAt: date,
           };
         }),
