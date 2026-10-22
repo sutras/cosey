@@ -1,6 +1,6 @@
 import { computed, defineComponent, ref, watch } from 'vue';
 import { ElButton, ElEmpty, ElSkeleton } from 'element-plus';
-import { coChartProps, coChartSlots, coChartEmits } from './co-chart.api';
+import { chartProps, chartSlots, chartEmits } from './chart.api';
 import { Icon } from '../icon';
 import { useEcharts, useLocale } from '../../hooks';
 import { addPxUnit, createBem } from '../../utils';
@@ -8,9 +8,9 @@ import { RtiDownload } from 'richtext-icons';
 
 export default defineComponent({
   name: 'CoChart',
-  props: coChartProps,
-  slots: coChartSlots,
-  emits: coChartEmits,
+  props: chartProps,
+  slots: chartSlots,
+  emits: chartEmits,
   setup(props, { slots, emit }) {
     const { t } = useLocale();
 

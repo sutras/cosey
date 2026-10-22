@@ -1,7 +1,7 @@
 import { enhanceComponent, type EnhancedComponent } from '../utils';
-import CoPage from './co-page';
+import CoPage from './page';
 
-export * from './co-page.api';
+export * from './page.api';
 
 const _CoPage: EnhancedComponent<typeof CoPage> = enhanceComponent(CoPage);
 

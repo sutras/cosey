@@ -132,7 +132,7 @@ getColor(1); // 'success'
 | color    | 标签颜色：`success` / `warning` / `danger` / `info` / `primary` | string           |
 | disabled | 是否禁用                                                        | boolean          |
 
-### CoDictTagProps
+### DictTagProps
 
 | 属性     | 描述                                 | 类型                            | 默认值 |
 | -------- | ------------------------------------ | ------------------------------- | ------ |
@@ -144,7 +144,7 @@ getColor(1); // 'success'
 | effect   | 主题                                 | 'dark' \| 'light' \| 'plain'    | -      |
 | fallback | 找不到字典项时的文案，默认回退到原值 | string                          | -      |
 
-### CoDictTagSlots
+### DictTagSlots
 
 | 插槽    | 描述       | 属性                               |
 | ------- | ---------- | ---------------------------------- |

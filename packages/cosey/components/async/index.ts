@@ -1,7 +1,7 @@
 import { enhanceComponent, type EnhancedComponent } from '../utils';
-import CoAsync from './co-async';
+import CoAsync from './async';
 
-export * from './co-async.api';
+export * from './async.api';
 
 const _CoAsync: EnhancedComponent<typeof CoAsync> = enhanceComponent(CoAsync);
 

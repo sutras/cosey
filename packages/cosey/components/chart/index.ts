@@ -1,7 +1,7 @@
 import { enhanceComponent, type EnhancedComponent } from '../utils';
-import CoChart from './co-chart';
+import CoChart from './chart';
 
-export * from './co-chart.api';
+export * from './chart.api';
 
 const _CoChart: EnhancedComponent<typeof CoChart> = enhanceComponent(CoChart);
 

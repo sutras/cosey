@@ -2,16 +2,16 @@ import { computed, defineComponent, getCurrentInstance } from 'vue';
 import type { Router } from 'vue-router';
 import { ElButton } from 'element-plus';
 import { RtiChevronLeft } from 'richtext-icons';
-import { coPageProps, coPageSlots, coPageEmits } from './co-page.api';
+import { pageProps, pageSlots, pageEmits } from './page.api';
 import { Icon } from '../icon';
 import { useLocale } from '../../hooks';
 import { createBem } from '../../utils';
 
 export default defineComponent({
   name: 'CoPage',
-  props: coPageProps,
-  slots: coPageSlots,
-  emits: coPageEmits,
+  props: pageProps,
+  slots: pageSlots,
+  emits: pageEmits,
   setup(props, { slots, emit }) {
     const { t } = useLocale();
 

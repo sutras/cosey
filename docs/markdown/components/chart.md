@@ -22,7 +22,7 @@ chart/basic
 
 ## API
 
-### CoChartProps
+### ChartProps
 
 | 属性            | 描述                                                        | 类型             | 默认值      |
 | --------------- | ----------------------------------------------------------- | ---------------- | ----------- |
@@ -38,7 +38,7 @@ chart/basic
 | backgroundColor | 导出图片的背景色                                            | string           | transparent |
 | merge           | `option` 变化时是否合并，`false` 表示整体替换               | boolean          | true        |
 
-### CoChartSlots
+### ChartSlots
 
 | 插槽    | 描述                    | 属性                                        |
 | ------- | ----------------------- | ------------------------------------------- |

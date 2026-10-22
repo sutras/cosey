@@ -1,6 +1,6 @@
 import { computed, defineComponent } from 'vue';
 import { ElTag } from 'element-plus';
-import { coDictTagProps, coDictTagSlots } from './co-dict-tag.api';
+import { dictTagProps, dictTagSlots } from './dict-tag.api';
 import { type DictItem, useDict } from '../../dict';
 import { useLocale } from '../../hooks';
 import { translateMessage } from '../../locale';
@@ -8,8 +8,8 @@ import { createBem } from '../../utils';
 
 export default defineComponent({
   name: 'CoDictTag',
-  props: coDictTagProps,
-  slots: coDictTagSlots,
+  props: dictTagProps,
+  slots: dictTagSlots,
   setup(props, { slots }) {
     const bem = createBem('dict-tag');
 

@@ -36,7 +36,7 @@ const fetch = useFetch(getUsers);
 
 ## API
 
-### CoAsyncProps
+### AsyncProps
 
 | 属性      | 描述                                                                    | 类型              | 默认值   |
 | --------- | ----------------------------------------------------------------------- | ----------------- | -------- |
@@ -50,9 +50,9 @@ const fetch = useFetch(getUsers);
 | retry     | 重试回调，不传时调用 `state.execute()`                                  | () => any         | -        |
 | retryText | 重试按钮文案                                                            | string            | 刷新     |
 
-### CoAsyncSlots
+### AsyncSlots
 
-`#default` 收到的是完整的 `CoAsyncSlotProps`，可以按需取用：
+`#default` 收到的是完整的 `AsyncSlotProps`，可以按需取用：
 
 | 插槽    | 描述           | 属性                                       |
 | ------- | -------------- | ------------------------------------------ |
@@ -64,9 +64,9 @@ const fetch = useFetch(getUsers);
 `data` 的类型取决于 `state.data`；需要精确类型时可显式标注：
 
 ```ts
-import type { CoAsyncSlotProps } from 'cosey';
+import type { AsyncSlotProps } from 'cosey';
 
-type UserSlot = CoAsyncSlotProps<User[]>;
+type UserSlot = AsyncSlotProps<User[]>;
 ```
 
 ### CoAsyncEmits

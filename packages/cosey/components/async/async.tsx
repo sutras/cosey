@@ -1,14 +1,14 @@
 import { computed, defineComponent, onBeforeUnmount, ref, unref, watch } from 'vue';
 import { ElButton, ElEmpty, ElResult, ElSkeleton } from 'element-plus';
-import { coAsyncProps, coAsyncSlots, coAsyncEmits } from './co-async.api';
+import { asyncProps, asyncSlots, asyncEmits } from './async.api';
 import { useLocale } from '../../hooks';
 import { createBem } from '../../utils';
 
 export default defineComponent({
   name: 'CoAsync',
-  props: coAsyncProps,
-  slots: coAsyncSlots,
-  emits: coAsyncEmits,
+  props: asyncProps,
+  slots: asyncSlots,
+  emits: asyncEmits,
   setup(props, { slots, emit }) {
     const { t } = useLocale();
 

@@ -1,7 +1,7 @@
 import { type ExtractPropTypes, type PropType, type SlotsType } from 'vue';
 import { type DictItem, type DictName } from '../../dict';
 
-export const coDictTagProps = {
+export const dictTagProps = {
   /** 字典名，需先通过 `launch({ dict })` 或 `registerDicts()` 注册 */
   dict: {
     type: String as PropType<DictName>,
@@ -30,12 +30,12 @@ export const coDictTagProps = {
   },
 };
 
-export type CoDictTagProps = ExtractPropTypes<typeof coDictTagProps>;
+export type DictTagProps = ExtractPropTypes<typeof dictTagProps>;
 
-export interface CoDictTagSlots {
+export interface DictTagSlots {
   default: { label: string; item?: DictItem };
 }
 
-export const coDictTagSlots = Object as SlotsType<CoDictTagSlots>;
+export const dictTagSlots = Object as SlotsType<DictTagSlots>;
 
-export const coDictTagEmits = {};
+export const dictTagEmits = {};

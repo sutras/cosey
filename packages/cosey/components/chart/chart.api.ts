@@ -1,7 +1,7 @@
 import { type ExtractPropTypes, type PropType, type SlotsType } from 'vue';
 import { type ECOption } from '../../utils/echarts';
 
-export const coChartProps = {
+export const chartProps = {
   /** echarts 配置 */
   option: {
     type: Object as PropType<ECOption>,
@@ -54,14 +54,14 @@ export const coChartProps = {
   },
 };
 
-export type CoChartProps = ExtractPropTypes<typeof coChartProps>;
+export type ChartProps = ExtractPropTypes<typeof chartProps>;
 
-export interface CoChartSlots {
+export interface ChartSlots {
   default: { chart: any; exportImage: () => void };
 }
 
-export const coChartSlots = Object as SlotsType<CoChartSlots>;
+export const chartSlots = Object as SlotsType<ChartSlots>;
 
-export const coChartEmits = {
+export const chartEmits = {
   export: (url: string) => typeof url === 'string',
 };

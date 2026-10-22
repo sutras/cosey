@@ -10,7 +10,7 @@ export interface AsyncState<T = any> {
   execute?: (...args: any[]) => any;
 }
 
-export const coAsyncProps = {
+export const asyncProps = {
   /** 直接传入 `useFetch()` 的返回值 */
   state: {
     type: Object as PropType<AsyncState>,
@@ -52,7 +52,7 @@ export const coAsyncProps = {
   },
 };
 
-export type CoAsyncProps = ExtractPropTypes<typeof coAsyncProps>;
+export type AsyncProps = ExtractPropTypes<typeof asyncProps>;
 
 /**
  * `#default` 插槽收到的参数。
@@ -61,10 +61,10 @@ export type CoAsyncProps = ExtractPropTypes<typeof coAsyncProps>;
  * 可在 `useAsyncSlotProps` 里显式标注获得更精确的提示：
  *
  * ```ts
- * type UserSlot = CoAsyncSlotProps<User[]>;
+ * type UserSlot = AsyncSlotProps<User[]>;
  * ```
  */
-export interface CoAsyncSlotProps<T = any> {
+export interface AsyncSlotProps<T = any> {
   /** `state.data` 解包后的值 */
   data: T | undefined;
   /** 是否加载中 */
@@ -77,15 +77,15 @@ export interface CoAsyncSlotProps<T = any> {
   retry: () => void;
 }
 
-export interface CoAsyncSlots<T = any> {
-  default: CoAsyncSlotProps<T>;
+export interface AsyncSlots<T = any> {
+  default: AsyncSlotProps<T>;
   loading: { retry: () => void };
   empty: { retry: () => void };
   error: { error: any; retry: () => void };
 }
 
-export const coAsyncSlots = Object as SlotsType<CoAsyncSlots>;
+export const asyncSlots = Object as SlotsType<AsyncSlots>;
 
-export const coAsyncEmits = {
+export const asyncEmits = {
   retry: () => true,
 };

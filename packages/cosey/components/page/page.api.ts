@@ -1,7 +1,7 @@
 import { type ExtractPropTypes, type PropType, type SlotsType } from 'vue';
 import { type RouteLocationRaw } from 'vue-router';
 
-export const coPageProps = {
+export const pageProps = {
   /** 页面标题 */
   title: {
     type: String,
@@ -31,9 +31,9 @@ export const coPageProps = {
   },
 };
 
-export type CoPageProps = ExtractPropTypes<typeof coPageProps>;
+export type PageProps = ExtractPropTypes<typeof pageProps>;
 
-export interface CoPageSlots {
+export interface PageSlots {
   default: {};
   title: {};
   description: {};
@@ -44,8 +44,8 @@ export interface CoPageSlots {
   footer: {};
 }
 
-export const coPageSlots = Object as SlotsType<CoPageSlots>;
+export const pageSlots = Object as SlotsType<PageSlots>;
 
-export const coPageEmits = {
+export const pageEmits = {
   back: () => true,
 };
