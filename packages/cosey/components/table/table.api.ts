@@ -17,6 +17,13 @@ export interface ToolbarConfig {
   setting?: boolean;
 }
 
+export interface TableBatchConfig {
+  /** 左侧文案，默认为「已选 N 项」 */
+  text?: string;
+  /** 外部接管的选中行，传了就不再跟随表格勾选列 */
+  rows?: any[];
+}
+
 export const tableEmitEvents = [
   'select-all',
   'expand-change',
@@ -128,9 +135,12 @@ const tableExtraProps = {
    * 批量操作条：选中行后显示，内容由 `#batch` 插槽提供。
    *
    * 传 `true` 使用默认文案；传对象可自定义文案。
+   *
+   * `rows` 用于外部接管选中行（选中态不在表格里，例如选择器自己维护），
+   * 传了它就只看这份数据，不再依赖表格的勾选列。
    */
   batch: {
-    type: [Boolean, Object] as PropType<boolean | { text?: string }>,
+    type: [Boolean, Object] as PropType<boolean | TableBatchConfig>,
     default: false,
   },
   /** 行拖拽排序，默认关闭；开启后 `row-move` 事件给出新的顺序 */

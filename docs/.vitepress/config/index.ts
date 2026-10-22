@@ -171,6 +171,7 @@ export default defineConfig({
             { text: 'InputNumberRange 数字范围输入框', link: '/components/input-number-range' },
             { text: 'Upload 上传', link: '/components/upload' },
             { text: 'RemoteSelect 远程选择器', link: '/components/remote-select' },
+            { text: 'TableSelect 表格选择器', link: '/components/table-select' },
             { text: 'WeekRangePicker 周范围选择器', link: '/components/week-range-picker' },
           ],
         },

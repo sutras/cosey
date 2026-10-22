@@ -11,6 +11,7 @@ export default {
       cancel: 'Cancel',
       loading: 'Loading',
       noData: 'No Data',
+      loadFailed: 'Load failed',
       addSuccess: 'Add successfully',
       editSuccess: 'Edit successfully',
       operateSuccess: 'Operation successfully',
@@ -25,6 +26,10 @@ export default {
       reload: 'Reload',
       close: 'Close',
       home: 'Home',
+      clear: 'Clear',
+      selectedCount: '{count} selected',
+      loadMore: 'Load more',
+      noMore: 'No more data',
     },
     chart: {
       exportImage: 'Export image',

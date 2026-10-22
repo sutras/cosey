@@ -11,6 +11,7 @@ export default {
       cancel: '取消',
       loading: '加载中',
       noData: '暂无数据',
+      loadFailed: '加载失败',
       reload: '刷新',
       addSuccess: '新增成功',
       editSuccess: '编辑成功',
@@ -25,6 +26,10 @@ export default {
       warning: '警告',
       close: '关闭',
       home: '首页',
+      clear: '清空',
+      selectedCount: '已选 {count} 项',
+      loadMore: '加载更多',
+      noMore: '没有更多了',
     },
     chart: {
       exportImage: '导出图片',

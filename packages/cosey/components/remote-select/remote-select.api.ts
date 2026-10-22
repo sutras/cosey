@@ -18,8 +18,15 @@ export const remoteSelectProps = {
   api: {
     type: Function as PropType<(...args: any[]) => Promise<any> | any>,
   },
+  /**
+   * 分页方式
+   *
+   * - `true` / 对象：底部页码分页，对象透传给 `ElPagination`
+   * - `'scroll'`：滚动到底部自动加载下一页
+   * - `false`：不分页
+   */
   pagination: {
-    type: [Object, Boolean] as PropType<boolean | PaginationProps>,
+    type: [Object, Boolean, String] as PropType<boolean | 'scroll' | PaginationProps>,
     default: true,
   },
   formProps: {
@@ -34,6 +41,18 @@ export const remoteSelectProps = {
   immediate: {
     type: Boolean,
     default: false,
+  },
+  searchable: {
+    type: Boolean,
+    default: false,
+  },
+  searchParam: {
+    type: [String, Function] as PropType<string | ((keyword: string) => Record<string, any>)>,
+    default: 'keyword',
+  },
+  searchDebounce: {
+    type: Number,
+    default: 300,
   },
 };
 
@@ -57,6 +76,7 @@ export const remoteSelectSlots = Object as SlotsType<RemoteSelectSlots>;
 
 export const remoteSelectEmits = {
   ...selectEmits,
+  search: (keyword: string) => typeof keyword === 'string',
 };
 
 export type RemoteSelectEmits = typeof remoteSelectEmits;

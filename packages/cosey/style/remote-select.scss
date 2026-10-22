@@ -1,13 +1,73 @@
 @use './base/index' as *;
 
 @include b(remote-select) {
+  @include e(error) {
+    display: flex;
+    align-items: center;
+    gap: css-var(size-xs);
+    color: css-var(text-color-secondary);
+    cursor: pointer;
+  }
+
+  @include e(retry) {
+    color: css-var(color-primary);
+  }
+
+  @include e(divider) {
+    &.el-select-dropdown__item {
+      border-top: 1px solid css-var(border-color-lighter);
+    }
+  }
+
+  // 滚动加载时列表末尾的一行：不足一屏也能点它翻页
+  @include e(more) {
+    padding: css-var(padding-xs) 0;
+    color: css-var(text-color-secondary);
+    font-size: css-var(font-size-small);
+    text-align: center;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+
+    &:hover {
+      color: css-var(color-primary);
+    }
+
+    &.is-loading {
+      cursor: default;
+      color: css-var(text-color-placeholder);
+
+      &:hover {
+        color: css-var(text-color-placeholder);
+      }
+    }
+
+    &.is-done {
+      cursor: default;
+      color: css-var(text-color-placeholder);
+
+      &:hover {
+        color: css-var(text-color-placeholder);
+      }
+    }
+  }
+
   @include e(popper) {
     display: flex;
     flex-direction: column;
-    height: 320px;
+    // 上限 320，实际高度由内容决定：选项少时不留空白
+    max-height: 320px;
 
     &.el-select-dropdown {
-      height: 100%;
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .el-select-dropdown__header,
+    .el-select-dropdown__footer {
+      flex: none;
     }
 
     .el-select-dropdown__footer:empty {
@@ -25,15 +85,32 @@
       }
     }
 
+    // 滚动区高度交接给 flex：scroller 撑满剩余空间，wrap 再撑满 scroller。
+    // 只清 max-height 不够（百分比高度在 flex 里解不定），wrap 会被内容顶出容器。
     .el-scrollbar {
-      flex: 1;
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .el-select-dropdown__wrap {
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: none;
+    }
+
+    // 没有列表可撑时（首次加载、搜索中、无数据）给个面板高度，否则会塌成一条
+    .el-select-dropdown__loading,
+    .el-select-dropdown__empty {
+      flex: 1 1 auto;
+      min-height: 160px;
     }
 
     .el-select-dropdown__empty {
-      flex: 1;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
     }
   }
 }

@@ -20,7 +20,7 @@ import { type TableColumnProps } from './table-column.api';
 import { type LongTextProps, LongText } from '../../long-text';
 import { type MediaCardProps, MediaCard } from '../../media-card';
 import { type MediaCardGroupProps, MediaCardGroup } from '../../media-card-group';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import { type Translator } from '../../../hooks';
 
 interface RendererOptions {
@@ -108,6 +108,14 @@ const AsyncSwitch = defineComponent({
   setup(props) {
     const loading = ref(false);
     const value = ref(props.value);
+
+    // 表格重新加载后行数据会换新，本地状态要跟上
+    watch(
+      () => props.value,
+      (val) => {
+        value.value = val;
+      },
+    );
 
     return () => (
       <ElSwitch

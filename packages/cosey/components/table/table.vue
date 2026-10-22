@@ -116,8 +116,8 @@
           <div :class="bem.e('batch-actions')">
             <slot
               name="batch"
-              :count="selectionRows.length"
-              :rows="selectionRows"
+              :count="batchRows.length"
+              :rows="batchRows"
               :clear="clearBatchSelection"
             ></slot>
           </div>
@@ -337,10 +337,12 @@ const mergedBatch = computed(() => {
   return isObject(props.batch) ? props.batch : {};
 });
 
-const isBatchVisible = computed(() => !!mergedBatch.value && selectionRows.value.length > 0);
+const batchRows = computed(() => mergedBatch.value?.rows ?? selectionRows.value);
+
+const isBatchVisible = computed(() => !!mergedBatch.value && batchRows.value.length > 0);
 
 const batchText = computed(
-  () => mergedBatch.value?.text ?? t('co.table.selected', { count: selectionRows.value.length }),
+  () => mergedBatch.value?.text ?? t('co.table.selected', { count: batchRows.value.length }),
 );
 
 const clearBatchSelection = () => {

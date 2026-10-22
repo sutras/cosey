@@ -54,6 +54,7 @@ import { PagViewer } from './pag-viewer';
 import { PagCard } from './pag-card';
 import { Table } from './table';
 import { TableAction } from './table-action';
+import { TableSelect } from './table-select';
 import { Toggle } from './toggle';
 import { Transition } from './transition';
 import { TransitionGroup } from './transition-group';
@@ -128,6 +129,7 @@ declare module 'vue' {
     CoPagCard: typeof PagCard;
     CoTable: typeof Table;
     CoTableAction: typeof TableAction;
+    CoTableSelect: typeof TableSelect;
     CoTableQuery: typeof FormQuery;
     CoToggle: typeof Toggle;
     CoTransition: typeof Transition;
@@ -204,6 +206,7 @@ export const registerGlobalComponents = {
       PagCard,
       Table,
       TableAction,
+      TableSelect,
       Toggle,
       Transition,
       TransitionGroup,

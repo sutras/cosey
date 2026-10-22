@@ -11,6 +11,7 @@ export default {
       cancel: 'إلغاء',
       loading: 'جارٍ التحميل',
       noData: 'لا توجد بيانات',
+      loadFailed: 'فشل التحميل',
       reload: 'تحديث',
       addSuccess: 'تمت الإضافة بنجاح',
       editSuccess: 'تم التعديل بنجاح',
@@ -25,6 +26,10 @@ export default {
       warning: 'تحذير',
       close: 'إغلاق',
       home: 'الصفحة الرئيسية',
+      clear: 'مسح',
+      selectedCount: 'تم تحديد {count}',
+      loadMore: 'تحميل المزيد',
+      noMore: 'لا مزيد من البيانات',
     },
     chart: {
       exportImage: 'تصدير الصورة',

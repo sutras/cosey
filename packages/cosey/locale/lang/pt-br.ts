@@ -11,6 +11,7 @@ export default {
       cancel: 'Cancelar',
       loading: 'Carregando',
       noData: 'Sem dados',
+      loadFailed: 'Falha ao carregar',
       reload: 'Recarregar',
       addSuccess: 'Adicionado com sucesso',
       editSuccess: 'Editado com sucesso',
@@ -25,6 +26,10 @@ export default {
       warning: 'Aviso',
       close: 'Fechar',
       home: 'Início',
+      clear: 'Limpar',
+      selectedCount: '{count} selecionado(s)',
+      loadMore: 'Carregar mais',
+      noMore: 'Não há mais dados',
     },
     chart: {
       exportImage: 'Exportar imagem',

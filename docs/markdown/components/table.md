@@ -115,6 +115,8 @@ urlFields: {
 
 开启 `batch` 后，勾选任意行会在表格上方出现一条操作栏，内容由 `#batch` 插槽提供，插槽参数里有 `count` / `rows` / `clear`。
 
+选中态不在表格里时（例如 [表格选择器](./table-select) 自己维护选中集），用 `batch.rows` 把数据交过去，操作栏就只看这份数据，不再依赖勾选列。
+
 ::: demo
 
 table/batch
@@ -268,7 +270,7 @@ type QueryFieldConfig<T = any> =
 | transform-summary  | 转换合计列数据                                                              | (sums: any[]) => any[]                                                                               | -                          |
 | split              | 分隔表格主体和头部等，显示分隔条                                            | boolean                                                                                              | false                      |
 | table-key          | 表格标识，设置后列顺序/显隐会持久化到本地存储                               | string                                                                                               | -                          |
-| batch              | 批量操作条，选中行后显示；内容由 `#batch` 插槽提供                          | boolean \| { text?: string }                                                                         | false                      |
+| batch              | 批量操作条，选中行后显示；内容由 `#batch` 插槽提供                          | boolean \| { text?: string; rows?: any[] }                                                           | false                      |
 | row-draggable      | 行拖拽排序                                                                  | boolean                                                                                              | false                      |
 
 ### TableConfig

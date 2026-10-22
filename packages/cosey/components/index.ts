@@ -51,6 +51,7 @@ export * from './stack-dialog';
 export * from './svg-icon';
 export * from './table';
 export * from './table-action';
+export * from './table-select';
 // `table-query` 已并入 `form-query`（同一个组件对象、同一份 props 与 expose），
 // 这里只为旧调用方保留名字。深层路径 `cosey/components/table-query` 不再提供。
 /** @deprecated 用 `FormQuery` */

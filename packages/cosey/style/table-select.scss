@@ -1,0 +1,81 @@
+@use './base/index' as *;
+
+// 触发器本体直接用 el-select 的类名与结构，这里只补键盘可达性和弹窗内的表格附属样式
+@include b(table-select) {
+  display: block;
+  width: 100%;
+
+  @include e(trigger) {
+    .el-select__wrapper {
+      @include focus-visible;
+    }
+  }
+
+  @include e(cell) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  @include e(footer) {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  @include e(dialog) {
+    max-width: calc(100vw - 32px);
+
+    .el-dialog__body {
+      padding-top: 0;
+    }
+  }
+
+  @include e(radio) {
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    border: css-var(border-width) solid css-var(border-color);
+    border-radius: 50%;
+    background-color: css-var(fill-color-blank);
+    cursor: pointer;
+    transition:
+      border-color css-var(transition-duration-fast),
+      background-color css-var(transition-duration-fast);
+
+    &.is-checked {
+      position: relative;
+      border-color: css-var(color-primary);
+      background-color: css-var(color-primary);
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: css-var(color-white);
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    &.is-disabled {
+      background-color: css-var(fill-color-light);
+      cursor: not-allowed;
+
+      &.is-checked {
+        border-color: css-var(border-color);
+        background-color: css-var(text-color-disabled);
+      }
+    }
+  }
+
+  @include e(picked) {
+    td.el-table__cell {
+      background-color: css-var(fill-color-light);
+    }
+  }
+}
