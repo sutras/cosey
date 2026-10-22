@@ -36,6 +36,9 @@ pnpm-lock.yaml
 /.vitepress
 .eslintcache
 
+# vite 加载配置时落在源码旁的临时 bundle（进程被 kill 时会残留）
+*.timestamp-*.mjs
+
 /stats.html
 
 .workbuddy
