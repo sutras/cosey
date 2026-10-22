@@ -20,7 +20,7 @@ export function enhanceComponent<T extends Component>(component: T): EnhancedCom
       if (!props) return;
 
       for (const [key, value] of Object.entries(defaults)) {
-        if (Object.hasOwn(props, key)) {
+        if (!Object.hasOwn(props, key)) {
           continue;
         }
 

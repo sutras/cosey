@@ -1,0 +1,29 @@
+@use './base/index' as *;
+
+@include b(chart) {
+  position: relative;
+  width: 100%;
+
+  @include e(canvas) {
+    width: 100%;
+    height: 100%;
+  }
+
+  @include e(toolbar) {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    z-index: 1;
+    display: flex;
+    gap: css-var(padding-xxs);
+  }
+
+  > .el-skeleton,
+  > .el-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+}

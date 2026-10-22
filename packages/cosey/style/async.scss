@@ -1,0 +1,14 @@
+@use './base/index' as *;
+
+@include b(async) {
+  min-width: 0;
+
+  @include e(skeleton) {
+    padding-block: css-var(padding-xs);
+  }
+
+  &.is-empty,
+  &.is-error {
+    padding-block: css-var(padding-lg);
+  }
+}

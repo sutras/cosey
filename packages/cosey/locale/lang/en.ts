@@ -9,6 +9,7 @@ export default {
       checkAll: 'Check all',
       confirm: 'Confirm',
       cancel: 'Cancel',
+      loading: 'Loading',
       noData: 'No Data',
       addSuccess: 'Add successfully',
       editSuccess: 'Edit successfully',
@@ -24,6 +25,9 @@ export default {
       reload: 'Reload',
       close: 'Close',
       home: 'Home',
+    },
+    chart: {
+      exportImage: 'Export image',
     },
     form: {
       weekOfYear: '[Week] w, YYYY',
@@ -100,6 +104,7 @@ export default {
       exitFullScreen: 'Exit full screen',
       fullScreen: 'Full screen',
       columnSettings: 'Column Settings',
+      selected: '{count} selected',
       restoreDefault: 'Restore default',
       filename: 'Filename',
       fileType: 'File type',

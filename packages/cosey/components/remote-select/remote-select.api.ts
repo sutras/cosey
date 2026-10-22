@@ -1,7 +1,7 @@
 import { type PaginationProps, selectEmits, selectProps } from 'element-plus';
 import { type PropType, ExtractPropTypes, SlotsType } from 'vue';
 import { type TableConfig } from '../table';
-import { type TableQueryProps } from '../table-query';
+import { type FormQueryProps } from '../form-query';
 import { type Props } from '../../hooks';
 
 export const remoteSelectProps = {
@@ -23,7 +23,7 @@ export const remoteSelectProps = {
     default: true,
   },
   formProps: {
-    type: Object as PropType<TableQueryProps>,
+    type: Object as PropType<FormQueryProps>,
   },
   transformParams: {
     type: Function as PropType<(params: Record<string, any>) => any>,

@@ -1,6 +1,6 @@
 import { withPinnedValue } from '../remote-select/with-pinned-value';
 import type { RemoteSelectLikeConfig } from '../remote-select/with-pinned-value';
-import type { TableQueryScheme } from '../table-query';
+import type { FormQueryScheme } from '../form-query';
 
 export interface PinnedSelectSchemeOptions {
   /** 字段名，同时是筛选模型里的 key */
@@ -20,7 +20,7 @@ export interface PinnedSelectSchemeOptions {
 }
 
 /** 比普通 scheme 多一个由当前值决定的 `key` */
-export type PinnedSelectScheme = TableQueryScheme & { key: string };
+export type PinnedSelectScheme = FormQueryScheme & { key: string };
 
 /**
  * 生成「关联筛选字段」的 scheme，交给 `formSchemes` 使用。

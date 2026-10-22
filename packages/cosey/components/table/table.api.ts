@@ -3,7 +3,7 @@ import { camelCase, omit, upperFirst } from 'lodash-es';
 import { TableColumnCtx, type PaginationProps } from 'element-plus';
 import elTableProps from 'element-plus/es/components/table/src/table/defaults.mjs';
 import { type MayBeTableColumnProps } from './table-column/table-column.api';
-import { type TableQueryExpose, type TableQueryProps, tableQueryExposeKeys } from '../table-query';
+import { type FormQueryExpose, type FormQueryProps, formQueryExposeKeys } from '../form-query';
 import { TableStatisticsColumn } from './table-stats/table-stats.api';
 
 export interface ToolbarConfig {
@@ -78,7 +78,7 @@ const tableExtraProps = {
     type: Function as PropType<(expose: TableExpose) => void>,
   },
   formProps: {
-    type: Object as PropType<TableQueryProps>,
+    type: Object as PropType<FormQueryProps>,
   },
   transformParams: {
     type: Function as PropType<(params: Record<string, any>) => any>,
@@ -93,7 +93,7 @@ const tableExtraProps = {
   },
   toolbarConfig: {
     type: [Object, Boolean] as PropType<ToolbarConfig | boolean>,
-    default: true,
+    default: undefined,
   },
   keys: {
     type: Object as PropType<TableConfig['keys']>,
@@ -116,7 +116,32 @@ const tableExtraProps = {
     type: Boolean,
     default: undefined,
   },
+  /**
+   * 表格标识。设置后会把列顺序/显示状态持久化到本地存储，刷新后恢复。
+   *
+   * 注意不能叫 `key`：`key` 是 Vue 的内置 attribute，会被编译到 vnode 上，不会作为 prop 传入。
+   */
+  tableKey: {
+    type: String,
+  },
+  /**
+   * 批量操作条：选中行后显示，内容由 `#batch` 插槽提供。
+   *
+   * 传 `true` 使用默认文案；传对象可自定义文案。
+   */
+  batch: {
+    type: [Boolean, Object] as PropType<boolean | { text?: string }>,
+    default: false,
+  },
+  /** 行拖拽排序，默认关闭；开启后 `row-move` 事件给出新的顺序 */
+  rowDraggable: {
+    type: Boolean,
+    default: false,
+  },
 };
+
+/** 自定义事件（非 el-table 原生事件） */
+export const tableCustomEmitEvents = ['row-move', 'cell-change'];
 
 export const tableProps = {
   ...omit(elTableProps, 'style'),
@@ -129,6 +154,8 @@ export const omittedTableProps = Object.keys(tableExtraProps) as unknown as keyo
 
 export interface TableSlots {
   default?: (props: Record<string, never>) => any;
+  /** 批量操作条内容，仅在选中行后渲染 */
+  batch?: (props: { count: number; rows: any[]; clear: () => void }) => any;
   append?: (props: Record<string, never>) => any;
   empty?: (props: Record<string, never>) => any;
   'toolbar-left'?: (props: Record<string, never>) => any;
@@ -142,6 +169,10 @@ export interface TableSlots {
 export const elSlotsName = ['default', 'append', 'empty'] as const;
 
 export interface TableCustomExpose {
+  /** 清空选中并隐藏批量条 */
+  clearSelection: () => void;
+  /** 当前选中的行 */
+  getSelectionRows: () => any[];
   reload: () => Promise<void>;
   expandAll: () => void;
   collapseAll: () => void;
@@ -157,7 +188,7 @@ export interface TableCustomExpose {
 }
 
 export type TableExpose = TableCustomExpose &
-  TableQueryExpose & {
+  FormQueryExpose & {
     clearSelection: () => void;
     getSelectionRows: () => any[];
     toggleRowSelection: (
@@ -200,7 +231,7 @@ const elTableExposeKeys = [
 
 export const tableExposeKeys = [
   ...elTableExposeKeys,
-  ...tableQueryExposeKeys,
+  ...formQueryExposeKeys,
   'reset',
   'submit',
   'reload',
@@ -261,6 +292,7 @@ export const defaultTableConfig = {
     currentPage: 1,
     pageSize: 10,
   },
+  toolbarConfig: true as ToolbarConfig | boolean,
   height: undefined,
   split: false,
 };
@@ -277,6 +309,8 @@ export interface TableConfig {
     desc?: string;
   };
   pagination?: Partial<PaginationProps>;
+  /** 工具栏按钮的全局默认值，可被表格上的 `toolbar-config` 覆盖 */
+  toolbarConfig?: ToolbarConfig | boolean;
   height?: number | string;
   split?: boolean;
 }

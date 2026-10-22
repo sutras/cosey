@@ -31,7 +31,7 @@ remote-select/basic
 | option-props     | 自定义 `ElOption` 的属性                   | Record<PropertyKey, any> \| ((props: Record<PropertyKey, any>, index: number) => Record<PropertyKey, any>) | -      |
 | api              | 获取列表数据的接口                         | (...args: any[]) => Promise\<any> \| any                                                                   | -      |
 | pagination       | 自定义分页属性，或者设置 `false` 隐藏分页  | boolean \| [PaginationProps](https://element-plus.org/zh-CN/component/pagination#%E5%B1%9E%E6%80%A7)       | true   |
-| form-props       | 自定义查询表单属性                         | [TableQueryProps](./table#tablequeryprops)                                                                 | -      |
+| form-props       | 自定义筛选表单属性                         | [FormQueryProps](./form-query#formqueryprops)                                                              | -      |
 | transform-params | 转换当前请求参数                           | (params: Record<string, any>) => any                                                                       | -      |
 | keys             | 定义接口相关的键名                         | [TableConfig](./table#tableconfig)['keys']                                                                 | -      |
 | immediate        | 是否立即请求数据，还是在下拉框显示时才请求 | boolean                                                                                                    | false  |

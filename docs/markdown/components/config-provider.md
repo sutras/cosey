@@ -12,7 +12,7 @@
 
 ### 表格配置
 
-表格接口相关的 key 可通过此组件进行全局配置。
+表格接口相关的 key、工具栏按钮等可通过此组件进行全局配置。
 
 ```vue
 <ConfigProvider
@@ -22,11 +22,16 @@
       total: 'total',
       page: 'page',
     },
+    toolbarConfig: {
+      export: false,
+    },
   }"
 >
   <router-view></router-view>
 </ConfigProvider>
 ```
+
+`table` 里的配置都可被单个表格上的同名属性覆盖，例如 `:toolbar-config="{ export: true }"`。
 
 更多表格配置可[参阅 TableConfig](./table#tableconfig)。
 

@@ -116,3 +116,82 @@ $contrarotation: 'co-ani-contrarotation';
     }
   }
 }
+
+// ---- 批量操作条 / 行拖拽 / 行内编辑（新增，需显式开启） ----
+
+@include b(table) {
+  @include e(batch) {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: css-var(padding-sm);
+    box-sizing: border-box;
+    // 与工具栏、表格内容保持同一左边界（表格自身有 padding-sm 内边距）
+    padding-block: css-var(padding-xxs);
+    padding-inline: css-var(padding-sm);
+    margin-block-start: css-var(padding-sm);
+    margin-inline: css-var(padding-sm);
+    border: 1px solid css-var(color-primary-light-7);
+    border-radius: css-var(border-radius-large);
+    background-color: css-var(color-primary-light-9);
+  }
+
+  @include e(batch-text) {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+    font-size: css-var(font-size-base);
+    color: css-var(color-primary);
+  }
+
+  @include e(batch-actions) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: css-var(size-xs);
+    margin-inline-start: auto;
+
+    // 间距统一由 gap 控制，抵消 el-button 相邻时的默认外边距
+    .el-button + .el-button {
+      margin-inline-start: 0;
+    }
+  }
+}
+
+@include b(table) {
+  .co-table__row--draggable {
+    cursor: grab;
+  }
+
+  tr.is-dragging {
+    opacity: 0.6;
+  }
+
+  tr.is-drag-over > td {
+    box-shadow: inset 0 2px 0 0 css-var(color-primary);
+  }
+
+  // 落点在行的下方：线画在下边框，和真实插入位置对齐
+  tr.is-drag-over-after > td {
+    box-shadow: inset 0 -2px 0 0 css-var(color-primary);
+  }
+}
+
+// 拖拽期间挂在 body 上：指针移到哪里都保持抓手光标，且不选中文本。
+// 用 * 是因为 input / td 各自有 cursor，不覆盖就会在拖过输入框时闪回 text。
+body.co-row-drag--active,
+body.co-row-drag--active * {
+  cursor: grabbing !important;
+  user-select: none !important;
+}
+
+.co-row-drag-handle--draggable {
+  cursor: grab;
+  touch-action: none;
+}
+
+@include b(table-column) {
+  @include e(editable) {
+    display: block;
+    width: 100%;
+  }
+}

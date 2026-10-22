@@ -2,6 +2,7 @@
 
 @include b(descriptions) {
   border-collapse: collapse;
+  font-size: css-var(font-size-base);
 
   tr {
     background: transparent;

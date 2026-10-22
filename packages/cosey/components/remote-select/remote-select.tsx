@@ -15,8 +15,7 @@ import {
   createBem,
 } from '../../utils';
 import { useFetch, useProps } from '../../hooks';
-import { TableQuery } from '../table-query';
-import { type TableQueryExpose } from '..';
+import { FormQuery, type FormQueryExpose } from '../form-query';
 
 export default defineComponent({
   name: 'CoRemoteSelect',
@@ -34,7 +33,7 @@ export default defineComponent({
 
     const tableData = ref<any[]>([]);
 
-    const tableQueryRef = ref<TableQueryExpose>();
+    const tableQueryRef = ref<FormQueryExpose>();
 
     const tableKeys = reactiveComputed(() => {
       return merge({}, defaultTableConfig.keys, toValue(tableConfig)?.keys, props.keys);
@@ -192,7 +191,7 @@ export default defineComponent({
                           }
                         }}
                       >
-                        <TableQuery
+                        <FormQuery
                           ref={tableQueryRef}
                           inline
                           grid={false}
@@ -202,7 +201,7 @@ export default defineComponent({
                           {...props.formProps}
                           reset={onReset}
                           submit={onSubmit}
-                        ></TableQuery>
+                        ></FormQuery>
                       </div>
                       {slots.headerAfter ? slots.headerAfter({}) : null}
                     </>

@@ -1,7 +1,7 @@
 import { computed, mergeProps, reactive, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
 import { type TableExpose, type TableProps, tableExposeKeys } from './table.api';
-import { type TableQueryProps, type TableQueryScheme } from '../table-query';
+import { type FormQueryProps, type FormQueryScheme } from '../form-query';
 import { createMergedExpose, warningOnce } from '../../utils';
 import { useQueryFilter } from '../../hooks/useQueryFilter';
 import type { QueryFieldConfig, QueryFilter } from '../../hooks/useQueryFilter';
@@ -21,8 +21,8 @@ export type UseTableProps = TableProps & { [prop: PropertyKey]: any };
  * 还会在初始化时被调用一次（用于收集各项的 `modelValue` 作为字段初值）。
  */
 export type TableSchemes<T> =
-  | MaybeRefOrGetter<TableQueryScheme[]>
-  | ((model: T) => TableQueryScheme[]);
+  | MaybeRefOrGetter<FormQueryScheme[]>
+  | ((model: T) => FormQueryScheme[]);
 
 /**
  * 查询表单的其它配置。
@@ -30,7 +30,7 @@ export type TableSchemes<T> =
  * `model`（由内部接管）、`resetValues`（由 url 同步自动接管）会在内部被覆盖；
  * `schemes` 建议提到顶层 `formSchemes`，留在 `formProps` 里也支持（作为兜底）。
  */
-export type UseTableFormProps = Omit<TableQueryProps, 'model' | 'resetValues'>;
+export type UseTableFormProps = Omit<FormQueryProps, 'model' | 'resetValues'>;
 
 /**
  * `useTable` 的入参。
@@ -152,7 +152,7 @@ export function useTable<T extends object = Record<string, any>>(
   const fieldKeys = Object.keys(urlFields ?? {});
   const initialFormProps = initial.formProps as Record<string, any> | undefined;
   const externalModel = initialFormProps?.model as Record<string, any> | undefined;
-  // `formProps.schemes` 是 co-table-query 既有的写法，作为兜底保留
+  // `formProps.schemes` 是 `co-form-query` 的原生写法，作为兜底保留
   const initialSchemes = initial.formSchemes ?? initialFormProps?.schemes;
 
   warningOnce(
@@ -169,14 +169,14 @@ export function useTable<T extends object = Record<string, any>>(
   const resolveSchemes = (source: TableSchemes<T> | undefined) => {
     const list =
       typeof source === 'function'
-        ? (source as (queryModel: T) => TableQueryScheme[])(typedModel)
-        : toValue(source as MaybeRefOrGetter<TableQueryScheme[]>);
+        ? (source as (queryModel: T) => FormQueryScheme[])(typedModel)
+        : toValue(source as MaybeRefOrGetter<FormQueryScheme[]>);
 
     return (list ?? []).filter((scheme) => !!scheme && typeof scheme === 'object');
   };
 
-  // 初值：`scheme.modelValue` 即该字段的默认值（与 `co-table-query` 的约定一致）。
-  // 与 `co-table-query` 自己初始化模型时的行为保持一致 —— 每个 scheme 都落到模型上，
+  // 初值：`scheme.modelValue` 即该字段的默认值（与 `co-form-query` 的约定一致）。
+  // 与 `co-form-query` 自己初始化模型时的行为保持一致 —— 每个 scheme 都落到模型上，
   // 没有 `modelValue` 的置为 `undefined`，这样模型里的键与筛选栏里的字段一一对应。
   // 必须写在 url 落值之前，否则会盖掉 url 带过来的条件。
   for (const scheme of resolveSchemes(initialSchemes)) {

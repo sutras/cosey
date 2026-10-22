@@ -19,4 +19,12 @@
       justify-content: flex-start;
     }
   }
+
+  @media (max-width: 768px) {
+    @include m(inline) {
+      @include b(form-item) {
+        display: flex;
+      }
+    }
+  }
 }

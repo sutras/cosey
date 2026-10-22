@@ -7,12 +7,20 @@ Cosey 在 [element-plus](https://element-plus.org/zh-CN/) 的基础上扩展了�
 | 组件                                         | 说明                                          |
 | -------------------------------------------- | --------------------------------------------- |
 | [Container 容器](./container)                | 带有默认内边距的容器，可将其高度设为一屏      |
+| [Page 页面骨架](./page)                      | 页面级标题、描述、返回与操作区                |
 | [Grid 栅格](./grid)                          | 24 栅格系统，响应式断点相对于容器宽度而非视口 |
 | [Icon 图标](./icon)                          | 图标组件                                      |
 | [ConfigProvider 全局配置](./config-provider) | 全局单例配置，涵盖主题、表格、国际化等        |
 | [Transition 过渡](./transition)              | 过渡动画                                      |
 | [TransitionGroup 过渡组](./transition-group) | 过渡动画组                                    |
 | [OnlyChild 唯一子组件](./only-child)         | 只渲染单个子元素的包装组件                    |
+
+## 能力组件
+
+| 组件                      | 说明                              |
+| ------------------------- | --------------------------------- |
+| [Dict 字典](./dict)       | 统一表单选项、表格标签与详情文案  |
+| [Async 异步状态](./async) | 加载 / 空 / 错误 / 数据四态的容器 |
 
 ## 表单组件
 
@@ -35,6 +43,7 @@ Cosey 在 [element-plus](https://element-plus.org/zh-CN/) 的基础上扩展了�
 | ----------------------------------------------- | -------------- |
 | [Card 卡片](./card)                             | 带内边距的卡片 |
 | [Panel 面板](./panel)                           | 信息聚合面板   |
+| [Chart 图表](./chart)                           | echarts 封装   |
 | [Descriptions 描述列表](./descriptions)         | 描述列表       |
 | [Table 表格](./table)                           | 表格           |
 | [Highlight 代码高亮](./highlight)               | 代码高亮       |

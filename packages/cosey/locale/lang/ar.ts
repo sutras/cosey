@@ -9,6 +9,7 @@ export default {
       checkAll: 'تحديد الكل',
       confirm: 'تأكيد',
       cancel: 'إلغاء',
+      loading: 'جارٍ التحميل',
       noData: 'لا توجد بيانات',
       reload: 'تحديث',
       addSuccess: 'تمت الإضافة بنجاح',
@@ -24,6 +25,9 @@ export default {
       warning: 'تحذير',
       close: 'إغلاق',
       home: 'الصفحة الرئيسية',
+    },
+    chart: {
+      exportImage: 'تصدير الصورة',
     },
     form: {
       weekOfYear: 'الأسبوع w من سنة YYYY',
@@ -100,6 +104,7 @@ export default {
       exitFullScreen: 'الخروج من وضع ملء الشاشة',
       fullScreen: 'ملء الشاشة',
       columnSettings: 'إعدادات الأعمدة',
+      selected: 'تم تحديد {count}',
       restoreDefault: 'استعادة الإعدادات الافتراضية',
       filename: 'اسم الملف',
       fileType: 'نوع الملف',

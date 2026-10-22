@@ -69,7 +69,7 @@ table/actions
 
 `useTable` 把「筛选模型 → 请求参数 → url」这条链路收在一起，顺序由内部保证（模型先于首次请求存在、`formSchemes` 在 `computed` 里求值、重查回调等表格挂载之后再注册）：
 
-- `formSchemes`：筛选表单的方案，推荐写成工厂 `(model) => [...]` —— 工厂里能拿到筛选模型，读到的响应式值也会被收集；各项的 `modelValue` 同时就是该字段的初值（与 `co-table-query` 的约定一致）；
+- `formSchemes`：筛选表单的方案，推荐写成工厂 `(model) => [...]` —— 工厂里能拿到筛选模型，读到的响应式值也会被收集；各项的 `modelValue` 同时就是该字段的初值（与 `FormQuery` 的 `schemes` 约定一致）；
 - `urlFields`：声明哪些筛选字段与 url **双向同步**（**不叫 `fields`**，因为 `fields` 在 cosey 里已经分别指表单暴露的 `FormItemContext[]`、导出时的列 prop，而同一个 `useTable` 的返回值上还有 `getFieldsValue()` —— 那是查询表单的**全部**字段值）；
 - 第二个返回值上的 `model`：表格之外也能直接读写筛选条件。
 
@@ -111,6 +111,48 @@ urlFields: {
 
 关联字段用 `pinnedSelectScheme` 而不是直接写 `fieldProps`：`co-remote-select` 只在**挂载时**按 `immediate` 拉一次数据来解析当前值的标签，而 url 变化时组件不会重建，标签会退化成裸 id（例如显示 `17`）。它给 scheme 挂了一个以当前值为内容的 `key`，值一变就重建 form-item，重新解析出标签。
 
+### 批量操作条
+
+开启 `batch` 后，勾选任意行会在表格上方出现一条操作栏，内容由 `#batch` 插槽提供，插槽参数里有 `count` / `rows` / `clear`。
+
+::: demo
+
+table/batch
+
+:::
+
+### 行内编辑
+
+给列加 `editable` 即把该单元格换成 `co-field`，值变化会直接写回 `row[prop]`，同时触发 `cell-change`。默认点击单元格不触发行选中，可用 `editable.stopPropagation: false` 关掉。
+
+::: demo
+
+table/editable
+
+:::
+
+### 行拖拽
+
+开启 `row-draggable` 后可以拖动行调整顺序，本地数据会立即重排，并抛出 `row-move`（`{ from, to, rows }`）。顺序要持久化时，记得在事件里提交给服务端。
+
+落点以行的中线为界：拖到上半部分插到该行之前，下半部分插到该行之后。高亮线（行上边框 / 下边框）画的就是真实的插入位置，拖到最后一行下半部分时线在表格底部。
+
+::: demo
+
+table/row-drag
+
+:::
+
+> 拖拽只对普通表格生效。树形数据、`el-table-v2` 这类行数与数据条数不一致的场景会自动失效。
+
+### 列配置持久化
+
+传 `table-key` 后，「列设置」里调整的顺序与显隐会记在本地存储里，刷新或下次进入同一表格时自动恢复；点「恢复默认」会清掉记录。
+
+```vue
+<co-table table-key="user-list" :columns="columns" />
+```
+
 ## API
 
 ### useTable
@@ -134,7 +176,7 @@ const [tableProps, { reload }] = useTable(() => ({
 | formSchemes   | 筛选表单的方案；各项的 `modelValue` 即该字段初值                                                          | [TableSchemes](#tableschemes)                                              | -        |
 | urlFields     | 与 url 双向同步的筛选字段                                                                                 | Partial\<Record\<keyof T & string, [QueryFieldConfig](#queryfieldconfig)>> | -        |
 | onQueryChange | url 上的筛选条件变化后怎么重查：`'submit'` 回到第 1 页、`'reload'` 保留当前页                             | `'submit' \| 'reload'`                                                     | 'submit' |
-| formProps     | 查询表单的其它配置；`model` / `resetValues` 由内部接管，`schemes` 也可写在这里（顶层 `formSchemes` 优先） | [TableQueryProps](#tablequeryprops)                                        | -        |
+| formProps     | 查询表单的其它配置；`model` / `resetValues` 由内部接管，`schemes` 也可写在这里（顶层 `formSchemes` 优先） | [FormQueryProps](./form-query#formqueryprops)                              | -        |
 | 其它          | 透传给 `co-table`，如 `pagination` / `toolbarConfig` / `height`                                           | -                                                                          | -        |
 
 返回 `UseTableResult`（元组）：
@@ -153,9 +195,9 @@ const [tableProps, { reload }] = useTable(() => ({
 
 ```ts
 type TableSchemes<T> =
-  | TableQueryScheme[] // 静态
-  | MaybeRefOrGetter<TableQueryScheme[]> // 跟随响应式数据
-  | ((model: T) => TableQueryScheme[]); // 推荐：能拿到筛选模型
+  | FormQueryScheme[] // 静态
+  | MaybeRefOrGetter<FormQueryScheme[]> // 跟随响应式数据
+  | ((model: T) => FormQueryScheme[]); // 推荐：能拿到筛选模型
 ```
 
 ### QueryFieldConfig
@@ -214,36 +256,24 @@ type QueryFieldConfig<T = any> =
 | action-column      | 定义表格操作列                                                              | [TableColumnProps](#tablecolumnprops)                                                                | -                          |
 | pagination         | 设置分页属性或隐藏分页组件                                                  | boolean \| [PaginationProps](https://element-plus.org/zh-CN/component/pagination#%E5%B1%9E%E6%80%A7) | true                       |
 | get-expose         | 获取 `TableExpose`，会在组件创建后调用                                      | (expose: TableExpose) => void                                                                        | -                          |
-| form-props         | 自定义查询表单属性                                                          | [TableQueryProps](#tablequeryprops)                                                                  | -                          |
+| form-props         | 自定义查询表单属性                                                          | [FormQueryProps](./form-query#formqueryprops)                                                        | -                          |
 | transform-params   | 请求之前对参数进行处理                                                      | (params: Record<string, any>) => any                                                                 | -                          |
 | transform-response | 请求之后对返回值进行处理                                                    | (res: any) => any                                                                                    | -                          |
 | parallel-fetch     | 会和 `api` 同时请求，并接收相同的参数，并影响加载状态。常用于获取统计数据。 | (...args: any[]) => Promise\<any> \| any                                                             | -                          |
-| toolbar-config     | 设置工具栏按钮                                                              | [ToolbarConfig](#toolbarconfig) \| boolean                                                           | -                          |
+| toolbar-config     | 设置工具栏按钮；不传时继承全局 `TableConfig['toolbarConfig']`               | [ToolbarConfig](#toolbarconfig) \| boolean                                                           | true                       |
 | keys               | 定义接口相关的键名                                                          | [TableConfig](#tableconfig)['keys']                                                                  | defaultTableConfig['keys'] |
 | stats-columns      | 定义统计列                                                                  | MaybeRef\<[TableStatisticsColumn](#tablestatisticscolumn)[]>                                         | -                          |
 | stats-data         | 统计数据                                                                    | MaybeRef\<Record<string, any>>                                                                       | -                          |
 | summary-properties | 设置默认合计时仅展示指定列数据                                              | string[]                                                                                             | -                          |
 | transform-summary  | 转换合计列数据                                                              | (sums: any[]) => any[]                                                                               | -                          |
 | split              | 分隔表格主体和头部等，显示分隔条                                            | boolean                                                                                              | false                      |
-
-### TableQueryProps
-
-继承 [FormQueryProps](./form-query) 并有以下额外属性：
-
-| 属性    | 描述           | 类型                                    | 默认值 |
-| ------- | -------------- | --------------------------------------- | ------ |
-| schemes | 请求数据的函数 | [TableQueryScheme](#tablequeryscheme)[] | []     |
-
-### TableQueryScheme
-
-```ts
-type TableQueryScheme = FormItemProps<FieldType> & {
-  render?: (params: { model: Record<string, any> }) => VNodeChild;
-  slots?: Record<string, unknown>;
-};
-```
+| table-key          | 表格标识，设置后列顺序/显隐会持久化到本地存储                               | string                                                                                               | -                          |
+| batch              | 批量操作条，选中行后显示；内容由 `#batch` 插槽提供                          | boolean \| { text?: string }                                                                         | false                      |
+| row-draggable      | 行拖拽排序                                                                  | boolean                                                                                              | false                      |
 
 ### TableConfig
+
+供 [ConfigProvider](./config-provider) 的 `table` 属性使用，设置表格的全局默认值。
 
 ```ts
 interface TableConfig {
@@ -257,8 +287,28 @@ interface TableConfig {
     asc?: string;
     desc?: string;
   };
+  pagination?: Partial<PaginationProps>;
+  toolbarConfig?: ToolbarConfig | boolean;
+  height?: number | string;
+  split?: boolean;
 }
 ```
+
+`toolbarConfig` 与表格上的 `toolbar-config` 逐项合并，优先级为 **默认值 → 全局 → 表格**：
+
+```vue
+<!-- 全局隐藏导出和全屏按钮 -->
+<ConfigProvider :table="{ toolbarConfig: { export: false, fullScreen: false } }">
+  <!-- 继承全局：只剩刷新和列设置 -->
+  <co-table :columns="columns" :api="listApi" />
+  <!-- 某张表仍要导出：局部覆盖 -->
+  <co-table :columns="columns" :api="listApi" :toolbar-config="{ export: true }" />
+  <!-- 整条工具栏关掉 -->
+  <co-table :columns="columns" :api="listApi" :toolbar-config="false" />
+</ConfigProvider>
+```
+
+全局设为 `false` 时所有表格默认不显示工具栏，单张表格传 `true` 或对象即可打开。
 
 ### defaultTableConfig
 
@@ -305,17 +355,25 @@ const defaultTableConfig = {
      */
     desc: 'desc',
   },
+  pagination: {
+    layout: 'prev, pager, next, sizes, jumper, total',
+    currentPage: 1,
+    pageSize: 10,
+  },
+  toolbarConfig: true,
+  height: undefined,
+  split: false,
 };
 ```
 
 ### ToolbarConfig
 
-| 属性       | 描述               | 类型    | 默认值 |
-| ---------- | ------------------ | ------- | ------ |
-| reload     | 是否显示重载按钮   | boolean | true   |
-| export     | 是否显示导出按钮   | boolean | true   |
-| fullScreen | 是否显示全屏按钮   | boolean | true   |
-| setting    | 是否显示列设置按钮 | boolean | true   |
+| 属性       | 描述                                     | 类型                            | 默认值 |
+| ---------- | ---------------------------------------- | ------------------------------- | ------ |
+| reload     | 是否显示重载按钮                         | boolean                         | true   |
+| export     | 是否显示导出按钮，传对象可指定导出文件名 | boolean \| { filename: string } | true   |
+| fullScreen | 是否显示全屏按钮                         | boolean                         | true   |
+| setting    | 是否显示列设置按钮                       | boolean                         | true   |
 
 ### TableStatisticsColumn
 
@@ -329,18 +387,24 @@ const defaultTableConfig = {
 
 继承 `element-plus` 的 [Table 插槽](https://element-plus.org/zh-CN/component/table#table-%E6%8F%92%E6%A7%BD) 和以下插槽，并能定义 `TableColumnProps["slots"]` 中同名的插槽。
 
-| 插槽               | 描述                                           | 属性 |
-| ------------------ | ---------------------------------------------- | ---- |
-| toolbar-left       | 自定义工具栏左边的内容                         | -    |
-| toolbar-right      | 自定义工具栏右边的内容                         | -    |
-| before-body        | 自定义主体前面内容（工具栏上面）               | -    |
-| before-body-plain  | 自定义主体前面内容（工具栏上面），没有包裹容器 | -    |
-| before-table       | 自定义表格前面内容（工具栏下面）               | -    |
-| before-table-plain | 自定义表格前面内容（工具栏下面），没有包裹容器 | -    |
+| 插槽               | 描述                                           | 属性                                              |
+| ------------------ | ---------------------------------------------- | ------------------------------------------------- |
+| toolbar-left       | 自定义工具栏左边的内容                         | -                                                 |
+| toolbar-right      | 自定义工具栏右边的内容                         | -                                                 |
+| before-body        | 自定义主体前面内容（工具栏上面）               | -                                                 |
+| before-body-plain  | 自定义主体前面内容（工具栏上面），没有包裹容器 | -                                                 |
+| before-table       | 自定义表格前面内容（工具栏下面）               | -                                                 |
+| before-table-plain | 自定义表格前面内容（工具栏下面），没有包裹容器 | -                                                 |
+| batch              | 批量操作条的内容                               | { count: number; rows: any[]; clear: () => void } |
 
 ### TableEmits
 
-继承 `element-plus` 的 [Table 事件](https://element-plus.org/zh-CN/component/table#table-%E4%BA%8B%E4%BB%B6)。
+继承 `element-plus` 的 [Table 事件](https://element-plus.org/zh-CN/component/table#table-%E4%BA%8B%E4%BB%B6)，并在 `row-draggable` 开启时提供：
+
+| 事件        | 描述                       | 类型                                                            |
+| ----------- | -------------------------- | --------------------------------------------------------------- |
+| row-move    | 行拖拽结束后触发           | ({ from: number; to: number; rows: any[] }) => void             |
+| cell-change | 行内编辑的值发生变化时触发 | ({ row: any; prop: string; value: any; index: number }) => void |
 
 ### TableExpose
 
@@ -373,6 +437,22 @@ const defaultTableConfig = {
 | format   | 格式化数据                                  | (cellValue: any, row: any, column: TableColumnCtx\<any>, index: number) => VNode \| string | -      |
 | actions  | 操作按钮，与 `slots` 同时存在时以它为准     | [TableColumnActions](#tablecolumnactions)                                                  | -      |
 | divider  | 操作按钮之间的分割线，仅在 `actions` 下生效 | boolean                                                                                    | -      |
+| editable | 行内编辑，传 `true` 使用默认输入框          | boolean \| [TableColumnEditable](#tablecolumneditable)                                     | -      |
+
+### TableColumnEditable
+
+```ts
+interface TableColumnEditable {
+  /** 编辑器类型，默认 input，可选值同 co-field 的 type */
+  type?: FieldType;
+  /** 传给编辑器的属性，不要传 modelValue */
+  props?: Record<string, any>;
+  /** 点击编辑器时阻止行点击/选中，默认 true */
+  stopPropagation?: boolean;
+  /** 值变化回调；不传时直接写回 row[prop] */
+  onChange?: (value: any, row: any, index: number) => void;
+}
+```
 
 ### TableColumnActions
 

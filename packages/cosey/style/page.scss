@@ -1,0 +1,87 @@
+@use './base/index' as *;
+
+@include b(page) {
+  display: flex;
+  flex-direction: column;
+  gap: css-var(padding);
+  min-width: 0;
+
+  @include e(header) {
+    display: flex;
+    align-items: center;
+    gap: css-var(padding-sm);
+    min-width: 0;
+    padding-block-end: css-var(padding-sm);
+
+    @include is(border) {
+      border-block-end: css-var(border-width) css-var(border-style) css-var(border-color-lighter);
+    }
+  }
+
+  @include e(heading) {
+    display: flex;
+    align-items: center;
+    gap: css-var(padding-xs);
+    min-width: 0;
+  }
+
+  @include e(back) {
+    margin-inline-end: css-var(size-xxs);
+  }
+
+  @include e(titles) {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  @include e(title) {
+    font-size: css-var(font-size-heading-5);
+    font-weight: css-var(font-weight-strong);
+    line-height: css-var(line-height-heading-5);
+    color: css-var(text-color-primary);
+  }
+
+  @include e(description) {
+    font-size: css-var(font-size-small);
+    line-height: css-var(line-height-sm);
+    color: css-var(text-color-secondary);
+  }
+
+  @include e(actions) {
+    display: flex;
+    align-items: center;
+    gap: css-var(padding-xs);
+    margin-inline-start: auto;
+  }
+
+  @include e(extra) {
+    display: flex;
+    align-items: center;
+    gap: css-var(padding-xs);
+  }
+
+  @include e(body) {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  @include e(footer) {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: css-var(padding-xs);
+    padding-block-start: css-var(padding-sm);
+    border-block-start: css-var(border-width) css-var(border-style) css-var(border-color-lighter);
+  }
+
+  @include is(ghost) {
+    gap: css-var(padding-sm);
+
+    .#{bem-name(page, 'header')} {
+      padding-block-end: css-var(padding-xs);
+    }
+  }
+}

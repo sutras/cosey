@@ -1,4 +1,4 @@
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, h } from 'vue';
 import { type TableColumnProps, type TableColumnSlots, tableColumnProps } from './table-column.api';
 import { isFunction, isPlainObject, isString, createBem } from '../../../utils';
 import { mapRendererColumnProps, renderer } from './renderer';
@@ -8,8 +8,12 @@ import classNames from 'classnames';
 import { useLocale } from '../../../hooks';
 import { Icon } from '../../icon';
 import { TableAction } from '../../table-action';
+import { Field } from '../../field';
 import { getCssVar } from '../../../utils';
 import { RtiHelp } from 'richtext-icons';
+
+/** 只在本组件内部使用、不能透传给 ElTableColumn 的属性 */
+const INTERNAL_PROP_KEYS = ['editable'];
 
 const TableColumn = defineComponent({
   // 使用和ep一样的组件名
@@ -19,7 +23,12 @@ const TableColumn = defineComponent({
 
   props: tableColumnProps,
 
-  setup(props: TableColumnProps) {
+  emits: {
+    'cell-change': (payload: { row: any; prop: string; value: any; index: number }) =>
+      payload.index >= 0,
+  },
+
+  setup(props: TableColumnProps, { emit }) {
     const bem = createBem('table-column');
 
     const { t } = useLocale();
@@ -29,7 +38,7 @@ const TableColumn = defineComponent({
       const cls = [props.className, bem.b()];
 
       for (const [key, value] of Object.entries(props)) {
-        if (value !== undefined) {
+        if (value !== undefined && !INTERNAL_PROP_KEYS.includes(key)) {
           (obj as any)[key] = value;
         }
       }
@@ -106,8 +115,59 @@ const TableColumn = defineComponent({
       };
     });
 
-    const renderLabel = () => <span class={bem.e('label')}>{mergedProps.value.label}</span>;
+    /**
+     * 行内编辑：把单元格渲染成 `co-field`。
+     * 返回 `undefined` 表示该列没有开启编辑，交回给 `actions` / `slots`。
+     */
+    const renderEditable = (slotProps: { row: any; $index: number }) => {
+      // 注意读 `props` 而不是 `mergedProps`：`editable` 在 INTERNAL_PROP_KEYS 里，
+      // 不会透传给 ElTableColumn，所以 mergedProps 上永远没有它
+      const { editable } = props;
 
+      if (!editable) {
+        return undefined;
+      }
+
+      // element-plus 收集嵌套列时会用 `{ row: {}, $index: -1 }` 调一次默认插槽
+      if (slotProps.$index < 0) {
+        return [];
+      }
+
+      const prop = (mergedProps.value.prop || mergedProps.value.property) as string;
+      const config = typeof editable === 'object' ? editable : {};
+      const stopPropagation = config.stopPropagation !== false;
+
+      return [
+        <span
+          class={bem.e('editable')}
+          onClick={stopPropagation ? (event: MouseEvent) => event.stopPropagation() : undefined}
+        >
+          {h(Field as any, {
+            type: config.type ?? 'input',
+            componentProps: {
+              ...config.props,
+              modelValue: prop ? slotProps.row[prop] : undefined,
+              'onUpdate:modelValue': (value: any) => {
+                if (prop) {
+                  slotProps.row[prop] = value;
+                }
+
+                config.onChange?.(value, slotProps.row, slotProps.$index);
+
+                emit('cell-change', {
+                  row: slotProps.row,
+                  prop,
+                  value,
+                  index: slotProps.$index,
+                });
+              },
+            },
+          })}
+        </span>,
+      ];
+    };
+
+    const renderLabel = () => <span class={bem.e('label')}>{mergedProps.value.label}</span>;
     const renderTooltip = () => (
       <>
         <ElTooltip content={mergedProps.value.tooltip} placement="top">
@@ -134,7 +194,9 @@ const TableColumn = defineComponent({
             default: (slotProps: any) =>
               mergedProps.value.columns
                 ? mergedProps.value.columns.map((column) => <TableColumn {...column} />)
-                : (renderActions.value?.(slotProps) ?? slots.value.default?.(slotProps)),
+                : (renderEditable(slotProps) ??
+                  renderActions.value?.(slotProps) ??
+                  slots.value.default?.(slotProps)),
           }}
         />
       );

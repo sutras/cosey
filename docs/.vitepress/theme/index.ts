@@ -19,6 +19,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 // import 'virtual:ssr-style.css';
 
 import { launch } from 'cosey';
+import en from 'cosey/locale/lang/en';
 
 import { createMock } from '@cosey/mock';
 
@@ -76,6 +77,48 @@ export default {
       api: {
         login: () => Promise.resolve(''),
         upload: commonApi.singleUpload,
+      },
+      // 应用自己的词条，供示例演示 labelKey 解析业务 key
+      i18n: {
+        messages: [
+          {
+            value: 'zh-cn',
+            app: {
+              dictDemo: {
+                draft: '草稿（应用词条）',
+                published: '已发布（应用词条）',
+              },
+            },
+          },
+          {
+            value: 'en',
+            // 英文语言包，示例里可以切过去看 labelKey 是否跟着变
+            cosey: en,
+            app: {
+              dictDemo: {
+                draft: 'Draft (app key)',
+                published: 'Published (app key)',
+              },
+            },
+          },
+        ],
+      },
+      dict: {
+        user_status: [
+          { value: 1, label: '启用', color: 'success' },
+          { value: 0, label: '禁用', color: 'info' },
+          { value: 2, label: '待审核', color: 'warning' },
+        ],
+        // labelKey 走 i18n，随语言切换
+        yes_no: [
+          { value: 1, labelKey: 'co.common.yes', color: 'success' },
+          { value: 0, labelKey: 'co.common.no', color: 'info' },
+        ],
+        // 业务自己的词条 key（在 i18n.messages[].app 里）
+        post_status: [
+          { value: 'draft', labelKey: 'dictDemo.draft', color: 'info' },
+          { value: 'published', labelKey: 'dictDemo.published', color: 'success' },
+        ],
       },
     });
 

@@ -46,6 +46,9 @@ function launch(app: App, options: CoseyOptions = {}) {
 
 export * from './layout/layout';
 
+// dict
+export * from './dict';
+
 export {
   // components
   registerGlobalComponents,

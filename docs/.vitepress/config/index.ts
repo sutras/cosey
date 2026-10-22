@@ -137,6 +137,14 @@ export default defineConfig({
               link: '/components/grid',
             },
             { text: 'Icon 图标', link: '/components/icon' },
+            { text: 'Page 页面骨架', link: '/components/page' },
+          ],
+        },
+        {
+          text: 'Ability 能力组件',
+          items: [
+            { text: 'Dict 字典', link: '/components/dict' },
+            { text: 'Async 异步状态', link: '/components/async' },
           ],
         },
         {
@@ -183,6 +191,7 @@ export default defineConfig({
             { text: 'Table 表格', link: '/components/table' },
             { text: 'StackDialog 层叠对话框', link: '/components/stack-dialog' },
             { text: 'Panel 面板', link: '/components/panel' },
+            { text: 'Chart 图表', link: '/components/chart' },
             { text: 'Ribbon 丝带角标', link: '/components/ribbon' },
           ],
         },

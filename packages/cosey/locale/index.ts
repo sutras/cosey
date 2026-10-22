@@ -82,3 +82,22 @@ export function useCoseyLocale() {
 export function useLocaleMessages() {
   return inject(localeMessagesKey, []);
 }
+
+/**
+ * 用应用自己的 vue-i18n 语言包（`launch({ locale: { messages } })` 里的 `app`）翻译。
+ *
+ * 未初始化 i18n 或 key 不存在时返回 `undefined`，由调用方决定回退策略。
+ * 与 `useLocale().t` 的分工：后者只认框架内置的 `co.*` 词条，读不到应用词条。
+ */
+export function translateMessage(key: string): string | undefined {
+  // vue-i18n 的 global 类型在深递归下会触发 TS2589，这里只取用到的方法
+  const global = i18n?.global as unknown as
+    | { te: (key: string) => boolean; t: (key: string) => string }
+    | undefined;
+
+  if (!global || !global.te(key)) {
+    return undefined;
+  }
+
+  return global.t(key);
+}

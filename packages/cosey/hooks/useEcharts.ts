@@ -8,7 +8,7 @@
  * 5. 响应式渲染
  */
 
-import { computed, MaybeRef, onBeforeUnmount, ref, type Ref, unref, watch } from 'vue';
+import { MaybeRef, onBeforeUnmount, ref, shallowRef, type Ref, unref, watch } from 'vue';
 import { echarts, type ECOption } from '../utils';
 import { useResizeObserver } from './useResizeObserver';
 
@@ -31,12 +31,14 @@ export function useEcharts(
   elRef: Ref<HTMLElement | null>,
   options: MaybeRef<UseEchartsOptions> = {},
 ) {
-  let chart: ReturnType<typeof echarts.init> | null = null;
+  // 必须用 ref：普通变量包在 computed 里没有依赖，初始化时的 null 会被永久缓存，
+  // 导致 `chart.value` 永远是 null（导出图片、getOption 等全部失效）
+  const chart = shallowRef<ReturnType<typeof echarts.init> | null>(null);
 
   const dispose = () => {
-    if (chart) {
-      chart.dispose();
-      chart = null;
+    if (chart.value) {
+      chart.value.dispose();
+      chart.value = null;
     }
   };
 
@@ -58,14 +60,14 @@ export function useEcharts(
   };
 
   const doSetOption = () => {
-    if (chart && optionQueue.value.length) {
+    if (chart.value && optionQueue.value.length) {
       for (const option of optionQueue.value) {
         if (option.length === 1) {
-          chart.setOption(option[0], {
+          chart.value.setOption(option[0], {
             notMerge: true,
           });
         } else {
-          chart.setOption(...(option as [any]));
+          chart.value.setOption(...(option as [any]));
         }
       }
       optionQueue.value = [];
@@ -76,7 +78,7 @@ export function useEcharts(
     dispose();
 
     if (el) {
-      chart = echarts.init(el, 'macarons');
+      chart.value = echarts.init(el, 'macarons');
       doSetOption();
     }
   });
@@ -86,9 +88,9 @@ export function useEcharts(
   });
 
   useResizeObserver(elRef, ({ blockSize, inlineSize }) => {
-    if (chart) {
+    if (chart.value) {
       // 取整，避免 canvas 虚化
-      chart.resize({
+      chart.value.resize({
         width: ~~inlineSize,
         height: ~~blockSize,
       });
@@ -97,6 +99,6 @@ export function useEcharts(
 
   return {
     setOption,
-    chart: computed(() => chart),
+    chart,
   };
 }

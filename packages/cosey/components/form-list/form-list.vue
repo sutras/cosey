@@ -3,8 +3,19 @@
 </template>
 
 <script lang="tsx" setup generic="T extends FormListRow">
-import { computed, inject, isVNode, onBeforeUnmount, onMounted, ref, useAttrs, watch } from 'vue';
-import { ElButton, ElSpace, type FormItemRule } from 'element-plus';
+import {
+  computed,
+  defineComponent,
+  inject,
+  isVNode,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useAttrs,
+  watch,
+} from 'vue';
+import type { PropType } from 'vue';
+import { ElButton, ElSpace, ElTable, ElTableColumn, type FormItemRule } from 'element-plus';
 import { cloneDeep, omit } from 'lodash-es';
 import { reactiveOmit } from '@vueuse/core';
 import {
@@ -21,12 +32,16 @@ import {
   FormItem,
   type FormItemExpose,
   type FormItemProps,
+  type FormItemWidth,
+  type FormItemPresetWidth,
   getFormItemWidth,
+  mapFormItemWidth,
   type FormContext,
   formContextSymbol,
 } from '../form';
 import { DndSort, DndSortItem } from '../dnd-sort';
 import { TransitionGroup as InternalTransitionGroup } from '../transition-group';
+import { useRowDrag } from '../../hooks/useRowDrag';
 import {
   auid,
   createMergedExpose,
@@ -38,7 +53,7 @@ import {
 } from '../../utils';
 import { getCssVar } from '../../utils';
 import { useLocale } from '../../hooks';
-import { RtiDelete, RtiPlus } from 'richtext-icons';
+import { RtiDelete, RtiDragHandle, RtiPlus } from 'richtext-icons';
 
 defineOptions({
   name: 'CoFormList',
@@ -59,6 +74,8 @@ const formItemProps = reactiveOmit(
   'min',
   'max',
   'draggable',
+  'layout',
+  'tableProps',
 ) as FormItemProps<'custom'>;
 
 const { t } = useLocale();
@@ -150,14 +167,32 @@ onBeforeUnmount(() => {
 // template
 const formItemRef = ref<FormItemExpose>();
 
+/**
+ * 缓存 `getProp()` 的结果：同一个路径每次返回**同一个数组**。
+ *
+ * 否则表格每次渲染都会造出全新的 `prop` 数组，`co-form-item` 的 `prop` 属性
+ * 按引用比较就永远「变了」，`shouldUpdateComponent` 失效 —— 整张表的输入框
+ * 都会跟着重渲一遍。
+ */
+const propCache = new Map<string, string[]>();
+
 const getProp = (...args: (string | number)[]) => {
   const arr = isString(props.prop)
     ? props.prop.split('.')
     : Array.isArray(props.prop)
       ? props.prop
       : [];
+  const path = [...arr, ...args.map(String)];
+  const key = JSON.stringify(path);
 
-  return [...arr, ...args.map(String)];
+  let cached = propCache.get(key);
+
+  if (!cached) {
+    cached = path;
+    propCache.set(key, cached);
+  }
+
+  return cached;
 };
 
 const getKey = (row: T) => {
@@ -204,6 +239,188 @@ const columns = computed(() => {
   );
 });
 
+// table 布局
+const tableLayout = computed(() => props.layout === 'table');
+
+const rootRef = ref<HTMLElement | null>(null);
+
+useRowDrag({
+  enabled: () => tableLayout.value && !!props.draggable && !mergedReadonly.value,
+  rootRef,
+  onMove: move,
+  // 行内全是输入框，必须只让手柄可拖，否则在输入框里按下鼠标会变成拖整行
+  handle: `.${bem.e('drag-handle')}`,
+});
+
+/**
+ * el-table 的 `$index` 是「当前 data 里的位置」，一旦排序/筛选就和 `modelValue`
+ * 的下标错开，所以先按行对象认一下，认不出再退回 `$index`。
+ */
+const resolveCellIndex = (row: T, index: number) => {
+  if (props.modelValue[index] === row) {
+    return index;
+  }
+
+  const found = props.modelValue.indexOf(row);
+
+  return found < 0 ? index : found;
+};
+
+/**
+ * 单元格的渲染边界。
+ *
+ * 默认插槽原本是在 el-table 的 render 里执行的：造 vnode 时读了 `row.name`，
+ * 等于让 el-table 的 render effect 订阅了**每一行的每个字段** —— 改一个字符，
+ * 整张表（所有行、所有格子）全部重渲。
+ *
+ * 套一层组件之后，字段的读取发生在单元格自己的 render effect 里：el-table 只看到
+ * `row` 这个对象引用，一次输入只会重渲「被改的那一行」的那几个格子。
+ */
+const FormListCell = defineComponent({
+  name: 'CoFormListCell',
+  props: {
+    row: { type: Object as PropType<FormListRow>, required: true },
+    index: { type: Number, required: true },
+    columnIndex: { type: Number, required: true },
+  },
+  setup(cellProps) {
+    return () => {
+      const nodes = slots.default?.({
+        row: cellProps.row as T,
+        index: cellProps.index,
+        getProp: getProp.bind(getProp, cellProps.index),
+      });
+
+      return Array.isArray(nodes) ? (nodes[cellProps.columnIndex] ?? null) : null;
+    };
+  },
+});
+
+const renderCell = (row: T, index: number, columnIndex: number) => {
+  // el-table 收集嵌套列时会用 `{ row: {}, $index: -1 }` 调一次默认插槽，
+  // 那一次不能把假数据交给用户
+  if (index < 0) {
+    return null;
+  }
+
+  return <FormListCell row={row} index={resolveCellIndex(row, index)} columnIndex={columnIndex} />;
+};
+
+/** 列的字段名：显式声明的优先，否则取表单项 prop 的末段 */
+const getColumnProp = (column: any) => {
+  if (isString(column.prop)) {
+    return column.prop;
+  }
+
+  if (Array.isArray(column.prop)) {
+    return column.prop[column.prop.length - 1];
+  }
+
+  return undefined;
+};
+
+const getColumnWidth = (width?: FormItemWidth) => {
+  if (isNumber(width)) {
+    return width;
+  }
+
+  const preset = mapFormItemWidth[width as FormItemPresetWidth];
+
+  if (isNumber(preset)) {
+    return preset;
+  }
+
+  return isString(width) ? width : undefined;
+};
+
+const tableColumns = computed(() => {
+  return (columns.value as any[]).map((column) => {
+    return {
+      label: column.label,
+      prop: getColumnProp(column),
+      width: getColumnWidth(column.width),
+      align: column.align,
+      headerAlign: column.headerAlign || column.align,
+      required: column.required,
+    };
+  });
+});
+
+const renderAddButton = () => {
+  return (
+    <ElButton class={bem.e('add')} link type="primary" onClick={handleAdd}>
+      <Icon class={bem.e('plus-icon')}>
+        <RtiPlus />
+      </Icon>
+      {t(props.addText)}
+    </ElButton>
+  );
+};
+
+const renderTable = () => {
+  return (
+    <div ref={rootRef} class={[bem.b(), bem.is('table')]}>
+      <ElTable
+        border
+        {...props.tableProps}
+        data={props.modelValue}
+        rowKey={getKey}
+        class={bem.e('table')}
+      >
+        {props.draggable && !mergedReadonly.value && (
+          <ElTableColumn width={36} align="center" class-name={bem.e('drag-column')}>
+            {{
+              default: ({ $index }: any) =>
+                $index < 0 ? null : (
+                  <span class={bem.e('drag-handle')}>
+                    <Icon size="lg">
+                      <RtiDragHandle />
+                    </Icon>
+                  </span>
+                ),
+            }}
+          </ElTableColumn>
+        )}
+        {tableColumns.value.map((column, columnIndex) => {
+          return (
+            <ElTableColumn
+              prop={column.prop}
+              width={column.width}
+              align={column.align}
+              headerAlign={column.headerAlign}
+              class-name={bem.e('cell')}
+            >
+              {{
+                header: () => (
+                  <div class={[bem.e('title'), bem.is('required', column.required)]}>
+                    {column.label}
+                  </div>
+                ),
+                default: ({ row, $index }: any) => renderCell(row, $index, columnIndex),
+              }}
+            </ElTableColumn>
+          );
+        })}
+        {!mergedReadonly.value && showRemoveButton.value && (
+          <ElTableColumn width={48} align="center" class-name={bem.e('action')}>
+            {{
+              default: ({ $index }: any) =>
+                $index < 0 ? null : (
+                  <ElButton link type="danger" onClick={() => remove($index)}>
+                    <Icon size="lg">
+                      <RtiDelete />
+                    </Icon>
+                  </ElButton>
+                ),
+            }}
+          </ElTableColumn>
+        )}
+      </ElTable>
+      {!mergedReadonly.value && showAddButton.value && renderAddButton()}
+    </div>
+  );
+};
+
 // expose
 defineExpose<FormListExpose<T>>(
   createMergedExpose<FormListExpose<T>>(formListExposeKeys, () => formItemRef.value, {
@@ -230,6 +447,8 @@ const template = defineTemplate(() => {
           remove,
           move,
         })
+      ) : tableLayout.value ? (
+        renderTable()
       ) : (
         <div class={bem.b()}>
           {props.modelValue.length > 0 && (
@@ -277,14 +496,7 @@ const template = defineTemplate(() => {
                 })}
               </InternalTransitionGroup>
             </DndSort>
-            {!mergedReadonly.value && showAddButton.value && (
-              <ElButton link type="primary" onClick={handleAdd}>
-                <Icon class={bem.e('plus-icon')}>
-                  <RtiPlus />
-                </Icon>
-                {t(props.addText)}
-              </ElButton>
-            )}
+            {!mergedReadonly.value && showAddButton.value && renderAddButton()}
           </div>
         </div>
       )}

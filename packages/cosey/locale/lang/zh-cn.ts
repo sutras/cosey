@@ -9,6 +9,7 @@ export default {
       checkAll: '全选',
       confirm: '确定',
       cancel: '取消',
+      loading: '加载中',
       noData: '暂无数据',
       reload: '刷新',
       addSuccess: '新增成功',
@@ -24,6 +25,9 @@ export default {
       warning: '警告',
       close: '关闭',
       home: '首页',
+    },
+    chart: {
+      exportImage: '导出图片',
     },
     form: {
       weekOfYear: 'YYYY 第w周',
@@ -100,6 +104,7 @@ export default {
       exitFullScreen: '退出全屏',
       fullScreen: '全屏',
       columnSettings: '列设置',
+      selected: '已选 {count} 项',
       restoreDefault: '恢复默认',
       filename: '文件名',
       fileType: '文件类型',

@@ -3,6 +3,25 @@ import { type TableColumnCtx } from 'element-plus';
 import elTableColumnProps from 'element-plus/es/components/table/src/table-column/defaults.mjs';
 import { type TableActionProps } from '../../table-action/table-action.api';
 import { type RendererType } from './renderer';
+import { type FieldType } from '../../field';
+
+/**
+ * 行内编辑配置。
+ *
+ * ```ts
+ * { prop: 'status', label: '状态', editable: { type: 'select', props: { options } } }
+ * ```
+ */
+export interface TableColumnEditable {
+  /** 编辑器类型，默认 `input`，可选值同 `co-field` 的 `type` */
+  type?: FieldType;
+  /** 传给编辑器的属性，注意不要传 `modelValue` */
+  props?: Record<string, any>;
+  /** 点击编辑器时阻止行点击/选中，默认 `true` */
+  stopPropagation?: boolean;
+  /** 值变化回调；不传时直接写回 `row[prop]` */
+  onChange?: (value: any, row: any, index: number) => void;
+}
 
 export type TableColumnPropsSlots =
   | string
@@ -35,6 +54,8 @@ export type TableColumnProps<T = any> = Partial<
   actions?: TableColumnActions;
   /** 操作按钮之间的分割线，仅在 `actions` 下生效；不传时走全局 `config.tableAction.divider` */
   divider?: boolean;
+  /** 行内编辑，传 `true` 使用默认的输入框 */
+  editable?: boolean | TableColumnEditable;
 };
 
 export type MayBeTableColumnProps = TableColumnProps | null | undefined | boolean;
@@ -74,6 +95,11 @@ export const tableColumnProps = {
     type: Boolean,
     // 必须显式给 `undefined`：Boolean 的默认值是 `false`，
     // 会把全局配置里的 `tableAction.divider` 一起盖掉
+    default: undefined,
+  },
+  editable: {
+    type: [Boolean, Object] as PropType<TableColumnProps['editable']>,
+    // 同上：Boolean 的默认 `false` 会让「没配置」和「显式关闭」无法区分
     default: undefined,
   },
 };

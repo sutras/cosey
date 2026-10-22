@@ -9,6 +9,7 @@ export default {
       checkAll: 'Selecionar tudo',
       confirm: 'Confirmar',
       cancel: 'Cancelar',
+      loading: 'Carregando',
       noData: 'Sem dados',
       reload: 'Recarregar',
       addSuccess: 'Adicionado com sucesso',
@@ -24,6 +25,9 @@ export default {
       warning: 'Aviso',
       close: 'Fechar',
       home: 'Início',
+    },
+    chart: {
+      exportImage: 'Exportar imagem',
     },
     form: {
       weekOfYear: '[Semana] w, YYYY',
@@ -100,6 +104,7 @@ export default {
       exitFullScreen: 'Sair da tela cheia',
       fullScreen: 'Tela cheia',
       columnSettings: 'Configurações de colunas',
+      selected: '{count} selecionado(s)',
       restoreDefault: 'Restaurar padrão',
       filename: 'Nome do arquivo',
       fileType: 'Tipo de arquivo',

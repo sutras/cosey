@@ -9,6 +9,7 @@ import { type ApiConfig, type RequiredApiConfig, defaultApiConfig, LoginFormMode
 import { type AuthConfig, type RequiredAuthConfig, defaultAuthConfig } from './auth';
 import { type PersistConfig } from './persist';
 import { type I18nConfig } from './i18n';
+import { setDicts, type DictRegistry } from '../dict';
 
 import { type RouteRecordRaw } from 'vue-router';
 import { type CoseyRouterOptions } from '../router';
@@ -75,6 +76,19 @@ export type CoseyOptions = {
   site?: SiteConfig;
   api?: ApiConfig;
   auth?: AuthConfig;
+  /**
+   * 全局字典，供 `useDict()` / `co-dict-tag` 使用。
+   *
+   * ```ts
+   * dict: {
+   *   user_status: [{ value: 1, labelKey: 'co.user.status.enabled', color: 'success' }],
+   *   yes_no: { 1: '是', 0: '否' },
+   * }
+   * ```
+   *
+   * 键名会按 `DictNameMap` 提示，见 `dict` 文档。
+   */
+  dict?: DictRegistry;
   initializeData?: InitializeDataHandler;
   filterRoute?: FilterRouteHandler;
   components?: LayoutComponents;
@@ -108,6 +122,7 @@ export function launchGlobalConfig(app: App, options: CoseyOptions) {
     site = {},
     api = {},
     auth = {},
+    dict = {},
     initializeData = () => void 0,
     filterRoute = () => true,
     components = {},
@@ -130,6 +145,8 @@ export function launchGlobalConfig(app: App, options: CoseyOptions) {
   };
 
   app.provide(globalConfigContextKey, globalConfig);
+
+  setDicts(dict);
 
   launchPersist(persist);
 

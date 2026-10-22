@@ -1,7 +1,9 @@
+import { CoAsync } from './async';
 import { AudioCard } from './audio-card';
 import { AudioViewer } from './audio-viewer';
 import { Card } from './card';
 import { CheckUpdates } from './check-updates';
+import { CoChart } from './chart';
 import { Close } from './close';
 import { Col } from './col';
 import { ConfigProvider } from './config-provider';
@@ -9,6 +11,7 @@ import { Container } from './container';
 import { ContextMenu, ContextMenuItem, ContextSubMenu } from './context-menu';
 import { Copy } from './copy';
 import { Descriptions } from './descriptions';
+import { CoDictTag } from './dict';
 import { DndSort, DndSortItem } from './dnd-sort';
 import { Editor } from './editor';
 import { Field } from './field';
@@ -35,6 +38,7 @@ import { MediaViewer } from './media-viewer';
 import { NumberFormat } from './number-format';
 import { OnlyChild } from './only-child';
 import { OptionalWrapper } from './optional-wrapper';
+import { CoPage } from './page';
 import { Panel } from './panel';
 import { RemoteSelect } from './remote-select';
 import { Ribbon } from './ribbon';
@@ -50,7 +54,6 @@ import { PagViewer } from './pag-viewer';
 import { PagCard } from './pag-card';
 import { Table } from './table';
 import { TableAction } from './table-action';
-import { TableQuery } from './table-query';
 import { Toggle } from './toggle';
 import { Transition } from './transition';
 import { TransitionGroup } from './transition-group';
@@ -62,10 +65,12 @@ import { type App } from 'vue';
 
 declare module 'vue' {
   export interface GlobalComponents {
+    CoAsync: typeof CoAsync;
     CoAudioCard: typeof AudioCard;
     CoAudioViewer: typeof AudioViewer;
     CoCard: typeof Card;
     CoCheckUpdates: typeof CheckUpdates;
+    CoChart: typeof CoChart;
     CoClose: typeof Close;
     CoCol: typeof Col;
     CoConfigProvider: typeof ConfigProvider;
@@ -75,6 +80,7 @@ declare module 'vue' {
     CoContextSubMenu: typeof ContextSubMenu;
     CoCopy: typeof Copy;
     CoDescriptions: typeof Descriptions;
+    CoDictTag: typeof CoDictTag;
     CoDndSort: typeof DndSort;
     CoDndSortItem: typeof DndSortItem;
     CoEditor: typeof Editor;
@@ -105,6 +111,7 @@ declare module 'vue' {
     CoNumberFormat: typeof NumberFormat;
     CoOnlyChild: typeof OnlyChild;
     CoOptionalWrapper: typeof OptionalWrapper;
+    CoPage: typeof CoPage;
     CoPanel: typeof Panel;
     CoRemoteSelect: typeof RemoteSelect;
     CoRibbon: typeof Ribbon;
@@ -121,7 +128,7 @@ declare module 'vue' {
     CoPagCard: typeof PagCard;
     CoTable: typeof Table;
     CoTableAction: typeof TableAction;
-    CoTableQuery: typeof TableQuery;
+    CoTableQuery: typeof FormQuery;
     CoToggle: typeof Toggle;
     CoTransition: typeof Transition;
     CoTransitionGroup: typeof TransitionGroup;
@@ -135,10 +142,12 @@ declare module 'vue' {
 export const registerGlobalComponents = {
   install(app: App) {
     const all = [
+      CoAsync,
       AudioCard,
       AudioViewer,
       Card,
       CheckUpdates,
+      CoChart,
       Close,
       Col,
       ConfigProvider,
@@ -148,6 +157,7 @@ export const registerGlobalComponents = {
       ContextSubMenu,
       Copy,
       Descriptions,
+      CoDictTag,
       DndSort,
       DndSortItem,
       Editor,
@@ -178,6 +188,7 @@ export const registerGlobalComponents = {
       NumberFormat,
       OnlyChild,
       OptionalWrapper,
+      CoPage,
       Panel,
       RemoteSelect,
       Ribbon,
@@ -193,7 +204,6 @@ export const registerGlobalComponents = {
       PagCard,
       Table,
       TableAction,
-      TableQuery,
       Toggle,
       Transition,
       TransitionGroup,
@@ -203,5 +213,8 @@ export const registerGlobalComponents = {
       WeekRangePicker,
     ];
     all.forEach((c) => app.use(c as any));
+
+    // 别名与 `FormQuery` 是同一个对象，上面注册出来的是 `CoFormQuery`，旧全局名单独补
+    app.component('CoTableQuery', FormQuery as any);
   },
 };

@@ -7,7 +7,7 @@
       :style="{ ...containerStyle, zIndex }"
     >
       <div v-if="formProps" :class="bem.e('header')">
-        <TableQuery ref="tableQuery" v-bind="formProps" :reset="onReset" :submit="onSubmit" />
+        <FormQuery ref="tableQuery" v-bind="formProps" :reset="onReset" :submit="onSubmit" />
       </div>
 
       <div v-if="$slots['before-body']" :class="bem.e('before-body')">
@@ -111,6 +111,18 @@
           </div>
         </div>
 
+        <div v-if="isBatchVisible" :class="bem.e('batch')">
+          <span :class="bem.e('batch-text')">{{ batchText }}</span>
+          <div :class="bem.e('batch-actions')">
+            <slot
+              name="batch"
+              :count="selectionRows.length"
+              :rows="selectionRows"
+              :clear="clearBatchSelection"
+            ></slot>
+          </div>
+        </div>
+
         <div v-if="$slots['before-table']" :class="bem.e('before-table')">
           <slot name="before-table"></slot>
         </div>
@@ -133,7 +145,7 @@
             max-height="none"
           >
             <template v-for="column in renderedColumns" :key="column.prop || column.property">
-              <TableColumn v-bind="column" :internal-slot="$slots" />
+              <TableColumn v-bind="column" :internal-slot="$slots" @cell-change="onCellChange" />
             </template>
             <template v-for="name in passedElSlotsName" :key="name" #[name]="slotProps">
               <slot :name="name" v-bind="slotProps"></slot>
@@ -228,14 +240,17 @@ import {
   defaultTableConfig,
   tableEmitEvents,
   tableEmitOnEvents,
+  tableCustomEmitEvents,
 } from './table.api';
 import { type TableColumnProps } from './table-column/table-column.api';
 import TableColumn from './table-column/table-column';
 import TableColumnEditor from './table-column-editor/table-column-editor';
-import { type TableQueryExpose, TableQuery } from '../table-query';
+import { FormQuery, type FormQueryExpose } from '../form-query';
 import TableExport from './table-export/table-export';
 import { Icon } from '../icon';
 import { useFetch, useFullPage, useResizeObserver } from '../../hooks';
+import { useRowDrag } from '../../hooks/useRowDrag';
+import { persist } from '../../persist';
 import {
   addPxUnit,
   createMergedExpose,
@@ -272,7 +287,7 @@ const props = defineProps(tableProps);
 
 const slots = defineSlots<TableSlots>();
 
-const emit = defineEmits(tableEmitEvents);
+const emit = defineEmits([...tableEmitEvents, ...tableCustomEmitEvents]);
 
 const eventObject = tableEmitOnEvents.reduce(
   (obj, [name, onName]) => {
@@ -305,7 +320,33 @@ const passedElSlotsName = computed(() => {
 });
 
 const elTableRef = ref<TableInstance>();
-const tableQueryRef = useTemplateRef<TableQueryExpose>('tableQuery');
+const tableQueryRef = useTemplateRef<FormQueryExpose>('tableQuery');
+
+// selection / batch
+const selectionRows = ref<any[]>([]);
+
+const handleSelectionChange = (rows: any[]) => {
+  selectionRows.value = rows;
+};
+
+const mergedBatch = computed(() => {
+  if (!props.batch) {
+    return null;
+  }
+
+  return isObject(props.batch) ? props.batch : {};
+});
+
+const isBatchVisible = computed(() => !!mergedBatch.value && selectionRows.value.length > 0);
+
+const batchText = computed(
+  () => mergedBatch.value?.text ?? t('co.table.selected', { count: selectionRows.value.length }),
+);
+
+const clearBatchSelection = () => {
+  elTableRef.value?.clearSelection();
+  selectionRows.value = [];
+};
 
 // order
 const mapOrderType = {
@@ -343,6 +384,9 @@ const elTableProps = computed(() => {
       onSortChange,
     },
     eventObject,
+    {
+      onSelectionChange: handleSelectionChange,
+    },
   );
 });
 
@@ -355,11 +399,151 @@ const containerStyle = computed(() => {
 // columns
 const renderedColumns = ref<TableColumnProps[]>([]);
 
+// column setting（只在传了 tableKey 时生效，不传则完全走旧逻辑）
+const COLUMN_STORAGE_PREFIX = 'Cosey:table-column:';
+
+interface StoredColumn {
+  k: string;
+  hidden?: boolean;
+  children?: StoredColumn[];
+}
+
+const getColumnKey = (column: TableColumnProps) =>
+  String(column.prop ?? column.property ?? column.label ?? column.type ?? '');
+
+const getColumnStorageKey = () => (props.tableKey ? COLUMN_STORAGE_PREFIX + props.tableKey : '');
+
+const readColumnSetting = (): StoredColumn[] | null => {
+  const key = getColumnStorageKey();
+
+  if (!key || !persist) {
+    return null;
+  }
+
+  try {
+    const value = persist.get(key);
+    const parsed = typeof value === 'string' ? JSON.parse(value) : value;
+
+    return Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+const snapshotColumns = (columns: TableColumnProps[]): StoredColumn[] =>
+  columns.map((column) => ({
+    k: getColumnKey(column),
+    hidden: !!column.hidden,
+    children: column.columns?.length ? snapshotColumns(column.columns) : undefined,
+  }));
+
+const writeColumnSetting = (columns: TableColumnProps[]) => {
+  const key = getColumnStorageKey();
+
+  if (!key || !persist) {
+    return;
+  }
+
+  try {
+    persist.set(key, snapshotColumns(columns));
+  } catch {
+    // 存储不可用（隐私模式等）时忽略
+  }
+};
+
+const clearColumnSetting = () => {
+  const key = getColumnStorageKey();
+
+  if (!key || !persist) {
+    return;
+  }
+
+  try {
+    persist.remove(key);
+  } catch {
+    // ignore
+  }
+};
+
+/** 按存储的顺序重排、回填 hidden；存储里没有的新列追加到末尾 */
+const applyColumnSetting = (
+  columns: TableColumnProps[],
+  stored: StoredColumn[],
+): TableColumnProps[] => {
+  const map = new Map<string, TableColumnProps>();
+
+  columns.forEach((column) => {
+    const key = getColumnKey(column);
+
+    if (!map.has(key)) {
+      map.set(key, column);
+    }
+  });
+
+  const result: TableColumnProps[] = [];
+
+  stored.forEach((item) => {
+    const column = map.get(item.k);
+
+    if (!column) {
+      return;
+    }
+
+    column.hidden = item.hidden;
+
+    if (column.columns?.length && item.children?.length) {
+      column.columns = applyColumnSetting(column.columns, item.children);
+    }
+
+    result.push(column);
+    map.delete(item.k);
+  });
+
+  columns.forEach((column) => {
+    const key = getColumnKey(column);
+
+    if (map.get(key) === column) {
+      result.push(column);
+      map.delete(key);
+    }
+  });
+
+  return result;
+};
+
 const setRenderedColumns = () => {
-  renderedColumns.value = cloneDeep(
+  const columns = cloneDeep(
     [...props.columns, props.actionColumn].filter(isObject) as TableColumnProps[],
   );
+
+  const stored = readColumnSetting();
+
+  renderedColumns.value = stored ? applyColumnSetting(columns, stored) : columns;
 };
+
+let columnSaveTimer: ReturnType<typeof setTimeout> | undefined;
+
+// 恢复默认时 `setRenderedColumns()` 会重置引用、触发下面的 watch，
+// 若照常写回，「清空存储」立刻就被默认快照覆盖 → 跳过那一次
+let skipColumnSave = false;
+
+watch(
+  renderedColumns,
+  () => {
+    if (!props.tableKey) {
+      return;
+    }
+
+    if (skipColumnSave) {
+      skipColumnSave = false;
+      return;
+    }
+
+    clearTimeout(columnSaveTimer);
+    columnSaveTimer = setTimeout(() => writeColumnSetting(renderedColumns.value), 200);
+  },
+  { deep: true },
+);
 
 const exportColumns = computed<TableColumnProps[]>(() => {
   return (renderedColumns.value as any)?.filter((column: any) => {
@@ -382,6 +566,8 @@ watch(
 );
 
 const onColumnReset = () => {
+  clearColumnSetting();
+  skipColumnSave = true;
   setRenderedColumns();
 };
 
@@ -613,16 +799,26 @@ const defaultToolbarConfig = {
 };
 
 const mergedToolbarConfig = computed<false | ToolbarConfig>(() => {
-  if (!props.toolbarConfig) {
+  const globalConfig = toValue(tableConfig)?.toolbarConfig ?? defaultTableConfig.toolbarConfig;
+  const localConfig = props.toolbarConfig;
+
+  // 关闭：就近生效 —— 表格显式 false 优先于全局；全局 false 可被表格的 true / 对象打开
+  if (!localConfig && localConfig !== undefined) {
     return false;
   }
-  if (props.toolbarConfig === true) {
-    return defaultToolbarConfig;
+  if (localConfig === undefined && globalConfig === false) {
+    return false;
   }
-  return {
-    ...defaultToolbarConfig,
-    ...props.toolbarConfig,
-  };
+
+  // 开关类配置逐项合并：默认 → 全局 → 表格
+  const merged = { ...defaultToolbarConfig };
+  if (isObject(globalConfig)) {
+    Object.assign(merged, globalConfig);
+  }
+  if (isObject(localConfig)) {
+    Object.assign(merged, localConfig);
+  }
+  return merged;
 });
 
 // reload
@@ -763,4 +959,31 @@ watch(
 );
 
 defineExpose<TableExpose>(expose);
+
+// 行内编辑：列组件的 `cell-change` 冒泡给使用方（列组件在 table 内部渲染，
+// 它的 emit 只会打到 table.vue，不会直达用户绑在 co-table 上的监听器）
+const onCellChange = (payload: { row: any; prop: string; value: any; index: number }) => {
+  emit('cell-change', payload);
+};
+
+// row drag（依赖 rootRef，放在最后）
+const onRowMove = (from: number, to: number) => {
+  const data = [...tableData.value];
+  const [moved] = data.splice(from, 1);
+
+  if (moved === undefined) {
+    return;
+  }
+
+  data.splice(to, 0, moved);
+  tableData.value = data;
+
+  emit('row-move', { from, to, rows: data });
+};
+
+useRowDrag({
+  enabled: () => props.rowDraggable,
+  rootRef,
+  onMove: onRowMove,
+});
 </script>
