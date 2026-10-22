@@ -1,5 +1,9 @@
 @use './base/index' as *;
 
 @include b(week-range-picker) {
-  --el-date-editor-width: 300px;
+  --el-date-editor-width: 320px;
+
+  @include e(separator) {
+    padding-inline: css-var(size-xxs);
+  }
 }

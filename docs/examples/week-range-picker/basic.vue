@@ -1,26 +1,25 @@
 <template>
-  <co-week-range-picker
-    start-placeholder="开始"
-    end-placeholder="结束"
-    v-model="value"
-  ></co-week-range-picker>
+  <co-week-range-picker v-model="value" start-placeholder="开始" end-placeholder="结束" />
 
   <div class="mt-2">
-    <el-button @click="onClick">set value</el-button>
+    <el-button @click="onSetValue">选中 2026 第 5 ~ 11 周</el-button>
+    <el-button @click="value = null">清空</el-button>
   </div>
 
-  <div>{{ format(value) }}</div>
+  <div class="mt-2">{{ display }}</div>
 </template>
 
 <script lang="ts" setup>
-import { dayjs } from 'element-plus';
-import { ref } from 'vue';
+import dayjs from 'dayjs';
+import { computed, ref } from 'vue';
 
-const value = ref();
+const value = ref<Date[] | null>(null);
 
-const onClick = () => {
-  value.value = [new Date('2025-06-22T16:00:00.000Z'), new Date('2025-09-27T15:59:59.999Z')];
+const onSetValue = () => {
+  value.value = [new Date(2026, 0, 28), new Date(2026, 2, 8)];
 };
 
-const format = (value) => value?.map((item) => dayjs(item).format('YYYY-MM-DD HH:mm:ss'));
+const display = computed(
+  () => value.value?.map((item) => dayjs(item).format('YYYY-MM-DD HH:mm:ss')) ?? '未选择',
+);
 </script>

@@ -1,101 +1,216 @@
 @use './base/index' as *;
 
 @include b(panel-week-range) {
-  width: 860px;
+  --co-week-cell-height: #{css-var(size-xxl)};
+
+  width: max-content;
+  min-width: min(468px, calc(100vw - #{css-var(size-xl)}));
+  max-width: calc(100vw - #{css-var(size-xl)});
+  padding: css-var(padding-xxs) css-var(padding-sm);
+  font-size: css-var(font-size-small);
 
   @include e(header) {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 12px;
-    border-bottom: 1px solid css-var(border-color-lighter);
+    gap: css-var(size-xxs);
+    padding-block: css-var(padding-xxs);
   }
 
-  @include e(header-label) {
-    font-size: css-var(font-size-large);
-    font-weight: 500;
-    padding-inline: 5px;
-    color: css-var(text-color-primary);
-  }
-
-  @include e(icon-btn) {
-    padding-block: 1px;
-    padding-inline: 6px;
+  @include e(nav) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: css-var(component-size-small);
+    height: css-var(component-size-small);
+    padding: 0;
     border: 0;
-    font-size: css-var(font-size-small);
-    line-height: 1;
-    color: css-var(text-color-primary);
+    border-radius: css-var(border-radius-base);
+    color: css-var(text-color-regular);
     background: transparent;
     cursor: pointer;
-    outline: none;
 
     &:hover {
       color: css-var(color-primary);
+      background: css-var(fill-color-light);
     }
   }
 
-  @include e(content) {
-    margin-inline: 15px;
-    margin-block-end: 15px;
+  @include e(title) {
+    font-size: css-var(font-size-medium);
+    font-weight: css-var(font-weight-strong);
+    color: css-var(text-color-primary);
   }
 
-  table {
-    table-layout: fixed;
-    width: 100%;
+  @include e(shortcuts) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: css-var(size-xs);
+    padding-block-end: css-var(padding-xs);
+    border-bottom: css-var(border-width) solid css-var(border-color-lighter);
+  }
+
+  @include e(shortcut) {
+    padding: css-var(padding-xxs) css-var(padding-sm);
+    border: 0;
+    border-radius: css-var(border-radius-round);
     font-size: css-var(font-size-small);
-    border-collapse: collapse;
-  }
-
-  @include e(td) {
-    padding-block: 3px;
-    text-align: center;
+    color: css-var(text-color-regular);
+    background: css-var(fill-color-light);
     cursor: pointer;
 
-    @include is(start) {
-      @include e(cell) {
-        border-start-start-radius: 9999px;
-        border-end-start-radius: 9999px;
-      }
+    &:hover {
+      color: css-var(color-primary);
+      background: css-var(color-primary-light-9);
+    }
+  }
+
+  @include e(body) {
+    padding-block-start: css-var(size-xs);
+    overflow-x: auto;
+    overflow-y: hidden;
+    outline: none;
+  }
+
+  @include e(row) {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(64px, 1fr));
+
+    & + & {
+      margin-block-start: css-var(size-xxs);
+    }
+  }
+
+  @include e(quarters) {
+    display: flex;
+    gap: css-var(size-xxs);
+    margin-inline-start: css-var(size-xs);
+  }
+
+  @include e(quarter) {
+    min-width: css-var(size-xl);
+    padding: css-var(padding-xxs) css-var(padding-xs);
+    border: 0;
+    border-radius: css-var(border-radius-base);
+    font-size: css-var(font-size-small);
+    color: css-var(text-color-regular);
+    background: transparent;
+    cursor: pointer;
+
+    &:hover {
+      color: css-var(color-primary);
+      background: css-var(fill-color-light);
     }
 
-    @include is(end) {
-      @include e(cell) {
-        border-start-end-radius: 9999px;
-        border-end-end-radius: 9999px;
-      }
-    }
-
-    @include is(start, end) {
-      @include e(cell-text) {
-        color: css-var(color-white);
-        background: css-var(color-primary);
-      }
-    }
-
-    @include is(in-range) {
-      @include e(cell) {
-        background: css-var(border-color-lighter);
-      }
+    @include is(active) {
+      color: css-var(color-primary);
+      background: css-var(fill-color-light);
+      font-weight: css-var(font-weight-primary);
     }
   }
 
   @include e(cell) {
-    padding-block: 6px;
-  }
-
-  @include e(cell-text) {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 36px;
-    margin-inline: 6px;
-    border-radius: 9999px;
-    line-height: 1.15;
-    color: css-var(text-color-primary);
+    gap: css-var(border-width);
+    height: var(--co-week-cell-height);
+    padding: 0 css-var(padding-xxs);
+    border: 0;
+    border-radius: 0;
+    line-height: css-var(line-height-lg);
+    color: css-var(text-color-regular);
+    white-space: nowrap;
+    background: transparent;
+    cursor: pointer;
 
-    &:hover {
+    &:focus-visible {
+      position: relative;
+      z-index: 1;
+      outline: 2px solid css-var(color-primary);
+      outline-offset: -2px;
+    }
+  }
+
+  @include e(week) {
+    font-weight: css-var(font-weight-primary);
+  }
+
+  @include e(date) {
+    font-size: css-var(font-size-extra-small);
+    font-variant-numeric: tabular-nums;
+    color: css-var(text-color-placeholder);
+  }
+
+  @include e(cell) {
+    &:not(.is-start):not(.is-end):not(.is-disabled):hover {
       color: css-var(color-primary);
+      background: css-var(fill-color-light);
+    }
+
+    @include is(in-range) {
+      color: css-var(text-color-regular);
+      background: css-var(border-color-extra-light);
+
+      .co-panel-week-range__date {
+        color: inherit;
+        opacity: 0.72;
+      }
+    }
+
+    @include is(today) {
+      position: relative;
+
+      .co-panel-week-range__week {
+        color: css-var(color-primary);
+        font-weight: css-var(font-weight-strong);
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset-inline-start: 50%;
+        bottom: css-var(size-xxs);
+        width: css-var(size-xxs);
+        height: css-var(size-xxs);
+        border-radius: css-var(border-radius-circle);
+        background: css-var(color-primary);
+        transform: translateX(-50%);
+      }
+    }
+
+    @include is(start) {
+      border-start-start-radius: css-var(border-radius-large);
+      border-end-start-radius: css-var(border-radius-large);
+    }
+
+    @include is(end) {
+      border-start-end-radius: css-var(border-radius-large);
+      border-end-end-radius: css-var(border-radius-large);
+    }
+
+    @include is(start, end) {
+      color: css-var(color-white);
+      background: css-var(color-primary);
+
+      .co-panel-week-range__week {
+        color: inherit;
+      }
+
+      .co-panel-week-range__date {
+        color: inherit;
+        opacity: 0.82;
+      }
+
+      &::after {
+        background: css-var(color-white);
+      }
+    }
+
+    @include is(disabled) {
+      color: css-var(text-color-placeholder);
+      background: css-var(fill-color-light);
+      cursor: not-allowed;
     }
   }
 }
