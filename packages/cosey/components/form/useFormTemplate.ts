@@ -10,12 +10,18 @@ import {
   formContextSymbol,
   formPropsOmit,
 } from './form.api';
+import { type FormItemWidth } from './form-item.api';
 import { nextTick, provide, reactive, ref, toRef, useTemplateRef } from 'vue';
 import { type FormInstance, type FormItemProp, type FormValidationResult } from 'element-plus';
 import { createMergedExpose } from '../../utils';
 
 export interface UseFormTemplateOptions<T> {
   omittedProps?: (keyof T)[];
+  /**
+   * `minWidth` 的兜底值，仅在调用方没显式设置时生效。
+   * `co-form-query` 用它给 inline 查询条默认一个最小宽度。
+   */
+  defaultMinWidth?: () => FormItemWidth | undefined;
 }
 
 export function useFormTemplate<T extends FormProps, U extends FormExpose = FormExpose>(
@@ -194,6 +200,7 @@ export function useFormTemplate<T extends FormProps, U extends FormExpose = Form
     grid: toRef(() => props.grid),
     readonly: toRef(() => props.readonly),
     width: toRef(() => props.width),
+    minWidth: toRef(() => props.minWidth ?? options.defaultMinWidth?.()),
     addResetField,
     removeResetField,
     onValidateChange,

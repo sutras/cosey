@@ -18,6 +18,9 @@ export const formProps = {
   width: {
     type: [String, Number] as PropType<FormItemWidth>,
   },
+  minWidth: {
+    type: [String, Number] as PropType<FormItemWidth>,
+  },
   grid: {
     type: Boolean,
     default: false,
@@ -70,6 +73,7 @@ export const formPropsOmit = [
   'rowProps',
   'colProps',
   'width',
+  'minWidth',
   'readonly',
   'submit',
   'reset',
@@ -129,6 +133,7 @@ export interface FormContext {
   grid?: boolean;
   readonly?: boolean;
   width?: FormItemWidth;
+  minWidth?: FormItemWidth;
   addResetField: (reset: () => void) => void;
   removeResetField: (reset: () => void) => void;
   /**

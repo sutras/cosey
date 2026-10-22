@@ -141,6 +141,21 @@ form/same-width-inline
 
 :::
 
+### 最小宽度
+
+不设置 `width` 时，控件区会按剩余空间伸缩，空间紧张时就会被压得很窄。
+给 `Form` 设置 `min-width` 可以定下伸缩下限（数值按 px，也可以用 `xs` ~ `xl` 预设），
+塞不下就整项换行，而不是继续挤。
+
+下面两个表单容器一样宽：不设 `min-width` 时一行塞得下两个控件（每个约 198px），
+设成 `320` 之后每个控件都不窄于 320px，于是一行只剩一个。
+
+::: demo
+
+form/min-width
+
+:::
+
 ### 标签位置
 
 顶部标签可以让表单控件有更多的空间。
@@ -177,22 +192,23 @@ form/all-fields
 
 继承 `element-plus` 的 [Form Attributes](https://element-plus.org/zh-CN/component/form.html#form-attributes) ，并添加以下属性：
 
-| 属性         | 描述                                             | 类型                       | 默认值 |
-| ------------ | ------------------------------------------------ | -------------------------- | ------ |
-| width        | 统一设置 `field` 为固定宽度                      | FormItemWidth              | -      |
-| grid         | 是否开启栅格化模式                               | boolean                    | false  |
-| row-props    | 栅格化模式下设置 `Row` 的属性                    | RowProps                   | -      |
-| col-props    | 栅格化模式下设置所有 `field` 共同的 `Col` 的属性 | ColProps                   | -      |
-| readonly     | 设置表单内所有 `field` 为只读状态                | boolean                    | false  |
-| submit       | 提交表单时触发的回调                             | () => any \| Promise\<any> | -      |
-| reset        | 重置表单时触发的回调                             | () => any                  | -      |
-| submit-text  | 提交按钮的文案                                   | string                     | '提交' |
-| reset-text   | 重置按钮的文案                                   | string                     | '重置' |
-| submit-props | 提交按钮的属性                                   | ButtonProps                | -      |
-| reset-props  | 重置按钮的属性                                   | ButtonProps                | -      |
-| hide-submit  | 是否隐藏提交按钮                                 | boolean                    | false  |
-| hide-reset   | 是否隐藏重置按钮                                 | boolean                    | false  |
-| hide-buttons | 同时隐藏提交和重置按钮                           | boolean                    | false  |
+| 属性         | 描述                                                   | 类型                       | 默认值 |
+| ------------ | ------------------------------------------------------ | -------------------------- | ------ |
+| width        | 统一设置 `field` 为固定宽度                            | FormItemWidth              | -      |
+| min-width    | 统一设置 `field` 最小宽度，未设 `width` 时作为伸缩下限 | FormItemWidth              | -      |
+| grid         | 是否开启栅格化模式                                     | boolean                    | false  |
+| row-props    | 栅格化模式下设置 `Row` 的属性                          | RowProps                   | -      |
+| col-props    | 栅格化模式下设置所有 `field` 共同的 `Col` 的属性       | ColProps                   | -      |
+| readonly     | 设置表单内所有 `field` 为只读状态                      | boolean                    | false  |
+| submit       | 提交表单时触发的回调                                   | () => any \| Promise\<any> | -      |
+| reset        | 重置表单时触发的回调                                   | () => any                  | -      |
+| submit-text  | 提交按钮的文案                                         | string                     | '提交' |
+| reset-text   | 重置按钮的文案                                         | string                     | '重置' |
+| submit-props | 提交按钮的属性                                         | ButtonProps                | -      |
+| reset-props  | 重置按钮的属性                                         | ButtonProps                | -      |
+| hide-submit  | 是否隐藏提交按钮                                       | boolean                    | false  |
+| hide-reset   | 是否隐藏重置按钮                                       | boolean                    | false  |
+| hide-buttons | 同时隐藏提交和重置按钮                                 | boolean                    | false  |
 
 ### FormSlots
 

@@ -9,27 +9,36 @@ import {
 } from './form-item.api';
 import { isNumber, isString } from '../../utils';
 
-export function getFormItemWidth(outWidth?: FormItemWidth) {
-  let width: string | number | undefined = outWidth;
+/** 把 `104` / `'md'` / `'320px'` 统一转成 CSS 长度，认不出来返回 undefined */
+export function resolveFormItemWidth(value?: FormItemWidth) {
+  const presetWidth = mapFormItemWidth[value as FormItemPresetWidth];
 
-  if (isNumber(outWidth)) {
-    width = outWidth + 'px';
-  }
-
-  const presetWidth = mapFormItemWidth[outWidth as FormItemPresetWidth];
   if (isNumber(presetWidth)) {
-    width = presetWidth + 'px';
+    return presetWidth + 'px';
   }
 
-  if (isString(width)) {
-    return {
-      width,
-    };
+  if (isNumber(value)) {
+    return value + 'px';
+  }
+
+  if (isString(value) && value) {
+    return value;
+  }
+
+  return undefined;
+}
+
+export function getFormItemWidth(outWidth?: FormItemWidth, minWidth?: FormItemWidth) {
+  const width = resolveFormItemWidth(outWidth);
+  const min = resolveFormItemWidth(minWidth);
+
+  if (width) {
+    return min ? { width, minWidth: min } : { width };
   }
 
   return {
     flex: 1,
-    minWidth: 0,
+    minWidth: min ?? 0,
   };
 }
 
@@ -40,6 +49,6 @@ export function useFormItemWidth<T extends FieldType>(
   return computed<CSSProperties>(() => {
     const outWidth = props.width ?? formContext?.width;
 
-    return getFormItemWidth(outWidth);
+    return getFormItemWidth(outWidth, formContext?.minWidth);
   });
 }

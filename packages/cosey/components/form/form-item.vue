@@ -128,7 +128,7 @@ watch(
 const formQueryContext = inject<FormQueryContext | null>(formQueryContextSymbol, null);
 
 const hidden = computed(() => {
-  return formQueryContext && formQueryContext.shouldHide(props.internalIndex!);
+  return !!formQueryContext?.shouldHide(props.internalIndex!);
 });
 
 const mergedColProps = computed(() => {
@@ -184,11 +184,18 @@ const mergedRules = computed(() => {
 });
 
 const mergedFormItemProps = computed(() => {
-  return {
+  const merged = {
     ...(formContext?.grid ? null : attrs),
     ...formItemProps,
     rules: mergedRules.value,
   };
+
+  // 非栅格时外面没有 Col 承载 `display:none`，隐藏得落在 FormItem 自己身上
+  if (formContext?.grid || !hidden.value) {
+    return merged;
+  }
+
+  return mergeProps(merged, { style: { display: 'none' } });
 });
 
 const mergedFieldProps = computed(() => {
