@@ -22,7 +22,7 @@
     "commit": "commit",
     "new-component": "tsx ./scripts/new-component.ts",
     "nc": "npm run new-component",
-    "docs:dev": "cross-env NODE_ENV=development vitepress dev docs --force --port 5174",
+    "docs:dev": "cross-env NODE_ENV=development vitepress dev docs --force --port 5774",
     "docs:build": "cross-env NODE_ENV=production vitepress build docs",
     "docs:build-debug": "cross-env NODE_ENV=production DEBUG=true vitepress build docs",
     "docs:preview": "vitepress preview docs",

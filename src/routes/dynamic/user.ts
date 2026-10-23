@@ -18,5 +18,15 @@ export default defineRoutes({
         authority: (ability) => ability.can('read', 'user'),
       },
     },
+    {
+      path: 'users/:id',
+      name: 'UserDetail',
+      component: () => import('@/views/users/detail.vue'),
+      meta: {
+        title: 'user.detail',
+        hideInMenu: true,
+        authority: (ability) => ability.can('read', 'user'),
+      },
+    },
   ],
 });

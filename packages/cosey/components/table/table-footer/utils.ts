@@ -136,9 +136,16 @@ export function defaultSummaryMethod(
   transformSummary?: (sums: any[]) => any[],
 ) {
   const sums: any[] = [];
+  // 首列可能是勾选 / 拖拽手柄这类没有 property 的系统列：合计文案要落在第一个真实数据列上，
+  // 系统列自己留空，否则整行的合计会错位一格
+  const labelIndex = columns.findIndex((column) => !!column.property);
   columns.forEach((column, index) => {
-    if (index === 0) {
+    if (index === labelIndex) {
       sums[index] = sumText;
+      return;
+    }
+    if (!column.property) {
+      sums[index] = '';
       return;
     }
     if (summaryProperties && !summaryProperties.includes(column.property)) {

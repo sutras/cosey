@@ -1,6 +1,6 @@
 <template>
-  <Panel :max-height="maxHeight">
-    <template #header>
+  <Card :max-height="maxHeight" :collapsible="false">
+    <template #title>
       <el-checkbox
         v-model="checkAll"
         :indeterminate="isIndeterminate"
@@ -8,19 +8,16 @@
       >
         {{ t('co.editor.checkAll') }}
       </el-checkbox>
-      <div :style="{ marginInlineStart: 'auto', fontSize: getCssVar('font-size-small') }">
-        {{ modelValue.length }} / {{ options.length }}
-      </div>
     </template>
+    <template #extra>{{ modelValue.length }} / {{ options.length }}</template>
     <slot></slot>
-  </Panel>
+  </Card>
 </template>
 
 <script lang="ts" setup>
 import { type CheckboxValueType } from 'element-plus';
 import { ref, watch } from 'vue';
-import { Panel } from '../../../panel';
-import { getCssVar } from '../../../../utils';
+import { Card } from '../../../card';
 import { useLocale } from '../../../../hooks';
 
 defineOptions({

@@ -38,8 +38,6 @@ import { MediaViewer } from './media-viewer';
 import { NumberFormat } from './number-format';
 import { OnlyChild } from './only-child';
 import { OptionalWrapper } from './optional-wrapper';
-import { CoPage } from './page';
-import { Panel } from './panel';
 import { RemoteSelect } from './remote-select';
 import { Ribbon } from './ribbon';
 import { Row } from './row';
@@ -112,8 +110,6 @@ declare module 'vue' {
     CoNumberFormat: typeof NumberFormat;
     CoOnlyChild: typeof OnlyChild;
     CoOptionalWrapper: typeof OptionalWrapper;
-    CoPage: typeof CoPage;
-    CoPanel: typeof Panel;
     CoRemoteSelect: typeof RemoteSelect;
     CoRibbon: typeof Ribbon;
     CoRow: typeof Row;
@@ -190,8 +186,6 @@ export const registerGlobalComponents = {
       NumberFormat,
       OnlyChild,
       OptionalWrapper,
-      CoPage,
-      Panel,
       RemoteSelect,
       Ribbon,
       Row,

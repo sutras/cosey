@@ -25,7 +25,7 @@ const columns = [
   { prop: 'name', label: '姓名' },
 ];
 
-const onRowMove = ({ from, to }: { from: number; to: number }) => {
-  ElMessage.success(`已从第 ${from + 1} 行移动到第 ${to + 1} 行，记得把顺序提交到服务端`);
+const onRowMove = ({ rows }: { from: number; to: number; rows: { name: string }[] }) => {
+  ElMessage.success(`顺序已更新：${rows.map((row) => row.name).join(' → ')}，记得提交到服务端`);
 };
 </script>

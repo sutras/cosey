@@ -11,7 +11,7 @@ import { ElButton, ElInput, ElSpace } from 'element-plus';
 import katex from 'katex';
 import Button from '../ui/button';
 import { ContextMenuContent } from '../../context-menu';
-import { Panel } from '../../panel';
+import { Card } from '../../card';
 import { FormDialog } from '../../form-dialog';
 import { Form } from '../../form';
 import Row from '../../row';
@@ -97,7 +97,7 @@ export default defineComponent({
           <FormDialog v-model={visible.value} title="LaTeX 公式" width="760px">
             <Row gutter={8} style="row-gap: 8px">
               <Col sm={8}>
-                <Panel header="数学公式" maxHeight="300px">
+                <Card title="数学公式" maxHeight="300px" collapsible={false}>
                   <ElSpace fill>
                     {formulas.map((item) => (
                       <ElButton
@@ -108,11 +108,11 @@ export default defineComponent({
                       </ElButton>
                     ))}
                   </ElSpace>
-                </Panel>
+                </Card>
               </Col>
               <Col sm={16}>
                 <ElSpace fill style="display: flex">
-                  <Panel header="编辑公式">
+                  <Card title="编辑公式" collapsible={false}>
                     <Form model={formModel} submit={onSubmit}>
                       <ElInput
                         v-model={formModel.formula}
@@ -122,10 +122,10 @@ export default defineComponent({
                         rows={6}
                       />
                     </Form>
-                  </Panel>
-                  <Panel header="预览">
+                  </Card>
+                  <Card title="预览" collapsible={false}>
                     <div ref="preview" style="height: 80px"></div>
-                  </Panel>
+                  </Card>
                 </ElSpace>
               </Col>
             </Row>

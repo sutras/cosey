@@ -137,7 +137,6 @@ export default defineConfig({
               link: '/components/grid',
             },
             { text: 'Icon 图标', link: '/components/icon' },
-            { text: 'Page 页面骨架', link: '/components/page' },
           ],
         },
         {
@@ -191,7 +190,6 @@ export default defineConfig({
             { text: 'ScrollView 滚动视图', link: '/components/scroll-view' },
             { text: 'Table 表格', link: '/components/table' },
             { text: 'StackDialog 层叠对话框', link: '/components/stack-dialog' },
-            { text: 'Panel 面板', link: '/components/panel' },
             { text: 'Chart 图表', link: '/components/chart' },
             { text: 'Ribbon 丝带角标', link: '/components/ribbon' },
           ],

@@ -24,6 +24,13 @@
         <co-table-action
           :actions="[
             {
+              label: t('common.view'),
+              icon: 'bi bi-eye',
+              onClick: () => {
+                router.push({ name: 'UserDetail', params: { id: row.id } });
+              },
+            },
+            {
               hidden: cannot('update', 'user'),
               label: t('common.edit'),
               icon: 'bi bi-pencil-square',
@@ -60,8 +67,11 @@ import * as mock from '@gunny/mock';
 import { useAbility } from '@casl/vue';
 import { warningConfirm } from 'cosey/utils';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 const { t } = useI18n();
+
+const router = useRouter();
 
 defineOptions({
   name: 'Users',
@@ -141,7 +151,7 @@ const [tableProps, { reload, getSelectionRows }] = useTable(() => ({
     label: t('common.actions'),
     slots: 'action',
     fixed: 'right',
-    minWidth: 150,
+    minWidth: 220,
   },
   height: '100%',
 }));

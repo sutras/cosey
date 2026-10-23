@@ -34,6 +34,16 @@ export default defineRoutes({
       },
     },
     {
+      path: 'posts/:id/edit',
+      name: 'BlogPostEditor',
+      component: () => import('@/views/blog/posts/editor.vue'),
+      meta: {
+        title: 'post.editor',
+        hideInMenu: true,
+        authority: (ability) => ability.can('update', 'blog_post'),
+      },
+    },
+    {
       path: 'post-comments',
       name: 'BlogPostComments',
       component: () => import('@/views/blog/post-comments/index.vue'),

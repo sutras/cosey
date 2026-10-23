@@ -8,28 +8,22 @@ export interface UseRowDragOptions {
   /** 移动回调：从 from 拖到 to（`to` 是移动结束后的最终下标） */
   onMove: (from: number, to: number) => void;
   /**
-   * 只在匹配该选择器的元素上开始拖拽（拖拽手柄）。
+   * 拖拽手柄的选择器：只有在这个元素上按下才会进入拖拽。
    *
-   * 不传时整行可拖。传了之后，只有手柄上按下才会进入拖拽 —— 行内全是输入框时
-   * 必须这么用，否则在输入框里按下鼠标会变成「拖整行」，连文字都选不中。
+   * 行内常常有输入框 / 按钮 / 可选中文字，所以不支持整行可拖。
+   * 手柄自身需要声明 `cursor` 与 `touch-action: none`。
    */
-  handle?: string;
+  handle: string;
   /** 按下后移动多少像素才真正进入拖拽，低于阈值当点击处理 */
   threshold?: number;
 }
 
 const ROW_SELECTOR = 'tr.el-table__row';
-const DRAGGABLE_CLASS = 'co-table__row--draggable';
-const HANDLE_CLASS = 'co-row-drag-handle--draggable';
 const DRAGGING_CLASS = 'is-dragging';
 /** 落点在参照行的上方：高亮线画在行的上边框 */
 const OVER_BEFORE_CLASS = 'is-drag-over';
 /** 落点在参照行的下方：高亮线画在行的下边框 */
 const OVER_AFTER_CLASS = 'is-drag-over-after';
-/** 拖拽期间挂在 body 上：统一 grabbing 光标、禁掉文本选择 */
-const LOCK_CLASS = 'co-row-drag--active';
-/** 这些元素上按下鼠标是「操作控件」，不能当作拖拽起点 */
-const INTERACTIVE_SELECTOR = 'input, textarea, select, button, a, label, [contenteditable="true"]';
 const DEFAULT_THRESHOLD = 4;
 
 interface DropTarget {
@@ -54,9 +48,9 @@ export function useRowDrag(options: UseRowDragOptions) {
   let startY = 0;
   let started = false;
   let rowEl: HTMLElement | null = null;
+  /** 按下时命中的元素，用来做指针捕获 */
+  let captureEl: Element | null = null;
   let dropTarget: DropTarget | null = null;
-  let observer: MutationObserver | null = null;
-  let frame = 0;
   let bound = false;
 
   const getRoot = () => options.rootRef.value;
@@ -64,41 +58,6 @@ export function useRowDrag(options: UseRowDragOptions) {
   const getRows = () => {
     const root = getRoot();
     return root ? Array.from(root.querySelectorAll<HTMLElement>(ROW_SELECTOR)) : [];
-  };
-
-  const decorate = () => {
-    if (!options.enabled()) {
-      return;
-    }
-
-    const root = getRoot();
-
-    if (!root) {
-      return;
-    }
-
-    if (options.handle) {
-      root.querySelectorAll<HTMLElement>(options.handle).forEach((element) => {
-        element.classList.add(HANDLE_CLASS);
-        // 触屏上按住手柄拖动时不要连带滚动页面
-        element.style.touchAction = 'none';
-      });
-
-      return;
-    }
-
-    getRows().forEach((row) => row.classList.add(DRAGGABLE_CLASS));
-  };
-
-  const scheduleDecorate = () => {
-    if (frame) {
-      return;
-    }
-
-    frame = requestAnimationFrame(() => {
-      frame = 0;
-      decorate();
-    });
   };
 
   /**
@@ -160,7 +119,17 @@ export function useRowDrag(options: UseRowDragOptions) {
 
   function cleanup() {
     stop();
-    document.body?.classList.remove(LOCK_CLASS);
+
+    if (captureEl && pointerId !== null) {
+      try {
+        if (captureEl.hasPointerCapture?.(pointerId)) {
+          captureEl.releasePointerCapture(pointerId);
+        }
+      } catch {
+        // 元素可能已经被卸载，忽略
+      }
+    }
+
     getRows().forEach((row) =>
       row.classList.remove(DRAGGING_CLASS, OVER_BEFORE_CLASS, OVER_AFTER_CLASS),
     );
@@ -169,6 +138,7 @@ export function useRowDrag(options: UseRowDragOptions) {
     pointerId = null;
     started = false;
     rowEl = null;
+    captureEl = null;
     dropTarget = null;
   }
 
@@ -184,7 +154,6 @@ export function useRowDrag(options: UseRowDragOptions) {
 
       started = true;
       rowEl?.classList.add(DRAGGING_CLASS);
-      document.body?.classList.add(LOCK_CLASS);
       // 启动前可能已经选中了一点文本，收回来
       window.getSelection()?.removeAllRanges();
     }
@@ -221,12 +190,7 @@ export function useRowDrag(options: UseRowDragOptions) {
       return;
     }
 
-    if (options.handle) {
-      if (!target.closest(options.handle)) {
-        return;
-      }
-    } else if (target.closest(INTERACTIVE_SELECTOR)) {
-      // 整行可拖时也别抢输入框 / 按钮的点击
+    if (!target.closest(options.handle)) {
       return;
     }
 
@@ -247,6 +211,16 @@ export function useRowDrag(options: UseRowDragOptions) {
     rowEl = row;
     started = false;
     dropTarget = null;
+    // 优先捕获手柄本身：图标 svg 可能在拖拽中被替换，捕获会跟着丢
+    captureEl = (options.handle && target.closest(options.handle)) || target;
+
+    try {
+      // 捕获之后指针跑到窗口外也照样收 move / up；Chromium 在捕获期间保持该元素的光标，
+      // 不会因为指针掠过别的元素而变回 pointer / text
+      captureEl.setPointerCapture(event.pointerId);
+    } catch {
+      captureEl = null;
+    }
 
     // 这里**不** preventDefault：还没超过阈值，点击 / 聚焦都得照常发生
     document.addEventListener('pointermove', onPointerMove);
@@ -265,18 +239,11 @@ export function useRowDrag(options: UseRowDragOptions) {
 
     root.addEventListener('pointerdown', onPointerDown);
 
-    observer = new MutationObserver(scheduleDecorate);
-    observer.observe(root, { childList: true, subtree: true });
-
     bound = true;
-    decorate();
   };
 
   const unbind = () => {
     const root = getRoot();
-
-    observer?.disconnect();
-    observer = null;
 
     if (root) {
       root.removeEventListener('pointerdown', onPointerDown);
@@ -306,13 +273,5 @@ export function useRowDrag(options: UseRowDragOptions) {
     { flush: 'post' },
   );
 
-  onBeforeUnmount(() => {
-    if (frame) {
-      cancelAnimationFrame(frame);
-      frame = 0;
-    }
-    unbind();
-  });
-
-  return { decorate };
+  onBeforeUnmount(unbind);
 }

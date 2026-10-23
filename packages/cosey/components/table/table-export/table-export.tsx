@@ -17,7 +17,7 @@ import { exportRenderer } from '../table-column/renderer';
 import { ElCheckbox, ElMessage } from 'element-plus';
 import { FormDialog } from '../../form-dialog';
 import { Form, FormItem } from '../../form';
-import { Panel } from '../../panel';
+import { Card } from '../../card';
 
 import { CheckableNode, useTreeCheck } from '../../../hooks';
 import { useLocale } from '../../../hooks';
@@ -204,10 +204,12 @@ export default defineComponent({
               }}
             />
             <FormItem v-model={formModel.fields} label={t('co.table.selectField')} prop="fields">
-              <Panel
-                max-height="240px"
+              <Card
+                size="small"
+                maxHeight="240px"
+                collapsible={false}
                 v-slots={{
-                  header: () => (
+                  title: () => (
                     <ElCheckbox
                       modelValue={checkAllValue.value}
                       indeterminate={checkAllIndeterminate.value}

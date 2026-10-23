@@ -1,5 +1,12 @@
 <template>
-  <co-container full-page>
-    <el-card style="height: 100%">内容</el-card>
-  </co-container>
+  <div class="demo-canvas window">
+    <co-container full-page>内容</co-container>
+  </div>
 </template>
+
+<style scoped>
+.window {
+  max-height: 360px;
+  overflow: auto;
+}
+</style>

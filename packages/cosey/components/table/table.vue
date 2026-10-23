@@ -144,6 +144,21 @@
             height="100%"
             max-height="none"
           >
+            <el-table-column
+              v-if="rowDraggable"
+              :width="44"
+              :resizable="false"
+              :class-name="bem.e('drag-cell')"
+            >
+              <template #default>
+                <span :class="bem.e('drag-handle')">
+                  <Icon size="md">
+                    <RtiDragHandle />
+                  </Icon>
+                </span>
+              </template>
+            </el-table-column>
+
             <template v-for="column in renderedColumns" :key="column.prop || column.property">
               <TableColumn v-bind="column" :internal-slot="$slots" @cell-change="onCellChange" />
             </template>
@@ -273,6 +288,7 @@ import { defaultSummaryMethod } from './table-footer/utils';
 import TableStats from './table-stats/table-stats';
 import {
   RtiDownload,
+  RtiDragHandle,
   RtiFullscreen,
   RtiFullscreenExit,
   RtiRotate360,
@@ -987,5 +1003,7 @@ useRowDrag({
   enabled: () => props.rowDraggable,
   rootRef,
   onMove: onRowMove,
+  // 只在最左侧的手柄上按下才拖，避免整行变成拖拽源（行内有输入框时连字都选不中）
+  handle: `.${bem.e('drag-handle')}`,
 });
 </script>

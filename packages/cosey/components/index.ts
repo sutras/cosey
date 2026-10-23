@@ -40,8 +40,6 @@ export * from './media-viewer';
 export * from './number-format';
 export * from './only-child';
 export * from './optional-wrapper';
-export * from './page';
-export * from './panel';
 export * from './remote-select';
 export * from './ribbon';
 export * from './row';

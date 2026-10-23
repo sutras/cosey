@@ -56,3 +56,9 @@
 .VPHomeHero .image-src {
   filter: drop-shadow(6px 6px 3px rgba(0, 0, 0, 0.25));
 }
+
+/* 容器示例的灰色底：让 container 的边界与内边距可见 */
+.demo-canvas {
+  border-radius: var(--el-border-radius-base);
+  background-color: var(--el-fill-color-light);
+}

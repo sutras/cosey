@@ -22,7 +22,7 @@
               label: t('common.edit'),
               icon: 'bi bi-pencil-square',
               onClick: () => {
-                upsert.edit(row);
+                router.push({ name: 'BlogPostEditor', params: { id: row.id } });
               },
             },
             {
@@ -56,8 +56,11 @@ import PostComments from './post-comments.vue';
 import { useTemplateRef } from 'vue';
 import { useAbility } from '@casl/vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 const { t } = useI18n();
+
+const router = useRouter();
 
 defineOptions({
   name: 'BlogPosts',

@@ -2,6 +2,153 @@
 
 @include b(card) {
   background-color: css-var(bg-color);
-  padding-inline: css-var(size-sm);
-  padding-block: css-var(size);
+  border-radius: css-var(border-radius-base);
+
+  @include m(medium) {
+    @include e(header) {
+      padding: css-var(padding-sm) css-var(padding);
+    }
+
+    @include e(title) {
+      font-size: css-var(font-size-heading-5);
+    }
+
+    @include e(body) {
+      padding: css-var(padding);
+    }
+  }
+
+  @include m(small) {
+    @include e(header) {
+      padding: css-var(padding-xs) css-var(padding-sm);
+    }
+
+    @include e(title) {
+      font-size: css-var(font-size-heading-6);
+    }
+
+    @include e(body) {
+      padding: css-var(padding-sm);
+    }
+  }
+
+  @include m(outlined) {
+    border: css-var(border-width) css-var(border-style) css-var(border-color-lighter);
+    overflow: hidden;
+  }
+
+  @include m(inner) {
+    overflow: hidden;
+
+    @include e(header) {
+      background-color: css-var(fill-color-light);
+    }
+  }
+
+  @include is(hoverable) {
+    cursor: pointer;
+    transition:
+      box-shadow css-var(transition-duration),
+      transform css-var(transition-duration);
+
+    &:hover {
+      box-shadow: css-var(box-shadow-light);
+      transform: translateY(-2px);
+    }
+  }
+
+  @include is(shadow) {
+    box-shadow: css-var(box-shadow-light);
+  }
+
+  @include e(header) {
+    display: flex;
+    align-items: center;
+    gap: css-var(padding-xs);
+    border-block-end: css-var(border-width) css-var(border-style) css-var(border-color-lighter);
+
+    @include is(clickable) {
+      cursor: pointer;
+      user-select: none;
+    }
+  }
+
+  @include e(heading) {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  @include e(title) {
+    display: flex;
+    align-items: center;
+    gap: css-var(size-xxs);
+    min-width: 0;
+    color: css-var(text-color-primary);
+  }
+
+  @include e(title-text) {
+    font-weight: css-var(font-weight-strong);
+  }
+
+  @include e(tooltip) {
+    flex: none;
+    color: css-var(text-color-secondary);
+    cursor: help;
+  }
+
+  @include e(subtitle) {
+    font-size: css-var(font-size-small);
+    color: css-var(text-color-regular);
+  }
+
+  @include e(extra) {
+    flex: none;
+    font-size: css-var(font-size-small);
+    color: css-var(text-color-secondary);
+  }
+
+  @include e(toggle) {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    padding: css-var(size-xs);
+    margin: calc(-1 * #{css-var(size-xs)});
+    color: css-var(text-color-secondary);
+    cursor: pointer;
+    transition: transform css-var(transition-duration);
+  }
+
+  @include e(toggle) {
+    @include is(collapsed) {
+      transform: rotate(180deg);
+    }
+  }
+
+  @include e(body) {
+    box-sizing: border-box;
+    min-width: 0;
+
+    @include is(scrollable) {
+      overflow: auto;
+      overscroll-behavior: contain;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        border-radius: 3px;
+        background-color: css-var(border-color);
+      }
+
+      &::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+    }
+  }
 }
