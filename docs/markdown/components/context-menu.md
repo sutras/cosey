@@ -2,13 +2,13 @@
 
 ## 简介
 
-通过点击鼠标右键展示的菜单，菜单会在鼠标右下角展示。
+在指定区域右键（或左键点击）弹出的操作菜单，支持图标、禁用项、分隔线、多级子菜单、当前项高亮与整行自定义内容；也可以按坐标或某个锚点元素打开。
 
 ## 代码演示
 
 ### 基础使用
 
-使用 `#reference` 来放置触发元素。
+用 `#reference` 放置触发元素，菜单项用 `co-context-menu-item` 声明。`icon` 决定左侧图标列（只要有一项带图标，整列都会对齐），`divided` 在项前加分隔线，`disabled` 置灰不可点；点击后把该项的 `command` 抛给 `@command`。
 
 ::: demo
 
@@ -16,9 +16,29 @@ context-menu/basic
 
 :::
 
-### 手动触发
+### 触发方式
 
-可调用 `open()` 方法并传递坐标来展示。
+`trigger` 默认 `contextmenu`（右键）；设为 `click` 后左键点击也能打开，适合做「更多操作」按钮。
+
+::: demo
+
+context-menu/click
+
+:::
+
+### 子菜单
+
+`co-context-sub-menu` 可嵌套任意层，`divided`、`disabled` 与菜单项一致。
+
+::: demo
+
+context-menu/sub-menu
+
+:::
+
+### 手动打开
+
+调用 `open(x, y)` 传入坐标，菜单出现在指定位置。
 
 ::: demo
 
@@ -26,13 +46,35 @@ context-menu/manual
 
 :::
 
-### 子菜单
+### 锚点定位
 
-支持任意层级的嵌套。
+`trigger="manual"` 搭配 `virtual-ref` 可以让菜单贴着某个元素显示：`virtual-ref` 只需提供 `getBoundingClientRect`，菜单会跟着元素移动。`placement` 决定方向，`offset` 决定间距。
+
+非模态场景建议同时把 `lock-scroll` 关掉——锁滚动会给页面补滚动条宽度并隐藏溢出，导致锚点坐标变化、菜单和元素一起跳一下。
 
 ::: demo
 
-context-menu/sub-menu
+context-menu/anchor
+
+:::
+
+### 当前项高亮
+
+给菜单项加 `active`，表示它是当前生效的选择（文字使用主色），常用于对齐方式、标题层级这类单选菜单。
+
+::: demo
+
+context-menu/active
+
+:::
+
+### 自定义内容
+
+默认插槽会替换整行内容，`icon` 插槽替换左侧图标。需要连续操作时把 `close-on-select` 设为 `false`，点击项本身不会关闭菜单，交给内部控件自己决定何时关闭。
+
+::: demo
+
+context-menu/custom
 
 :::
 
@@ -48,6 +90,7 @@ context-menu/sub-menu
 | placement   | 菜单相对锚点的放置位置，仅 `virtual-ref` 定位时生效                                | string                                 | right-start |
 | offset      | 菜单与锚点之间的偏移量（px）                                                       | number                                 | 0           |
 | persistent  | 关闭时仅隐藏菜单不卸载内容（菜单项子树上挂有待交互浮层时开启）                     | boolean                                | false       |
+| lock-scroll | 打开时锁定页面滚动；锚定在元素上的非模态菜单建议关闭                               | boolean                                | true        |
 
 ### ContextMenuSlots
 
