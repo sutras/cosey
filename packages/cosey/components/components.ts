@@ -10,7 +10,7 @@ import { ConfigProvider } from './config-provider';
 import { Container } from './container';
 import { ContextMenu, ContextMenuItem, ContextSubMenu } from './context-menu';
 import { Copy } from './copy';
-import { Descriptions } from './descriptions';
+import { Descriptions, DescriptionsItem } from './descriptions';
 import { CoDictTag } from './dict';
 import { DndSort, DndSortItem } from './dnd-sort';
 import { Editor } from './editor';
@@ -79,6 +79,7 @@ declare module 'vue' {
     CoContextSubMenu: typeof ContextSubMenu;
     CoCopy: typeof Copy;
     CoDescriptions: typeof Descriptions;
+    CoDescriptionsItem: typeof DescriptionsItem;
     CoDictTag: typeof CoDictTag;
     CoDndSort: typeof DndSort;
     CoDndSortItem: typeof DndSortItem;
@@ -155,6 +156,7 @@ export const registerGlobalComponents = {
       ContextSubMenu,
       Copy,
       Descriptions,
+      DescriptionsItem,
       CoDictTag,
       DndSort,
       DndSortItem,

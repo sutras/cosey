@@ -1,58 +1,223 @@
 @use './base/index' as *;
 
 @include b(descriptions) {
-  border-collapse: collapse;
   font-size: css-var(font-size-base);
+  line-height: css-var(line-height);
+  color: css-var(text-color-primary);
 
-  tr {
-    background: transparent;
+  @include e(header) {
+    display: flex;
+    align-items: center;
+    margin-block-end: css-var(margin-md);
   }
 
-  td {
-    &:nth-child(2n-1) {
-      color: css-var(text-color-secondary);
+  @include e(title) {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: css-var(size-xxs);
+    min-width: 0;
+    font-size: css-var(font-size-heading-5);
+    font-weight: css-var(font-weight-strong);
+    line-height: css-var(line-height-lg);
+  }
+
+  @include e(title-text) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @include e(tooltip) {
+    flex: none;
+    color: css-var(text-color-secondary);
+    cursor: help;
+  }
+
+  @include e(extra) {
+    margin-inline-start: auto;
+    color: css-var(text-color-regular);
+  }
+
+  @include e(view) {
+    width: 100%;
+    overflow: hidden;
+    border-radius: css-var(border-radius-large);
+
+    // 宽度必须显式给满，否则表格按内容撑开、整体缩在左上角
+    table {
+      width: 100%;
+      min-width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
     }
   }
 
-  @include is(label-left) {
-    td:nth-child(2n-1) {
-      text-align: left;
+  @include e(row) {
+    > th,
+    > td {
+      font-weight: normal;
+      vertical-align: top;
+    }
+  }
+
+  @include e(item-label) {
+    color: css-var(text-color-secondary);
+    text-align: start;
+
+    &::after {
+      content: ':';
+      position: relative;
+      top: -0.5px;
+      margin-inline: 2px css-var(margin-xs);
+    }
+  }
+
+  @include e(item-label-text) {
+    display: inline-flex;
+    align-items: center;
+    gap: css-var(size-xxs);
+    min-width: 0;
+  }
+
+  @include e(item-content) {
+    color: css-var(text-color-primary);
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  // 非边框：标签与内容同格横排；行间距由单元格下内边距提供，末行不留白
+  @include is-not(bordered) {
+    @include e(row) {
+      > th,
+      > td {
+        padding-block-end: css-var(size);
+        padding-inline-end: css-var(size);
+      }
+
+      > th:last-child,
+      > td:last-child {
+        padding-inline-end: 0;
+      }
+
+      &:last-child {
+        > th,
+        > td {
+          padding-block-end: 0;
+        }
+      }
+    }
+
+    @include e(item-container) {
+      display: flex;
+    }
+
+    @include e(item-label) {
+      display: inline-flex;
+      flex: none;
+      align-items: baseline;
+    }
+
+    @include e(item-content) {
+      display: inline-flex;
+      flex: 1;
+      align-items: baseline;
+      min-width: 0;
+    }
+  }
+
+  // 边框：标签深底、单元格细分隔线，外框一层浅边
+  @include is(bordered) {
+    @include e(view) {
+      border: css-var(border-width) css-var(border-style) css-var(border-color-lighter);
+
+      table {
+        table-layout: auto;
+      }
+    }
+
+    @include e(row) {
+      border-block-end: css-var(border-width) css-var(border-style) css-var(border-color-lighter);
+
+      &:last-child {
+        border-block-end: none;
+      }
+
+      > th,
+      > td {
+        padding: css-var(padding-content-vertical-lg) css-var(padding-content-horizontal-lg);
+        border-inline-end: css-var(border-width) css-var(border-style) css-var(border-color-lighter);
+      }
+
+      > th:last-child,
+      > td:last-child {
+        border-inline-end: none;
+      }
+
+      > th {
+        // 标签底是浅灰，secondary 压不住对比度，跟正文同一个色阶
+        color: css-var(text-color-regular);
+        background-color: css-var(fill-color-light);
+      }
+    }
+
+    // 边框模式不显示冒号
+    @include e(item-label) {
+      &::after {
+        content: '';
+      }
     }
   }
 
   @include is(label-center) {
-    td:nth-child(2n-1) {
+    @include e(item-label) {
       text-align: center;
     }
   }
 
   @include is(label-right) {
-    td:nth-child(2n-1) {
+    @include e(item-label) {
       text-align: right;
     }
   }
 
-  &:not(.is-bordered) {
-    td:nth-child(2n) {
-      padding-inline-start: css-var(padding-xs);
+  @include m(medium) {
+    @include is-not(bordered) {
+      @include e(row) {
+        > th,
+        > td {
+          padding-block-end: css-var(size-sm);
+        }
+      }
     }
 
-    td:nth-child(2n-1):not(:first-child) {
-      padding-inline-start: css-var(padding-sm);
+    @include is(bordered) {
+      @include e(row) {
+        > th,
+        > td {
+          padding: css-var(padding-content-vertical) css-var(padding-content-horizontal-lg);
+        }
+      }
     }
   }
 
-  @include is(bordered) {
-    td {
-      border: 1px solid css-var(border-color-lighter);
-      padding-block: css-var(padding-xxs);
-      padding-inline: css-var(padding-xs);
+  @include m(small) {
+    @include is-not(bordered) {
+      @include e(row) {
+        > th,
+        > td {
+          padding-block-end: css-var(size-xs);
+        }
+      }
     }
-  }
 
-  @include has(colon) {
-    td:nth-child(2n-1) span::after {
-      content: ':\00a0';
+    @include is(bordered) {
+      @include e(row) {
+        > th,
+        > td {
+          padding: css-var(padding-content-vertical-sm) css-var(padding-content-horizontal-sm);
+        }
+      }
     }
   }
 }
