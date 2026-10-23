@@ -47,11 +47,9 @@ export default defineComponent({
               </div>
             )
           )}
-          {slots.default ? (
-            <div class={bem.e('content-body')}>{slots.default({})}</div>
-          ) : (
-            <span class={bem.e('content-title')}>{props.title}</span>
-          )}
+          <span class={bem.e('content-title')}>
+            {slots.default ? slots.default({}) : props.title}
+          </span>
           <div class={bem.e('content-arrow')}>
             {props.arrow && (
               <Icon class={bem.e('content-arrow-icon')} size="lg">

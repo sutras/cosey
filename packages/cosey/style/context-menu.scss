@@ -59,11 +59,6 @@
       @include truncate;
     }
 
-    @include e(content-body) {
-      min-width: 0;
-      flex: 1;
-    }
-
     @include e(content-arrow) {
       display: flex;
       align-items: center;
