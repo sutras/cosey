@@ -60,7 +60,7 @@ descriptions/vertical
 
 ### 尺寸
 
-`default` / `medium` / `small` 只影响单元格间距。切换下方的边框开关，可以看到有边框时上下内边距的差异更明显。
+`large` / `medium` / `small` 只影响单元格间距，默认 `medium`。切换下方的边框开关，可以看到有边框时上下内边距的差异更明显。
 
 ::: demo
 
@@ -90,7 +90,7 @@ descriptions/items
 | column        | 列数，可按断点声明               | number \| `Partial<Record<'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'xxl', number>>` | 1 / 2 / 3  |
 | bordered      | 显示边框                         | boolean                                                                            | false      |
 | layout        | 排列方向                         | `horizontal` \| `vertical`                                                         | horizontal |
-| size          | 尺寸                             | `default` \| `medium` \| `small`                                                   | default    |
+| size          | 尺寸                             | `large` \| `medium` \| `small`                                                     | medium     |
 | colon         | 标签后追加冒号（边框模式不显示） | boolean                                                                            | true       |
 | label-align   | 标签对齐方式                     | `left` \| `center` \| `right`                                                      | left       |
 | label-style   | 标签列样式                       | CSSProperties                                                                      | -          |

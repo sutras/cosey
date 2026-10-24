@@ -5,7 +5,7 @@
       <el-radio-button :value="true">有边框</el-radio-button>
     </el-radio-group>
 
-    <co-descriptions title="default" :column="3" :bordered="bordered">
+    <co-descriptions title="large" size="large" :column="3" :bordered="bordered">
       <co-descriptions-item label="商品">云数据库</co-descriptions-item>
       <co-descriptions-item label="计费方式">按量付费</co-descriptions-item>
       <co-descriptions-item label="自动续费">是</co-descriptions-item>
@@ -14,7 +14,7 @@
       <co-descriptions-item label="实例规格">2 核 4G</co-descriptions-item>
     </co-descriptions>
 
-    <co-descriptions title="medium" size="medium" :column="3" :bordered="bordered">
+    <co-descriptions title="medium（默认）" :column="3" :bordered="bordered">
       <co-descriptions-item label="商品">云数据库</co-descriptions-item>
       <co-descriptions-item label="计费方式">按量付费</co-descriptions-item>
       <co-descriptions-item label="自动续费">是</co-descriptions-item>

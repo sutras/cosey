@@ -253,8 +253,6 @@ export default defineComponent({
       containerWidth.value = inlineSize;
     });
 
-    const size = computed(() => (props.size === 'middle' ? 'medium' : props.size));
-
     const items = computed(() =>
       props.items?.length ? fromData(props.items) : collectChildren(slots.default?.({})),
     );
@@ -388,7 +386,7 @@ export default defineComponent({
         ref={rootRef}
         class={[
           bem.b(),
-          bem.m(size.value),
+          bem.m(props.size),
           bem.is('bordered', props.bordered),
           bem.is('vertical', props.layout === 'vertical'),
           bem.is(`label-${props.labelAlign}`, props.labelAlign !== 'left'),

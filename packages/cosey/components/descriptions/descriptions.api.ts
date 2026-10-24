@@ -1,6 +1,6 @@
 import type { CSSProperties, ExtractPropTypes, PropType, SlotsType, VNodeChild } from 'vue';
 
-export type DescriptionsSize = 'default' | 'medium' | 'middle' | 'small';
+export type DescriptionsSize = 'large' | 'medium' | 'small';
 
 export type DescriptionsLayout = 'horizontal' | 'vertical';
 
@@ -56,7 +56,7 @@ export const descriptionsProps = {
   /** 尺寸 */
   size: {
     type: String as PropType<DescriptionsSize>,
-    default: 'default',
+    default: 'medium',
   },
   /** 标签后追加冒号（边框模式不显示冒号） */
   colon: {

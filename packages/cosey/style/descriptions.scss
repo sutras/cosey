@@ -42,7 +42,7 @@
   @include e(view) {
     width: 100%;
     overflow: hidden;
-    border-radius: css-var(border-radius-large);
+    border-radius: css-var(border-radius-base);
 
     // 宽度必须显式给满，否则表格按内容撑开、整体缩在左上角
     table {
@@ -91,7 +91,7 @@
     @include e(row) {
       > th,
       > td {
-        padding-block-end: css-var(size);
+        padding-block-end: css-var(size-sm);
         padding-inline-end: css-var(size);
       }
 
@@ -145,7 +145,7 @@
 
       > th,
       > td {
-        padding: css-var(padding-content-vertical-lg) css-var(padding-content-horizontal-lg);
+        padding: css-var(padding-content-vertical) css-var(padding-content-horizontal-lg);
         border-inline-end: css-var(border-width) css-var(border-style) css-var(border-color-lighter);
       }
 
@@ -181,12 +181,13 @@
     }
   }
 
-  @include m(medium) {
+  // medium 是默认值，上面就是它的间距；large 只是把它放宽
+  @include m(large) {
     @include is-not(bordered) {
       @include e(row) {
         > th,
         > td {
-          padding-block-end: css-var(size-sm);
+          padding-block-end: css-var(size);
         }
       }
     }
@@ -195,7 +196,7 @@
       @include e(row) {
         > th,
         > td {
-          padding: css-var(padding-content-vertical) css-var(padding-content-horizontal-lg);
+          padding: css-var(padding-content-vertical-lg) css-var(padding-content-horizontal-lg);
         }
       }
     }
