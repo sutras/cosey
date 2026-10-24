@@ -2,6 +2,9 @@
 
 @include b(highlight) {
   position: relative;
+  // 代码块不跟着外部字号走（放进标题或大字号容器里会失控）
+  font-size: css-var(font-size-small);
+  line-height: css-var(line-height-lg);
 
   @include e(scroll) {
     border-radius: css-var(border-radius-base);
@@ -11,6 +14,9 @@
     display: inline-block;
     min-width: 100%;
     padding: css-var(padding-sm);
+    font-size: inherit;
+    // 复制按钮压在右上角，右侧要留出它的位置；主题的 `padding: 1em` 是简写且后加载，必须加 important
+    padding-inline-end: css-var(size-xl) !important;
   }
 
   @include e(copy) {

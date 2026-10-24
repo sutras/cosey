@@ -1,25 +1,26 @@
-import { computed, defineComponent } from 'vue';
+import { defineComponent } from 'vue';
 import { ElScrollbar } from 'element-plus';
 import { Prism, highlightProps, highlightSlots } from './highlight.api';
 import { Copy } from '../copy';
-import { createBem } from '../../utils';
+import { createBem, getVNodeText } from '../../utils';
 
 export default defineComponent({
   name: 'CoHighlight',
   props: highlightProps,
   slots: highlightSlots,
-  setup(props) {
+  setup(props, { slots }) {
     const bem = createBem('highlight');
 
-    const highlightedCode = computed(() =>
-      Prism.highlight(
-        props.code || '',
+    return () => {
+      // 默认插槽与 `code` 等价：取插槽里的纯文本
+      const code = props.code || getVNodeText(slots.default?.({}) ?? '');
+
+      const highlightedCode = Prism.highlight(
+        code,
         Prism.languages[props.lang] || Prism.languages['text'],
         props.lang,
-      ),
-    );
+      );
 
-    return () => {
       return (
         <div class={bem.b()}>
           <ElScrollbar
@@ -28,11 +29,13 @@ export default defineComponent({
             view-class={`language-${props.lang}`}
             maxHeight={props.maxHeight}
           >
-            <code class={`language-${props.lang}`} innerHTML={highlightedCode.value}></code>
+            <code class={`language-${props.lang}`} innerHTML={highlightedCode}></code>
           </ElScrollbar>
-          <div class={bem.e('copy')}>
-            <Copy text={props.code} />
-          </div>
+          {code ? (
+            <div class={bem.e('copy')}>
+              <Copy text={code} />
+            </div>
+          ) : null}
         </div>
       );
     };
