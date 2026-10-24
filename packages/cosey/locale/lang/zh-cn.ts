@@ -27,6 +27,7 @@ export default {
       close: '关闭',
       home: '首页',
       clear: '清空',
+      copy: '复制',
       selectedCount: '已选 {count} 项',
       loadMore: '加载更多',
       noMore: '没有更多了',

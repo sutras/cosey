@@ -1,20 +1,70 @@
 @use './base/index' as *;
 
 @include b(copy) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: css-var(size-lg);
-  height: css-var(size-lg) !important;
+  height: css-var(size-lg);
+  padding: 0;
+  border: 0;
+  background: none;
   font-size: css-var(font-size-medium);
+  color: css-var(text-color-regular);
+  cursor: pointer;
   transition: none;
+
+  // 两个状态的图标尺寸必须一致，否则切换时行高会跳
+  // 图标固定 1em，需要更大尺寸的场景自己覆盖这个盒子
+  @include e(icon) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+    line-height: 1;
+
+    // Icon 内部还有一层 `.co-icon`（也写死 1em），要一起撑满
+    .co-icon {
+      width: 100%;
+      height: 100%;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
 
   &:not(.is-copied):hover {
     opacity: 0.75;
   }
 
-  @include is(copied) {
-    font-size: css-var(font-size-extra-large);
+  @include m(primary) {
+    color: css-var(color-primary);
+  }
 
+  @include m(success) {
+    color: css-var(color-success);
+  }
+
+  @include m(warning) {
+    color: css-var(color-warning);
+  }
+
+  @include m(danger) {
+    color: css-var(color-danger);
+  }
+
+  @include m(info) {
+    color: css-var(color-info);
+  }
+
+  @include is(copied) {
     @include e(icon) {
       color: css-var(color-success);
     }
   }
+
+  @include focus-visible;
 }

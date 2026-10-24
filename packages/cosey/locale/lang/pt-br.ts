@@ -27,6 +27,7 @@ export default {
       close: 'Fechar',
       home: 'Início',
       clear: 'Limpar',
+      copy: 'Copiar',
       selectedCount: '{count} selecionado(s)',
       loadMore: 'Carregar mais',
       noMore: 'Não há mais dados',

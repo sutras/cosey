@@ -27,6 +27,7 @@ export default {
       close: 'إغلاق',
       home: 'الصفحة الرئيسية',
       clear: 'مسح',
+      copy: 'نسخ',
       selectedCount: 'تم تحديد {count}',
       loadMore: 'تحميل المزيد',
       noMore: 'لا مزيد من البيانات',

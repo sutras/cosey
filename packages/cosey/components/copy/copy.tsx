@@ -1,9 +1,9 @@
 import { defineComponent } from 'vue';
-import { ElButton } from 'element-plus';
 import { useClipboard } from '@vueuse/core';
+import { RtiCheck, RtiCopy } from 'richtext-icons';
 import { copyProps } from './copy.api';
 import Icon from '../icon';
-import { RtiCheck, RtiCopy } from 'richtext-icons';
+import { useLocale } from '../../hooks';
 import { createBem } from '../../utils';
 
 export default defineComponent({
@@ -12,20 +12,20 @@ export default defineComponent({
   setup(props) {
     const bem = createBem('copy');
 
+    const { t } = useLocale();
+
     const { copy, copied } = useClipboard();
 
-    return () => {
-      return (
-        <ElButton
-          link
-          type={props.type}
-          class={[bem.b(), bem.is('copied', copied.value)]}
-          style={{ color: props.color }}
-          onClick={() => copy(props.text || '')}
-        >
-          <Icon class={bem.e('icon')}>{copied.value ? <RtiCheck /> : <RtiCopy />}</Icon>
-        </ElButton>
-      );
-    };
+    return () => (
+      <button
+        type="button"
+        class={[bem.b(), bem.m(props.type, !!props.type), bem.is('copied', copied.value)]}
+        style={props.color ? { color: props.color } : undefined}
+        aria-label={props.label || t('co.common.copy')}
+        onClick={() => copy(props.text || '')}
+      >
+        <Icon class={bem.e('icon')}>{copied.value ? <RtiCheck /> : <RtiCopy />}</Icon>
+      </button>
+    );
   },
 });
