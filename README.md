@@ -65,8 +65,6 @@ Cosey 基于 element-plus 并补充了众多组件，意在使开发者更加专
 - 更新版本 `npm run cosey:version`
 - 构建库 `npm run cosey:build`
 - 发布库 `npm run cosey:publish`
-- 打包案例 `npm run build`
-- 打包文档 `npm run docs:build`
 - 部署案例和文档 `npm run deploy`（可传 `demo` 或 `docs` 只部署单个站点）
 
 ## 推送代码流程

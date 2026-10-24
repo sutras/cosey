@@ -1,4 +1,31 @@
-## 0.0.0 (2026-10-06)
+## 0.0.0 (2026-10-24)
+
+## 1.4.0 (2026-10-24)
+
+- fix(input-number-range): 填反时失焦交换 ([de2ca09](https://github.com/sutras/cosey/commit/de2ca09))
+- fix(style): mixins 补齐 functions 导入 ([aa05c92](https://github.com/sutras/cosey/commit/aa05c92))
+- fix(users): 详情页离开时不再请求 users/NaN ([8ba8fcf](https://github.com/sutras/cosey/commit/8ba8fcf))
+- refactor(components): 统一 async/chart/page/dict 命名, 去掉 Co 前缀 ([c85896a](https://github.com/sutras/cosey/commit/c85896a))
+- refactor(context-menu): 自定义内容并入标题容器 ([1c6b9ad](https://github.com/sutras/cosey/commit/1c6b9ad))
+- refactor(copy): 改用原生 button ([9f64aac](https://github.com/sutras/cosey/commit/9f64aac))
+- refactor(descriptions): 尺寸改用 large/medium/small ([ed6a9fd](https://github.com/sutras/cosey/commit/ed6a9fd))
+- refactor(locale): 应用词条与框架词条合并 ([a236879](https://github.com/sutras/cosey/commit/a236879))
+- feat(components): card 重写, page/panel 并入 container/card ([6ff8037](https://github.com/sutras/cosey/commit/6ff8037))
+- feat(components): co-descriptions 重写 ([411e309](https://github.com/sutras/cosey/commit/411e309))
+- feat(components): 新增 dict/async/chart/page, 表格支持行拖拽与行内编辑 ([6f32cd8](https://github.com/sutras/cosey/commit/6f32cd8))
+- feat(components): 新增 table-select, remote-select 支持触底加载 ([063acd7](https://github.com/sutras/cosey/commit/063acd7))
+- feat(components): 新增 Typography 组件族 ([75f9e03](https://github.com/sutras/cosey/commit/75f9e03))
+- feat(form-query): 支持字段分组 ([6e02903](https://github.com/sutras/cosey/commit/6e02903))
+- feat(form): 支持 min-width, form-query 增加声明式字段与非栅格折叠 ([745e3e0](https://github.com/sutras/cosey/commit/745e3e0))
+- feat(highlight): 支持默认插槽并固定字号 ([8cfa88a](https://github.com/sutras/cosey/commit/8cfa88a))
+- feat(mock): 新增商品与商品分类接口, 后台补充商品模块 ([1d8771b](https://github.com/sutras/cosey/commit/1d8771b))
+- feat(week-range-picker): 重构为季度分页面板, 周固定 ISO 语义 ([7347082](https://github.com/sutras/cosey/commit/7347082))
+- docs(context-menu): 示例扩到 7 个 ([2ce5bcf](https://github.com/sutras/cosey/commit/2ce5bcf))
+- chore: 修改SnugMenu图标尺寸, 将FormTabs徽标放到右上角 ([c76b1cc](https://github.com/sutras/cosey/commit/c76b1cc))
+- chore: 忽略 vite 配置的临时 bundle (_.timestamp-_.mjs) ([7baec60](https://github.com/sutras/cosey/commit/7baec60))
+- chore(deploy): 修改部署方式 ([75493e3](https://github.com/sutras/cosey/commit/75493e3))
+- chore(users): 查询栏增加创建时间周范围筛选, 演示 week-range-picker ([0f3ef0a](https://github.com/sutras/cosey/commit/0f3ef0a))
+- build: changelog ([9a91d07](https://github.com/sutras/cosey/commit/9a91d07))
 
 ## <small>1.3.2 (2026-10-06)</small>
 
