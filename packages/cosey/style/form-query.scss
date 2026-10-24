@@ -1,6 +1,84 @@
 @use './base/index' as *;
 
 @include b(form-query) {
+  // 组：默认「标题一行 + 内容」，标题右侧用一条细线拉到行尾
+  @include e(group) {
+    display: block;
+    margin-block-end: css-var(size-xxs);
+
+    // 组名左置：标题固定一列，字段在右侧自己铺满
+    @include is(left) {
+      display: flex;
+      align-items: stretch;
+      gap: css-var(size-sm);
+      margin-block-end: 18px;
+      border-block-end: 1px solid css-var(border-color-lighter);
+    }
+
+    // 整组都被折叠起来时整个容器收起，别留一块空白
+    @include is(empty) {
+      display: none;
+    }
+  }
+
+  @include e(group-title) {
+    display: flex;
+    align-items: center;
+    margin-block-end: 18px;
+    font-size: css-var(font-size-extra-small);
+    font-weight: css-var(font-weight-primary);
+    line-height: css-var(line-height);
+    color: css-var(text-color-secondary);
+    white-space: nowrap;
+
+    &::before,
+    &::after {
+      content: '';
+      height: 0;
+      border-block-start: 1px solid css-var(border-color-lighter);
+    }
+
+    &::before {
+      width: 40px;
+      margin-inline-end: css-var(size-xs);
+    }
+
+    &::after {
+      flex: 1;
+      margin-inline-start: css-var(size-xs);
+    }
+
+    @include is(left) {
+      flex: none;
+      align-items: flex-start;
+      align-items: center;
+      width: 96px;
+      height: 32px;
+      padding-block-start: css-var(size-xxs);
+      padding-inline-end: css-var(size-sm);
+      white-space: normal;
+
+      &::before {
+        display: none;
+      }
+      &::after {
+        display: none;
+      }
+    }
+  }
+
+  @include e(group-body) {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    min-width: 0;
+
+    // 退出行内后字段该各占一行、撑满容器
+    @include is(block) {
+      display: block;
+    }
+  }
+
   @include e(form-item-buttons) {
     margin-inline-start: auto;
     align-self: flex-end;
@@ -8,6 +86,12 @@
     .el-form-item__label {
       display: none;
     }
+  }
+
+  // 分组时的操作区：单独占一行、靠右下，与上面的字段区分开
+  @include e(buttons-row) {
+    width: 100%;
+    margin-block-start: css-var(size-xs);
   }
 
   @include e(buttons) {

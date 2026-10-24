@@ -36,6 +36,26 @@ form-query/schemes
 
 :::
 
+### 分组
+
+字段多的时候按语义分组：`groups` 声明组的名称与顺序，字段上用 `group` 指定所属组，组名默认独占一行（右侧一条细线）。声明式字段和手写 `co-form-item` 都能归组。
+
+- 段内保持书写顺序，没标记或组名没声明的字段排在最后一段，不带组头；
+- 栅格和行内（`grid="false"`）都生效：栅格里每组是一个整行区块，行内里每组是一段「组名 + 行内字段」；
+- 和折叠一起用时，一整组字段都被收起，组名也跟着隐藏，不会留一截悬空。
+
+`group-layout="left"` 把组名挪到左侧一列（96px），省掉每组的标题行；容器宽度不足 576px（手机尺寸）时自动退回顶部，不用自己判断。左侧这一列会挤占字段宽度，通常要配合少排一列（比如 `col-props` 从三列改两列），示例里的切换就是这么做的。
+
+行内模式下 `left` 就是「每组一行」：组名一列，字段在右侧接着排、放不下才换行。
+
+用了 `groups` 时，「提交 / 重置」会单独占一行并靠右下（没分组时仍紧跟最后一个字段），避免操作按钮和最后一组挤在一起。
+
+::: demo
+
+form-query/grouped
+
+:::
+
 ### 行内筛选条
 
 关掉栅格（`:grid="false"`）并开启 `inline`，就是表格头部、下拉弹层里那种一行排开的筛选条。
@@ -43,6 +63,8 @@ form-query/schemes
 这种排布没有列宽托底，控件会被压到输入框的固有宽度（`状态` 这种窄控件甚至会被挤成一条），
 所以非栅格 + `inline` 时 `min-width` 默认取 `200`：空间不够就整项换行，而不是继续挤。
 需要别的下限就显式传 `min-width`；显式传了 `width` 则不再兜这个默认值。
+
+浏览器宽度 ≤ 768px 时会自动退出行内（`inline` 失效），表单项变成块级、撑满容器，不会再挤成一列窄控件。
 
 ::: demo
 
@@ -129,6 +151,8 @@ form-query/invalid
 | switch-to-invalid | 校验失败时自动展开，把出错的字段露出来                                                                                                                        | boolean                   | true                                     |
 | schemes           | 声明式字段；与插槽里的 `co-form-item` 等价，各项 `modelValue` 即初值                                                                                          | FormQueryScheme[]         | []                                       |
 | submit-on-enter   | 输入框里按 Enter 直接提交                                                                                                                                     | boolean                   | true                                     |
+| groups            | 按组排布字段，组头独占一行（仅栅格模式生效）                                                                                                                  | FormQueryGroup[]          | []                                       |
+| group-layout      | 组名位置：`top` 独占一行，`left` 在左侧占一列（<576px 自动回落 `top`）                                                                                        | `top` \| `left`           | top                                      |
 
 ### FormQueryScheme
 
@@ -138,6 +162,13 @@ type FormQueryScheme = FormItemProps<FieldType> & {
   slots?: Record<string, unknown>;
 };
 ```
+
+### FormQueryGroup
+
+| 属性  | 描述                           | 类型   |
+| ----- | ------------------------------ | ------ |
+| name  | 与字段上的 `group` 对应        | string |
+| label | 组标题，不传则只分段、不留标题 | string |
 
 ### FormQuerySlots
 

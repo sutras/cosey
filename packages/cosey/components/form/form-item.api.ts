@@ -59,6 +59,10 @@ export const formItemProps = {
   internalIndex: {
     type: Number,
   },
+  /** 在 `co-form-query` 里所属的分组，对应 `groups[].name`，只影响排布 */
+  group: {
+    type: String,
+  },
   tooltip: {
     type: null as unknown as PropType<VNodeChild>,
   },
@@ -79,6 +83,7 @@ export interface FormItemProps<T extends FieldType> extends Partial<ElFormItemPr
   readonly?: boolean;
   colProps?: ColPublicProps;
   internalIndex?: number;
+  group?: string;
   tooltip?: VNodeChild;
   extra?: VNodeChild;
 }

@@ -27,6 +27,17 @@ export function createFormQueryScheme<T extends FieldType>(props: FormItemProps<
   return props;
 }
 
+/** 查询表单的分组：字段上标 `group`，这里只负责组名、标题与顺序 */
+export interface FormQueryGroup {
+  /** 与字段 `group` 对应 */
+  name: string;
+  /** 组标题，不传则只分段、不渲染标题 */
+  label?: string;
+}
+
+/** 组名位置 */
+export type FormQueryGroupLayout = 'top' | 'left';
+
 export const formQueryProps = {
   ...formProps,
   grid: {
@@ -70,6 +81,24 @@ export const formQueryProps = {
   submitOnEnter: {
     type: Boolean,
     default: true,
+  },
+  /**
+   * 分组：按声明顺序分段，组头独占一行。字段用 `group` 指定所属分组，
+   * 没有标记或标记了未声明分组名的字段排在最后一段（不渲染组头）。
+   *
+   * 只在栅格模式下生效；`grid=false` 时忽略。
+   */
+  groups: {
+    type: Array as PropType<FormQueryGroup[]>,
+    default: () => [],
+  },
+  /**
+   * 组名位置：`top` 独占一行；`left` 在左侧占一列、字段排在右边。
+   * `left` 只在容器够宽（≥992px）时生效，窄屏自动回落成 `top`。
+   */
+  groupLayout: {
+    type: String as PropType<FormQueryGroupLayout>,
+    default: 'top',
   },
 };
 
