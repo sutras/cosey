@@ -1,3 +1,5 @@
+@use './functions' as *;
+
 @mixin line-clamp($lines) {
   display: -webkit-box;
   overflow: hidden;
@@ -13,7 +15,7 @@
 
 @mixin focus-visible {
   &:focus-visible {
-    outline: 2px solid css-var(color-primary-light-5);
+    outline: 2px solid #{css-var(color-primary-light-5)};
     outline-offset: 1px;
     transition:
       outline-offset 0s,
