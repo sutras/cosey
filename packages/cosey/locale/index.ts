@@ -40,6 +40,16 @@ export function launchLocale(app: App, config: I18nConfig = {}) {
   const coesyMessages = getMessages(mergedConfig, 'cosey');
   const dayjsMessages = getMessages(mergedConfig, 'dayjs');
 
+  /**
+   * 应用词条与框架词条合成同一份：`vue-i18n` 和 `useLocale` 读的是同一个对象，
+   * 应用侧因此也能翻译、覆盖 `co.*`。
+   */
+  const messages: Record<string, any> = {};
+
+  mergedConfig.messages.forEach((item) => {
+    messages[item.value] = defaultsDeep({}, appMessages[item.value], coesyMessages[item.value]);
+  });
+
   const locale = persist.get(langKey) || mergedConfig.locale;
   const coseyLocale = shallowRef<Language>({} as Language);
 
@@ -47,7 +57,7 @@ export function launchLocale(app: App, config: I18nConfig = {}) {
     legacy: false,
     locale: locale,
     fallbackLocale: locale,
-    messages: appMessages,
+    messages,
     silentTranslationWarn: true,
     silentFallbackWarn: true,
     missingWarn: false,
@@ -57,7 +67,7 @@ export function launchLocale(app: App, config: I18nConfig = {}) {
   watch(
     () => toValue(i18n.global.locale),
     (locale) => {
-      coseyLocale.value = coesyMessages[locale];
+      coseyLocale.value = messages[locale] ?? ({} as Language);
       dayjs.locale(dayjsMessages[locale]);
       persist.set(langKey, locale);
 
@@ -84,10 +94,9 @@ export function useLocaleMessages() {
 }
 
 /**
- * 用应用自己的 vue-i18n 语言包（`launch({ locale: { messages } })` 里的 `app`）翻译。
+ * 用 vue-i18n 的语言包翻译（应用词条与框架词条已合成同一份）。
  *
  * 未初始化 i18n 或 key 不存在时返回 `undefined`，由调用方决定回退策略。
- * 与 `useLocale().t` 的分工：后者只认框架内置的 `co.*` 词条，读不到应用词条。
  */
 export function translateMessage(key: string): string | undefined {
   // vue-i18n 的 global 类型在深递归下会触发 TS2589，这里只取用到的方法
