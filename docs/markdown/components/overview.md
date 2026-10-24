@@ -48,7 +48,7 @@ Cosey 在 [element-plus](https://element-plus.org/zh-CN/) 的基础上扩展了�
 | [Table 表格](./table)                           | 表格           |
 | [Highlight 代码高亮](./highlight)               | 代码高亮       |
 | [HorizontalTree 水平树](./horizontal-tree)      | 水平树         |
-| [LongText 长文本](./long-text)                  | 长文本展示     |
+| [Typography 排版](./typography)                 | 文本排版       |
 | [NumberFormat 数字格式化](./number-format)      | 数字格式化     |
 | [ScrollView 滚动视图](./scroll-view)            | 自定义滚动条   |
 | [StackDialog 层叠对话框](./stack-dialog)        | 层叠对话框     |

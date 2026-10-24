@@ -181,7 +181,7 @@ export default defineConfig({
             { text: 'Descriptions 描述列表', link: '/components/descriptions' },
             { text: 'Highlight 代码高亮', link: '/components/highlight' },
             { text: 'HorizontalTree 水平树', link: '/components/horizontal-tree' },
-            { text: 'LongText 长文本', link: '/components/long-text' },
+            { text: 'Typography 排版', link: '/components/typography' },
             { text: 'MediaCard 媒体卡片', link: '/components/media-card' },
             {
               text: 'NumberFormat 数字格式化',

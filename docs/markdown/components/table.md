@@ -541,11 +541,11 @@ type TableColumnPropsSlots =
 
 #### longtext
 
-使用 [LongText](./long-text) 组件渲染。
+使用 [TypographyParagraph](./typography) 组件渲染，默认 3 行截断且可展开。
 
-| 参数  | 描述                 | 类型                                       |
-| ----- | -------------------- | ------------------------------------------ |
-| props | 自定义组件的 `props` | [LongTextProps](./long-text#longtextprops) |
+| 参数  | 描述                 | 类型                                                                                   |
+| ----- | -------------------- | -------------------------------------------------------------------------------------- |
+| props | 自定义组件的 `props` | [TypographyParagraphProps](./typography#typographyparagraphprops)（可覆盖 `ellipsis`） |
 
 #### switch
 

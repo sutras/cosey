@@ -14,10 +14,11 @@ import {
   type LinkProps,
   type SwitchProps,
   type TableColumnCtx,
+  type TagProps,
 } from 'element-plus';
 import { get } from 'lodash-es';
 import { type TableColumnProps } from './table-column.api';
-import { type LongTextProps, LongText } from '../../long-text';
+import { TypographyParagraph, type TypographyParagraphProps } from '../../typography';
 import { type MediaCardProps, MediaCard } from '../../media-card';
 import { type MediaCardGroupProps, MediaCardGroup } from '../../media-card-group';
 import { defineComponent, ref, watch } from 'vue';
@@ -48,12 +49,12 @@ export type RendererType =
   | {
       type: 'tag';
       path?: string | string[];
-      props?: LongTextProps;
+      props?: Partial<TagProps>;
     }
   | 'longtext'
   | {
       type: 'longtext';
-      props?: LongTextProps;
+      props?: Partial<TypographyParagraphProps>;
     }
   | 'switch'
   | {
@@ -189,7 +190,14 @@ export function renderer<T extends RendererType>(
       );
     }
     case 'longtext':
-      return <LongText text={cellValue} {...obj.props} />;
+      // 默认 3 行 + 可展开：单元格里没有 tooltip，得留个看全文的出口
+      return (
+        <TypographyParagraph
+          text={cellValue}
+          ellipsis={{ rows: 3, expandable: true }}
+          {...obj.props}
+        />
+      );
     case 'switch': {
       return <AsyncSwitch value={cellValue} props={obj.props} api={obj.api} row={row} t={t} />;
     }

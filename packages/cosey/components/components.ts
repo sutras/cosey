@@ -30,7 +30,13 @@ import { Icon } from './icon';
 import { IconifyIcon } from './iconify-icon';
 import { ImageCard } from './image-card';
 import { InputNumberRange } from './input-number-range';
-import { LongText } from './long-text';
+import {
+  LongText,
+  Typography,
+  TypographyParagraph,
+  TypographyText,
+  TypographyTitle,
+} from './typography';
 import { Mask } from './mask';
 import { MediaCard } from './media-card';
 import { MediaCardGroup } from './media-card-group';
@@ -103,6 +109,10 @@ declare module 'vue' {
     CoIconifyIcon: typeof IconifyIcon;
     CoImageCard: typeof ImageCard;
     CoInputNumberRange: typeof InputNumberRange;
+    CoTypography: typeof Typography;
+    CoTypographyText: typeof TypographyText;
+    CoTypographyTitle: typeof TypographyTitle;
+    CoTypographyParagraph: typeof TypographyParagraph;
     CoLongText: typeof LongText;
     CoMask: typeof Mask;
     CoMediaCard: typeof MediaCard;
@@ -180,6 +190,10 @@ export const registerGlobalComponents = {
       IconifyIcon,
       ImageCard,
       InputNumberRange,
+      Typography,
+      TypographyText,
+      TypographyTitle,
+      TypographyParagraph,
       LongText,
       Mask,
       MediaCard,

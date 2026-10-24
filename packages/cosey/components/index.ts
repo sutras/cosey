@@ -32,7 +32,6 @@ export * from './icon';
 export * from './iconify-icon';
 export * from './image-card';
 export * from './input-number-range';
-export * from './long-text';
 export * from './mask';
 export * from './media-card';
 export * from './media-card-group';
@@ -74,6 +73,7 @@ export type TableQueryCustomExpose = Pick<
   'getFieldsValue' | 'setFieldsValue' | 'getModel' | 'reset'
 >;
 export * from './toggle';
+export * from './typography';
 export * from './transition';
 export * from './transition-group';
 export * from './upload';

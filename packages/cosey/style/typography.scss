@@ -1,0 +1,173 @@
+@use './base/index' as *;
+
+@include b(typography) {
+  // 离屏测量节点按根元素宽度量行数，需要定位上下文
+  position: relative;
+  margin: 0;
+  color: css-var(text-color-primary);
+  font-size: css-var(font-size-base);
+  line-height: css-var(line-height);
+  word-break: break-word;
+
+  @include e(content) {
+    display: inline;
+  }
+
+  // 开了 ellipsis：按字符裁好后内容要变成块级，行内按钮才能跟在省略号后面
+  @include is(ellipsis) {
+    @include is(trimmed) {
+      @include e(content) {
+        display: block;
+        overflow: hidden;
+      }
+    }
+
+    @include is(expanded) {
+      @include e(content) {
+        display: block;
+      }
+    }
+
+    // 插槽内容切不了字符，退回 CSS clamp
+    @include state-not(trimmed, expanded) {
+      @include e(content) {
+        @include line-clamp(3);
+      }
+    }
+  }
+
+  @include m(secondary) {
+    color: css-var(text-color-secondary);
+  }
+
+  @include m(success) {
+    color: css-var(color-success);
+  }
+
+  @include m(warning) {
+    color: css-var(color-warning);
+  }
+
+  @include m(danger) {
+    color: css-var(color-danger);
+  }
+
+  @include is(disabled) {
+    color: css-var(text-color-disabled);
+    cursor: not-allowed;
+    user-select: none;
+  }
+
+  @include is(mark) {
+    padding: 0 2px;
+    background-color: css-var(color-warning-light-9);
+  }
+
+  @include is(code) {
+    padding: 0.2em 0.4em;
+    border: css-var(border-width) css-var(border-style) css-var(border-color-lighter);
+    border-radius: css-var(border-radius-base);
+    background-color: css-var(fill-color-light);
+    font-family: monospace;
+    font-size: 0.9em;
+  }
+
+  @include is(underline) {
+    text-decoration: underline;
+    text-underline-offset: 0.1em;
+  }
+
+  @include is(delete) {
+    text-decoration: line-through;
+  }
+
+  @include is(strong) {
+    font-weight: css-var(font-weight-strong);
+  }
+
+  @include is(italic) {
+    font-style: italic;
+  }
+
+  @include m(h1) {
+    font-size: css-var(font-size-heading-1);
+    line-height: css-var(line-height-heading-1);
+  }
+
+  @include m(h2) {
+    font-size: css-var(font-size-heading-2);
+    line-height: css-var(line-height-heading-2);
+  }
+
+  @include m(h3) {
+    font-size: css-var(font-size-heading-3);
+    line-height: css-var(line-height-heading-3);
+  }
+
+  @include m(h4) {
+    font-size: css-var(font-size-heading-4);
+    line-height: css-var(line-height-heading-4);
+  }
+
+  @include m(h5) {
+    font-size: css-var(font-size-heading-5);
+    line-height: css-var(line-height-heading-5);
+  }
+
+  @include e(toggle) {
+    display: inline;
+    margin-inline-start: css-var(size-xxs);
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: inherit;
+    line-height: inherit;
+    color: css-var(color-primary);
+    cursor: pointer;
+
+    &:hover {
+      color: css-var(color-primary-light-3);
+    }
+
+    @include focus-visible;
+  }
+
+  @include e(copy) {
+    margin-inline-start: css-var(size-xxs);
+    // 行内跟着正文走：尺寸由图标决定，不额外占高度
+    width: auto;
+    height: auto;
+    font-size: inherit;
+    color: css-var(color-primary);
+    vertical-align: middle;
+
+    // 行内的复制按钮比全局（1em）大一点
+    .co-copy__icon {
+      width: min(1.25em, 20px);
+      height: min(1.25em, 20px);
+    }
+  }
+
+  // 测量时的占位：复制按钮宽度（跟图标一致）+ 左边距
+  @include e(reserve) {
+    display: inline-block;
+    width: calc(min(1.25em, 20px) + #{css-var(size-xxs)});
+  }
+
+  @include e(gap) {
+    display: inline-block;
+    width: css-var(size-xxs);
+  }
+
+  // 离屏测量节点，只量行数，不参与布局
+  @include e(measure) {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    z-index: -1;
+    width: 100%;
+    visibility: hidden;
+    word-break: break-word;
+    pointer-events: none;
+  }
+}

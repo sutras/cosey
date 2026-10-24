@@ -50,7 +50,7 @@ import { ElMessage } from 'element-plus';
 import configsApi from '@/api/system/configs';
 import ConfigUpsert from './configs-upsert.vue';
 import { useFetch, useOuterUpsert } from 'cosey/hooks';
-import { LongText, MediaCard, MediaCardGroup, useTable } from 'cosey/components';
+import { MediaCard, MediaCardGroup, TypographyParagraph, useTable } from 'cosey/components';
 import { ref, useTemplateRef } from 'vue';
 import ConfigGroups from '../config-groups/index.vue';
 import { useAbility } from '@casl/vue';
@@ -81,7 +81,7 @@ const [tableProps, { reload }] = useTable(() => ({
       format(cellValue, row) {
         switch (row.type) {
           case 'textarea':
-            return <LongText text={cellValue} />;
+            return <TypographyParagraph text={cellValue} ellipsis={{ rows: 3 }} />;
           case 'image':
             return <MediaCard src={cellValue} />;
           case 'album':
