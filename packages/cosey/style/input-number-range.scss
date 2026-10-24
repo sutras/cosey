@@ -14,6 +14,17 @@
     box-shadow: 0 0 0 1px css-var(color-primary) inset;
   }
 
+  // 禁用时整块一起置灰，否则内层是灰的、外层还是白框
+  @include is(disabled) {
+    background-color: css-var(disabled-bg-color);
+    box-shadow: 0 0 0 1px css-var(disabled-border-color) inset;
+    cursor: not-allowed;
+
+    &:hover {
+      box-shadow: 0 0 0 1px css-var(disabled-border-color) inset;
+    }
+  }
+
   @include e(start) {
     display: flex;
     flex: 1;
