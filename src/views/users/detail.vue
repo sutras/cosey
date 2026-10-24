@@ -1,5 +1,5 @@
 <template>
-  <co-container title="用户详情" :loading="isFetching" back sticky>
+  <co-container :title="t('user.detail')" :loading="isFetching" back sticky>
     <template #actions>
       <el-button v-if="can('update', 'user')" type="primary" @click="onEdit">
         {{ t('common.edit') }}
@@ -43,26 +43,16 @@
           </div>
         </co-card>
 
-        <co-row :gutter="16">
+        <co-row :gutter="16" class="gap-y-4">
           <co-col v-for="group in groups" :key="group.title" :span="12" :xs="24" :sm="24" :md="12">
             <co-card :title="group.title" class="stretch">
-              <div v-for="(row, i) in group.rows" :key="i" class="row">
-                <template v-for="(field, j) in row" :key="j">
-                  <span class="label">{{ field.label }}</span>
-                  <span class="value">{{ field.value ?? '-' }}</span>
-                </template>
-              </div>
+              <co-descriptions :items="group.items" :column="infoColumn" />
             </co-card>
           </co-col>
         </co-row>
 
         <co-card :title="t('user.social')">
-          <div v-for="(row, i) in socialRows" :key="i" class="row">
-            <template v-for="(field, j) in row" :key="j">
-              <span class="label">{{ field.label }}</span>
-              <span class="value">{{ field.value ?? '-' }}</span>
-            </template>
-          </div>
+          <co-descriptions :items="socialItems" :column="infoColumn" />
         </co-card>
 
         <co-card :title="t('user.recentComments')">
@@ -85,13 +75,13 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAbility } from '@casl/vue';
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
-import { chunk } from 'lodash-es';
-import { useFetch, useOuterUpsert } from 'cosey/hooks';
+import type { DescriptionsItemData } from 'cosey/components';
+import { useFetch, useOuterUpsert, useWindowResize } from 'cosey/hooks';
 import usersApi from '@/api/users';
 import postsApi from '@/api/blog';
 import UserUpsert from './user-upsert.vue';
@@ -107,24 +97,43 @@ const { can } = useAbility();
 const { getUser } = usersApi;
 const { getPostComments } = postsApi;
 
-const { isFetching, data, error, execute } = useFetch(() => getUser(Number(route.params.id)));
+/**
+ * 当前详情页的用户 id；不是整数时视为无效，免得拼出 `/users/NaN`。
+ * 页面按 `route.path` 作 key（见 layout-main），换 id 会重新挂载，
+ * 用挂载时的 id 拉数据即可——监听参数反而会在离开本页时拿空参数补一轮请求。
+ */
+const userId = computed(() => {
+  const id = Number(route.params.id);
 
-watch(
-  () => route.params.id,
-  () => {
-    execute();
-  },
+  return Number.isInteger(id) ? id : undefined;
+});
+
+const { isFetching, data, error, execute } = useFetch(() =>
+  userId.value === undefined ? undefined : getUser(userId.value),
 );
 
 const user = computed(() => data.value as any);
 
+// 窄屏一列放不下两个字段（手机号会被折断），断成单列
+const viewportWidth = ref(window.innerWidth);
+useWindowResize(() => {
+  viewportWidth.value = window.innerWidth;
+});
+const infoColumn = computed(() => (viewportWidth.value < 768 ? 1 : 2));
+
 const fmt = (value: string | undefined, template: string) =>
   value ? dayjs(value).format(template) : '-';
 
-const field = (label: string, value: unknown) => ({
-  label,
-  value: Array.isArray(value) ? value.join('、') : value,
-});
+/** 一条信息：数组用顿号连起来，空值显示 - */
+const desc = (label: string, raw: unknown): DescriptionsItemData => {
+  const value = Array.isArray(raw) ? raw.join('、') : raw;
+
+  return {
+    label,
+    content:
+      value === undefined || value === null || value === '' ? '-' : (value as string | number),
+  };
+};
 
 const groups = computed(() => {
   const item = user.value || {};
@@ -132,43 +141,34 @@ const groups = computed(() => {
   return [
     {
       title: t('user.profile'),
-      rows: chunk(
-        [
-          field(t('user.name'), item.name),
-          field(t('user.gender'), item.gender),
-          field(t('user.birthday'), fmt(item.birthday, 'YYYY-MM-DD')),
-          field(t('user.zodiac'), item.constellation),
-        ],
-        2,
-      ),
+      items: [
+        desc(t('user.name'), item.name),
+        desc(t('user.gender'), item.gender),
+        desc(t('user.birthday'), fmt(item.birthday, 'YYYY-MM-DD')),
+        desc(t('user.zodiac'), item.constellation),
+      ],
     },
     {
       title: t('user.other'),
-      rows: chunk(
-        [
-          field(t('user.height'), item.height),
-          field(t('user.weight'), item.weight),
-          field(t('user.phone'), item.mobile),
-          field(t('user.education'), item.qualification),
-        ],
-        2,
-      ),
+      items: [
+        desc(t('user.height'), item.height),
+        desc(t('user.weight'), item.weight),
+        desc(t('user.phone'), item.mobile),
+        desc(t('user.education'), item.qualification),
+      ],
     },
   ];
 });
 
-const socialRows = computed(() => {
+const socialItems = computed(() => {
   const item = user.value || {};
 
-  return chunk(
-    [
-      field(t('user.traits'), item.trait),
-      field(t('user.datingType'), item.friendshipType),
-      field(t('user.hobbies'), item.hobbies),
-      field(t('user.address'), item.address),
-    ],
-    2,
-  );
+  return [
+    desc(t('user.traits'), item.trait),
+    desc(t('user.datingType'), item.friendshipType),
+    desc(t('user.hobbies'), item.hobbies),
+    desc(t('user.address'), item.address),
+  ];
 });
 
 const comments = ref<any[]>([]);
@@ -186,15 +186,11 @@ const loadComments = async (id: number) => {
   }
 };
 
-watch(
-  () => route.params.id,
-  (id) => {
-    if (id) {
-      loadComments(Number(id));
-    }
-  },
-  { immediate: true },
-);
+onMounted(() => {
+  if (userId.value !== undefined) {
+    loadComments(userId.value);
+  }
+});
 
 const upsert = useOuterUpsert({
   success() {
@@ -258,31 +254,6 @@ const onEdit = () => {
   flex-wrap: wrap;
   font-size: 12px;
   color: var(--el-text-color-tertiary);
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) 64px minmax(0, 1fr);
-  gap: 10px 12px;
-  padding-block: 4px;
-}
-
-@media (max-width: 768px) {
-  .row {
-    grid-template-columns: 64px minmax(0, 1fr);
-  }
-}
-
-.label {
-  font-size: 13px;
-  color: var(--el-text-color-secondary);
-}
-
-.value {
-  min-width: 0;
-  font-size: 13px;
-  color: var(--el-text-color-primary);
-  overflow-wrap: break-word;
 }
 
 .comment-list {
