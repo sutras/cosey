@@ -6,38 +6,6 @@
           {{ t('common.add') }}
         </el-button>
       </template>
-      <template #action="{ row }">
-        <co-table-action
-          :actions="[
-            {
-              hidden: cannot('update', 'rbac_role'),
-              label: t('rbac.permission'),
-              icon: 'bi bi-clipboard2-check',
-              onClick: () => {
-                permissionsUpsert.edit(row);
-              },
-            },
-            {
-              hidden: cannot('update', 'rbac_role'),
-              label: t('common.edit'),
-              icon: 'bi bi-pencil-square',
-              onClick: () => {
-                roleUpsert.edit(row);
-              },
-            },
-            {
-              hidden: cannot('delete', 'rbac_role'),
-              label: t('common.delete'),
-              icon: 'bi bi-trash3',
-              type: 'danger',
-              popconfirm: {
-                title: t('common.confirmDelete'),
-                confirm: () => onDelete(row.id),
-              },
-            },
-          ]"
-        />
-      </template>
     </co-table>
 
     <RoleUpsert :ref="roleUpsert.ref" />
@@ -75,7 +43,34 @@ const [tableProps, { reload }] = useTable(() => ({
   ],
   actionColumn: {
     label: t('common.actions'),
-    slots: 'action',
+    actions: (row) => [
+      {
+        hidden: cannot('update', 'rbac_role'),
+        label: t('rbac.permission'),
+        icon: 'bi bi-clipboard2-check',
+        onClick: () => {
+          permissionsUpsert.edit(row);
+        },
+      },
+      {
+        hidden: cannot('update', 'rbac_role'),
+        label: t('common.edit'),
+        icon: 'bi bi-pencil-square',
+        onClick: () => {
+          roleUpsert.edit(row);
+        },
+      },
+      {
+        hidden: cannot('delete', 'rbac_role'),
+        label: t('common.delete'),
+        icon: 'bi bi-trash3',
+        type: 'danger',
+        popconfirm: {
+          title: t('common.confirmDelete'),
+          confirm: () => onDelete(row.id),
+        },
+      },
+    ],
     minWidth: 200,
     fixed: 'right',
   },

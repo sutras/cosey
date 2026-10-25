@@ -6,30 +6,6 @@
           {{ t('common.add') }}
         </el-button>
       </template>
-      <template #action="{ row }">
-        <co-table-action
-          :actions="[
-            {
-              hidden: cannot('update', 'product_category'),
-              label: t('common.edit'),
-              icon: 'bi bi-pencil-square',
-              onClick: () => {
-                upsert.edit(row);
-              },
-            },
-            {
-              hidden: cannot('delete', 'product_category'),
-              label: t('common.delete'),
-              icon: 'bi bi-trash3',
-              type: 'danger',
-              popconfirm: {
-                title: t('common.confirmDelete'),
-                confirm: () => onDelete(row.id),
-              },
-            },
-          ]"
-        />
-      </template>
     </co-table>
 
     <ProductCategoryUpsert :ref="upsert.ref" />
@@ -68,7 +44,26 @@ const [tableProps, { reload }] = useTable(() => ({
   formSchemes: [{ prop: 'name', label: t('product.categoryName') }],
   actionColumn: {
     label: t('common.actions'),
-    slots: 'action',
+    actions: (row) => [
+      {
+        hidden: cannot('update', 'product_category'),
+        label: t('common.edit'),
+        icon: 'bi bi-pencil-square',
+        onClick: () => {
+          upsert.edit(row);
+        },
+      },
+      {
+        hidden: cannot('delete', 'product_category'),
+        label: t('common.delete'),
+        icon: 'bi bi-trash3',
+        type: 'danger',
+        popconfirm: {
+          title: t('common.confirmDelete'),
+          confirm: () => onDelete(row.id),
+        },
+      },
+    ],
     fixed: 'right',
     minWidth: 140,
   },

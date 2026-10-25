@@ -6,38 +6,6 @@
           {{ t('common.add') }}
         </el-button>
       </template>
-      <template #action="{ row }">
-        <co-table-action
-          :actions="[
-            {
-              hidden: cannot('read', 'system_enum_item'),
-              label: t('enum.enumItem'),
-              icon: 'bi bi-list-ul',
-              onClick: () => {
-                enumItemsRef?.open(row.id);
-              },
-            },
-            {
-              hidden: cannot('update', 'system_enum'),
-              label: t('common.edit'),
-              icon: 'bi bi-pencil-square',
-              onClick: () => {
-                upsert.edit(row);
-              },
-            },
-            {
-              hidden: cannot('delete', 'system_enum'),
-              label: t('common.delete'),
-              icon: 'bi bi-trash3',
-              type: 'danger',
-              popconfirm: {
-                title: t('common.confirmDelete'),
-                confirm: () => onDelete(row.id),
-              },
-            },
-          ]"
-        />
-      </template>
     </co-table>
 
     <Upsert :ref="upsert.ref" />
@@ -78,7 +46,34 @@ const [tableProps, { reload }] = useTable(() => ({
   ],
   actionColumn: {
     label: t('common.actions'),
-    slots: 'action',
+    actions: (row) => [
+      {
+        hidden: cannot('read', 'system_enum_item'),
+        label: t('enum.enumItem'),
+        icon: 'bi bi-list-ul',
+        onClick: () => {
+          enumItemsRef.value?.open(row.id);
+        },
+      },
+      {
+        hidden: cannot('update', 'system_enum'),
+        label: t('common.edit'),
+        icon: 'bi bi-pencil-square',
+        onClick: () => {
+          upsert.edit(row);
+        },
+      },
+      {
+        hidden: cannot('delete', 'system_enum'),
+        label: t('common.delete'),
+        icon: 'bi bi-trash3',
+        type: 'danger',
+        popconfirm: {
+          title: t('common.confirmDelete'),
+          confirm: () => onDelete(row.id),
+        },
+      },
+    ],
     fixed: 'right',
     minWidth: 220,
   },

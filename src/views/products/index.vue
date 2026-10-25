@@ -20,30 +20,6 @@
           {{ t('product.batchOffSale') }}
         </el-button>
       </template>
-      <template #action="{ row }">
-        <co-table-action
-          :actions="[
-            {
-              hidden: cannot('update', 'product'),
-              label: t('common.edit'),
-              icon: 'bi bi-pencil-square',
-              onClick: () => {
-                upsert.edit(row);
-              },
-            },
-            {
-              hidden: cannot('delete', 'product'),
-              label: t('common.delete'),
-              icon: 'bi bi-trash3',
-              type: 'danger',
-              popconfirm: {
-                title: t('common.confirmDelete'),
-                confirm: () => onDelete(row.id),
-              },
-            },
-          ]"
-        />
-      </template>
     </co-table>
 
     <ProductUpsert :ref="upsert.ref" :categories="categories" />
@@ -85,7 +61,7 @@ const [tableProps, { reload, getSelectionRows }] = useTable(() => ({
   columns: [
     { type: 'selection' },
     { prop: 'id', label: 'ID' },
-    { prop: 'cover', label: t('product.cover'), renderer: 'media', width: 80 },
+    { prop: 'cover', label: t('product.cover'), renderer: 'media' },
     { prop: 'name', label: t('product.name'), minWidth: 260, tooltip: t('product.name') },
     { prop: 'code', label: t('product.code'), minWidth: 120 },
     { prop: 'categoryName', label: t('product.category') },
@@ -131,7 +107,26 @@ const [tableProps, { reload, getSelectionRows }] = useTable(() => ({
   ],
   actionColumn: {
     label: t('common.actions'),
-    slots: 'action',
+    actions: (row) => [
+      {
+        hidden: cannot('update', 'product'),
+        label: t('common.edit'),
+        icon: 'bi bi-pencil-square',
+        onClick: () => {
+          upsert.edit(row);
+        },
+      },
+      {
+        hidden: cannot('delete', 'product'),
+        label: t('common.delete'),
+        icon: 'bi bi-trash3',
+        type: 'danger',
+        popconfirm: {
+          title: t('common.confirmDelete'),
+          confirm: () => onDelete(row.id),
+        },
+      },
+    ],
     fixed: 'right',
     minWidth: 150,
   },

@@ -3,28 +3,6 @@
     <template #toolbar-left>
       <el-button type="primary" @click="onAdd()">新增</el-button>
     </template>
-    <template #action="{ row }">
-      <co-table-action
-        :actions="[
-          {
-            label: '编辑',
-            icon: 'bi bi-pencil-square',
-            onClick: () => {
-              onEdit(row);
-            },
-          },
-          {
-            label: '删除',
-            icon: 'bi bi-trash3',
-            type: 'danger',
-            popconfirm: {
-              title: '确定删除？',
-              confirm: () => onDelete(row.id),
-            },
-          },
-        ]"
-      />
-    </template>
   </co-table>
 </template>
 
@@ -66,7 +44,24 @@ const [tableProps, { reload }] = useTable({
   ],
   actionColumn: {
     label: '操作',
-    slots: 'action',
+    actions: (row) => [
+      {
+        label: '编辑',
+        icon: 'bi bi-pencil-square',
+        onClick: () => {
+          onEdit(row);
+        },
+      },
+      {
+        label: '删除',
+        icon: 'bi bi-trash3',
+        type: 'danger',
+        popconfirm: {
+          title: '确定删除？',
+          confirm: () => onDelete(row.id),
+        },
+      },
+    ],
     fixed: 'right',
     minWidth: 150,
   },

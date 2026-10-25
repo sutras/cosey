@@ -20,37 +20,6 @@
           {{ t('user.batchUnmute') }}
         </el-button>
       </template>
-      <template #action="{ row }">
-        <co-table-action
-          :actions="[
-            {
-              label: t('common.view'),
-              icon: 'bi bi-eye',
-              onClick: () => {
-                router.push({ name: 'UserDetail', params: { id: row.id } });
-              },
-            },
-            {
-              hidden: cannot('update', 'user'),
-              label: t('common.edit'),
-              icon: 'bi bi-pencil-square',
-              onClick: () => {
-                upsert.edit(row);
-              },
-            },
-            {
-              hidden: cannot('delete', 'user'),
-              label: t('common.delete'),
-              icon: 'bi bi-trash3',
-              type: 'danger',
-              popconfirm: {
-                title: t('common.confirmDelete'),
-                confirm: () => onDelete(row.id),
-              },
-            },
-          ]"
-        />
-      </template>
     </co-table>
 
     <UserUpsert :ref="upsert.ref" />
@@ -149,7 +118,33 @@ const [tableProps, { reload, getSelectionRows }] = useTable(() => ({
   },
   actionColumn: {
     label: t('common.actions'),
-    slots: 'action',
+    actions: (row) => [
+      {
+        label: t('common.view'),
+        icon: 'bi bi-eye',
+        onClick: () => {
+          router.push({ name: 'UserDetail', params: { id: row.id } });
+        },
+      },
+      {
+        hidden: cannot('update', 'user'),
+        label: t('common.edit'),
+        icon: 'bi bi-pencil-square',
+        onClick: () => {
+          upsert.edit(row);
+        },
+      },
+      {
+        hidden: cannot('delete', 'user'),
+        label: t('common.delete'),
+        icon: 'bi bi-trash3',
+        type: 'danger',
+        popconfirm: {
+          title: t('common.confirmDelete'),
+          confirm: () => onDelete(row.id),
+        },
+      },
+    ],
     fixed: 'right',
     minWidth: 220,
   },

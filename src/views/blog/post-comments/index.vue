@@ -1,31 +1,6 @@
 <template>
   <co-container full-page>
-    <co-table v-bind="tableProps">
-      <template #action="{ row }">
-        <co-table-action
-          :actions="[
-            {
-              hidden: cannot('update', 'blog_comment'),
-              label: t('common.edit'),
-              icon: 'bi bi-pencil-square',
-              onClick: () => {
-                upsert.edit(row);
-              },
-            },
-            {
-              hidden: cannot('delete', 'blog_comment'),
-              label: t('common.delete'),
-              icon: 'bi bi-trash3',
-              type: 'danger',
-              popconfirm: {
-                title: t('common.confirmDelete'),
-                confirm: () => onDelete(row.id),
-              },
-            },
-          ]"
-        />
-      </template>
-    </co-table>
+    <co-table v-bind="tableProps"></co-table>
 
     <PostCommentsUpsert :ref="upsert.ref" />
   </co-container>
@@ -62,7 +37,26 @@ const [tableProps, { reload }] = useTable(() => ({
   ],
   actionColumn: {
     label: t('common.actions'),
-    slots: 'action',
+    actions: (row) => [
+      {
+        hidden: cannot('update', 'blog_comment'),
+        label: t('common.edit'),
+        icon: 'bi bi-pencil-square',
+        onClick: () => {
+          upsert.edit(row);
+        },
+      },
+      {
+        hidden: cannot('delete', 'blog_comment'),
+        label: t('common.delete'),
+        icon: 'bi bi-trash3',
+        type: 'danger',
+        popconfirm: {
+          title: t('common.confirmDelete'),
+          confirm: () => onDelete(row.id),
+        },
+      },
+    ],
     fixed: 'right',
     minWidth: 140,
   },

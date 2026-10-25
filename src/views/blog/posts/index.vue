@@ -6,38 +6,6 @@
           {{ t('common.add') }}
         </el-button>
       </template>
-      <template #action="{ row }">
-        <co-table-action
-          :actions="[
-            {
-              hidden: cannot('read', 'blog_comment'),
-              label: t('post.comment'),
-              icon: 'bi bi-chat-dots',
-              onClick: () => {
-                postComments?.open(row.id);
-              },
-            },
-            {
-              hidden: cannot('update', 'blog_post'),
-              label: t('common.edit'),
-              icon: 'bi bi-pencil-square',
-              onClick: () => {
-                router.push({ name: 'BlogPostEditor', params: { id: row.id } });
-              },
-            },
-            {
-              hidden: cannot('delete', 'blog_post'),
-              label: t('common.delete'),
-              icon: 'bi bi-trash3',
-              type: 'danger',
-              popconfirm: {
-                title: t('common.confirmDelete'),
-                confirm: () => onDelete(row.id),
-              },
-            },
-          ]"
-        />
-      </template>
     </co-table>
 
     <PostsUpsert :ref="upsert.ref" />
@@ -82,7 +50,34 @@ const [tableProps, { reload }] = useTable(() => ({
   ],
   actionColumn: {
     label: t('common.actions'),
-    slots: 'action',
+    actions: (row) => [
+      {
+        hidden: cannot('read', 'blog_comment'),
+        label: t('post.comment'),
+        icon: 'bi bi-chat-dots',
+        onClick: () => {
+          postComments.value?.open(row.id);
+        },
+      },
+      {
+        hidden: cannot('update', 'blog_post'),
+        label: t('common.edit'),
+        icon: 'bi bi-pencil-square',
+        onClick: () => {
+          router.push({ name: 'BlogPostEditor', params: { id: row.id } });
+        },
+      },
+      {
+        hidden: cannot('delete', 'blog_post'),
+        label: t('common.delete'),
+        icon: 'bi bi-trash3',
+        type: 'danger',
+        popconfirm: {
+          title: t('common.confirmDelete'),
+          confirm: () => onDelete(row.id),
+        },
+      },
+    ],
     fixed: 'right',
     minWidth: 200,
   },
