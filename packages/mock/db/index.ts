@@ -1,7 +1,7 @@
 import Dexie from 'dexie';
 
 import { type DB } from './types';
-import { seed, seedProducts } from './seeder';
+import { seed, seedProducts, seedSocial, seedSocialPermissions } from './seeder';
 
 export const db = new Dexie('CoseyAdminDB') as DB;
 
@@ -30,9 +30,22 @@ export const schema = {
   products: '++id, name, code, categoryId, spec, price, stock, status, createdAt, updatedAt',
 };
 
+export const schemaV3 = {
+  ...schema,
+  socialTopics: '++id, name, sort, status, momentCount, createdAt, updatedAt',
+  socialMoments: '++id, userId, topicId, likeCount, commentCount, status, createdAt, updatedAt',
+  socialMedals: '++id, name, sort, status, createdAt, updatedAt',
+  socialProps: '++id, name, category, price, stock, status, createdAt, updatedAt',
+  socialGifts: '++id, name, price, charm, status, createdAt, updatedAt',
+  socialGuilds: '++id, name, ownerId, memberCount, level, status, createdAt, updatedAt',
+  socialFinances: '++id, userId, type, amount, status, createdAt, updatedAt',
+  socialVips: '++id, level, name, price, duration, status, createdAt, updatedAt',
+};
+
 // 数据库表设计
 db.version(1).stores(schemaV1);
 db.version(2).stores(schema);
+db.version(3).stores(schemaV3);
 
 /**
  * 重置数据库
@@ -44,6 +57,13 @@ export async function resetDB() {
 }
 
 /**
+ * 种子数据版本
+ *
+ * 改种子文案或结构后递增，老库会在下次启动时自动重建（本地 mock 数据，可丢弃）。
+ */
+const SEED_VERSION = '3';
+
+/**
  * 初始化数据库
  *
  * 返回的 promise 在种子数据就绪后才 resolve，接口处理前应等待它，
@@ -52,9 +72,12 @@ export async function resetDB() {
 export function initSeed() {
   if (!seedTask) {
     seedTask = (async () => {
-      if (!localStorage.getItem('mockSeeded')) {
+      const version = localStorage.getItem('mockSeedVersion');
+
+      if (!localStorage.getItem('mockSeeded') || version !== SEED_VERSION) {
         await resetDB();
         localStorage.setItem('mockSeeded', 'true');
+        localStorage.setItem('mockSeedVersion', SEED_VERSION);
         return;
       }
 
@@ -63,6 +86,15 @@ export function initSeed() {
       if (count === 0) {
         await seedProducts(db);
       }
+
+      // 老数据同样没有社交表
+      const socialCount = await db.socialTopics.count();
+      if (socialCount === 0) {
+        await seedSocial(db);
+      }
+
+      // 老数据没有社交模块的权限项
+      await seedSocialPermissions(db);
     })();
   }
 

@@ -3,6 +3,13 @@ import { DB } from '../types';
 import * as mock from '@gunny/mock';
 import CryptoJS from 'crypto-js';
 import { schema } from '..';
+import {
+  momentCorpus,
+  momentFallback,
+  postComments as articleComments,
+  postParagraphs,
+  postTypeCorpus,
+} from './corpus';
 
 function fillObject(fields: string[], item: any[]) {
   return fields.reduce(
@@ -129,6 +136,8 @@ export async function seed(db: DB) {
       return fillObject(fields, item);
     }),
   );
+
+  await seedSocialPermissions(db);
 
   // roles
   // prettier-ignore
@@ -351,12 +360,9 @@ export async function seed(db: DB) {
 
   // post
   {
-    const postTypeCount = 3;
-    const postTypes = Array(postTypeCount)
-      .fill(0)
-      .map((_, i) => {
-        return [i + 1, null, mock.word(2, 6), mock.paragraph(10, 20), date, date];
-      });
+    const postTypes = postTypeCorpus.map((item, i) => {
+      return [i + 1, null, item.name, item.description, date, date];
+    });
 
     await db.postTypes.bulkAdd(
       postTypes.map<any>((item) => {
@@ -365,17 +371,27 @@ export async function seed(db: DB) {
       }),
     );
 
-    const postCount = postTypeCount * 10;
+    const postCount = postTypeCorpus.length * 10;
 
     const posts = Array(postCount)
       .fill(0)
       .map((_, i) => {
+        const typeIndex = i % postTypeCorpus.length;
+        const corpus = postTypeCorpus[typeIndex];
+        const titleIndex = Math.floor(i / postTypeCorpus.length) % corpus.titles.length;
+        const title = corpus.titles[titleIndex];
+
+        const content = Array.from(
+          { length: 4 },
+          (_, k) => postParagraphs[(i * 4 + k) % postParagraphs.length],
+        ).join('\n\n');
+
         return [
           i + 1,
-          (i % postTypeCount) + 1,
-          mock.word(10, 20),
-          mock.paragraphs(3, 5),
-          mock.paragraph(10, 20),
+          typeIndex + 1,
+          title,
+          content,
+          corpus.digests[titleIndex % corpus.digests.length],
           '',
           2,
           date,
@@ -401,10 +417,12 @@ export async function seed(db: DB) {
       .map((_, i) => {
         const id = i + 1;
         const postId = i + 1;
+        const content = articleComments[i % articleComments.length];
+        const reply = articleComments[(i * 3 + 5) % articleComments.length];
         // prettier-ignore
         return [
-          [ id, 1, null, postId, mock.paragraph(10, 20), date, date, null],
-          [ id + postCount, 1, id, postId, mock.paragraph(10, 20), date, date, null],
+          [ id, 1, null, postId, content, date, date, null],
+          [ id + postCount, 1, id, postId, reply, date, date, null],
         ];
       })
       .flat(1);
@@ -418,6 +436,7 @@ export async function seed(db: DB) {
   }
 
   await seedProducts(db);
+  await seedSocial(db);
 }
 
 interface CatalogGroup {
@@ -543,4 +562,342 @@ export async function seedProducts(db: DB) {
     });
 
   await db.products.bulkPut(products);
+}
+
+// prettier-ignore
+const socialTopicCatalog: Array<[string, string]> = [
+  ['日常碎片', '记录生活里的小确幸'],
+  ['深夜emo', '情绪总需要一个出口'],
+  ['开黑组队', '一起上分的都在这儿'],
+  ['美食探店', '今天又吃了什么好东西'],
+  ['旅行日记', '在路上才叫度假'],
+  ['健身打卡', '今日份自律'],
+  ['萌宠来袭', '猫猫狗狗的日常'],
+  ['职场吐槽', '打工人的树洞'],
+  ['影视安利', '最近在追什么'],
+  ['情感树洞', '说出来就轻松了'],
+  ['游戏攻略', '通关技巧与版本解读'],
+  ['音乐现场', '分享最近循环的歌'],
+];
+
+// prettier-ignore
+const socialMedalCatalog: Array<[string, string, string]> = [
+  ['初来乍到', '首次登录', '完成首次登录即可获得'],
+  ['社交新星', '发布 10 条动态', '累计发布 10 条动态解锁'],
+  ['人气之星', '单条动态获赞 500', '任意一条动态点赞数达到 500'],
+  ['一掷千金', '累计消费 10000 元', '平台累计消费满 10000 元'],
+  ['公会栋梁', '担任公会会长', '创建或接管一个公会后获得'],
+  ['守护天使', '送出 999 个礼物', '累计赠送礼物 999 个'],
+  ['长情陪伴', '连续在线 30 天', '连续 30 天登录平台'],
+  ['年度 MVP', '年度贡献榜前十', '年度贡献值进入前十名'],
+];
+
+// prettier-ignore
+const socialPropCatalog: Array<[string, string, number, number]> = [
+  ['星河头像框',   'avatar_frame', 680,  1000],
+  ['樱花头像框',   'avatar_frame', 480,  1000],
+  ['鎏金头像框',   'avatar_frame', 1280, 500],
+  ['萌宠爪印',     'avatar_frame', 520,  800],
+  ['气泡·云朵',    'chat_bubble',  380,  2000],
+  ['气泡·霓虹',    'chat_bubble',  560,  1500],
+  ['气泡·薄荷',    'chat_bubble',  420,  1200],
+  ['入场·流星雨',  'entrance',     1880, 300],
+  ['入场·星河战舰', 'entrance',    3880, 120],
+  ['入场·彩虹桥',  'entrance',     980,  400],
+  ['名片·极简白',  'card',         260,  5000],
+  ['名片·暗夜黑',  'card',         320,  5000],
+];
+
+// prettier-ignore
+const socialGiftCatalog: Array<[string, number, number]> = [
+  ['小心心', 1, 1],
+  ['棒棒糖', 6, 6],
+  ['玫瑰', 18, 20],
+  ['幸运星', 66, 80],
+  ['独角兽', 520, 680],
+  ['跑车', 1888, 2600],
+  ['火箭', 5200, 8000],
+  ['城堡', 13140, 20000],
+];
+
+const socialGuildNames = [
+  '星河战队',
+  '深夜食堂',
+  '云端旅人',
+  '零食补给站',
+  '猫猫教',
+  '早八人联盟',
+  '荒野俱乐部',
+  '次元裂缝',
+  '日落电台',
+  '凌晨四点',
+];
+
+// prettier-ignore
+const socialVipCatalog: Array<[number, string, number, string]> = [
+  [1, '青铜会员', 30,   '专属标识,每日签到翻倍,可创建 1 个公会'],
+  [2, '白银会员', 88,   '专属标识,每日签到翻倍,聊天室置顶,可创建 2 个公会'],
+  [3, '黄金会员', 168,  '专属头像框,每日签到 3 倍,聊天室置顶,可创建 3 个公会,赠送礼物 9 折'],
+  [4, '铂金会员', 288,  '专属头像框,每日签到 3 倍,进入房间免排队,可创建 5 个公会,赠送礼物 85 折'],
+  [5, '钻石会员', 588,  '专属座驾,每日签到 5 倍,进入房间免排队,可创建 8 个公会,赠送礼物 8 折'],
+  [6, '星耀会员', 1288, '专属座驾与入场特效,每日签到 8 倍,专属客服,公会数量不限,赠送礼物 7 折'],
+];
+
+const financeTypes = ['recharge', 'consume', 'withdraw', 'reward'];
+
+const financeRemarks: Record<string, string> = {
+  recharge: '微信充值',
+  consume: '购买礼物',
+  withdraw: '提现到支付宝',
+  reward: '收到打赏',
+};
+
+/**
+ * 社交模块权限：父级「社交管理」+ 每个资源的 manage/create/read/update/delete
+ *
+ * 幂等：按父级 `social` 判断，已存在则跳过；老库升级时也只补一次。
+ */
+export async function seedSocialPermissions(db: DB) {
+  const exist = await db.permissions.where('subject').equals('social').count();
+  if (exist) {
+    return;
+  }
+
+  const date = new Date();
+  const fields = schema.permissions.slice(2).split(/, */);
+  const all = await db.permissions.toArray();
+
+  let id = all.reduce((max, row) => Math.max(max, row.id), 0) + 1;
+  let order = all.reduce((max, row) => Math.max(max, row.order ?? 0), 0) + 1;
+
+  const rows: any[] = [];
+
+  const rootId = id++;
+  rows.push(
+    fillObject(fields, [rootId, null, 'manage', 'social', null, '社交管理', order++, date, date]),
+  );
+
+  // prettier-ignore
+  const groups: Array<[string, string]> = [
+    ['social_topic',   '话题'],
+    ['social_moment',  '动态'],
+    ['social_medal',   '勋章'],
+    ['social_prop',    '道具'],
+    ['social_gift',    '礼物'],
+    ['social_guild',   '公会'],
+    ['social_finance', '财务'],
+    ['social_vip',     '会员'],
+  ];
+  const actions: Array<[string, string]> = [
+    ['create', '创建'],
+    ['read', '查看'],
+    ['update', '修改'],
+    ['delete', '删除'],
+  ];
+
+  groups.forEach(([subject, label]) => {
+    const manageId = id++;
+    rows.push(
+      fillObject(fields, [
+        manageId,
+        rootId,
+        'manage',
+        subject,
+        null,
+        `${label}管理`,
+        order++,
+        date,
+        date,
+      ]),
+    );
+
+    actions.forEach(([action, actionLabel]) => {
+      rows.push(
+        fillObject(fields, [
+          id++,
+          manageId,
+          action,
+          subject,
+          null,
+          `${actionLabel}${label}`,
+          order++,
+          date,
+          date,
+        ]),
+      );
+    });
+  });
+
+  await db.permissions.bulkAdd(rows);
+}
+
+/**
+ * 社交：话题、动态、勋章、道具、礼物、公会、财务、会员
+ */
+export async function seedSocial(db: DB) {
+  const date = new Date();
+  const assets = await db.assets.toArray();
+  const users = await db.users.toArray();
+
+  const assetUrl = (index: number) => assets[index % assets.length]?.url ?? '';
+  const userIds = users.map((row) => row.id);
+  const pickUserId = (index: number) => userIds[index % userIds.length] ?? 1;
+  const daysAgo = (days: number) => new Date(date.getTime() - days * 864e5);
+
+  // 话题
+  const topics = socialTopicCatalog.map(([name, description], index) => ({
+    id: index + 1,
+    name,
+    description,
+    cover: assetUrl(index),
+    momentCount: 0,
+    sort: index + 1,
+    status: index === socialTopicCatalog.length - 1 ? 0 : 1,
+    createdAt: daysAgo(mock.random(30, 360)),
+    updatedAt: date,
+  }));
+
+  // 动态
+  const momentTotal = 260;
+  const activeTopicIds = topics.filter((row) => row.status === 1).map((row) => row.id);
+  const topicNameById = new Map(topics.map((row) => [row.id, row.name]));
+
+  const momentText = (topicId: number, index: number) => {
+    const pool = momentCorpus[topicNameById.get(topicId) ?? ''] || momentFallback;
+    return pool[index % pool.length];
+  };
+
+  const moments = Array(momentTotal)
+    .fill(0)
+    .map((_, index) => {
+      const id = index + 1;
+      const topicId = activeTopicIds[index % activeTopicIds.length];
+      const imageCount = index % 6 === 0 ? 0 : (index % 4) + 1;
+
+      return {
+        id,
+        userId: pickUserId(index * 7),
+        topicId,
+        content: momentText(topicId, index),
+        images: Array.from({ length: imageCount }, (_, offset) => assetUrl(index * 3 + offset)),
+        likeCount: mock.random(0, 1200),
+        commentCount: mock.random(0, 180),
+        status: index % 17 === 0 ? 0 : 1,
+        createdAt: daysAgo(mock.random(0, 90)),
+        updatedAt: date,
+      };
+    });
+
+  const momentCounts = moments.reduce<Record<number, number>>((acc, row) => {
+    acc[row.topicId] = (acc[row.topicId] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  await db.socialTopics.bulkPut(
+    topics.map((row) => ({ ...row, momentCount: momentCounts[row.id] ?? 0 })),
+  );
+  await db.socialMoments.bulkPut(moments);
+
+  // 勋章
+  await db.socialMedals.bulkPut(
+    socialMedalCatalog.map(([name, condition, description], index) => ({
+      id: index + 1,
+      name,
+      icon: assetUrl(index + 20),
+      description,
+      condition,
+      sort: index + 1,
+      status: index === socialMedalCatalog.length - 1 ? 0 : 1,
+      createdAt: daysAgo(mock.random(30, 200)),
+      updatedAt: date,
+    })),
+  );
+
+  // 道具
+  await db.socialProps.bulkPut(
+    socialPropCatalog.map(([name, category, price, stock], index) => ({
+      id: index + 1,
+      name,
+      icon: assetUrl(index + 30),
+      category,
+      price,
+      stock,
+      description: `${name}，可用于个人主页装扮。`,
+      status: index % 7 === 6 ? 0 : 1,
+      createdAt: daysAgo(mock.random(10, 180)),
+      updatedAt: date,
+    })),
+  );
+
+  // 礼物
+  await db.socialGifts.bulkPut(
+    socialGiftCatalog.map(([name, price, charm], index) => ({
+      id: index + 1,
+      name,
+      icon: assetUrl(index + 50),
+      price,
+      charm,
+      description: `赠送「${name}」可增加 ${charm} 点好感值。`,
+      status: index === socialGiftCatalog.length - 1 ? 0 : 1,
+      createdAt: daysAgo(mock.random(10, 180)),
+      updatedAt: date,
+    })),
+  );
+
+  // 公会
+  await db.socialGuilds.bulkPut(
+    socialGuildNames.map((name, index) => ({
+      id: index + 1,
+      name,
+      avatar: assetUrl(index + 60),
+      ownerId: pickUserId(index * 11),
+      memberCount: mock.random(8, 486),
+      level: mock.random(1, 12),
+      notice: `${name}：进群先看公告，禁止广告与人身攻击。`,
+      status: index === socialGuildNames.length - 1 ? 0 : 1,
+      createdAt: daysAgo(mock.random(20, 300)),
+      updatedAt: date,
+    })),
+  );
+
+  // 财务流水
+  const financeTotal = 320;
+  await db.socialFinances.bulkPut(
+    Array(financeTotal)
+      .fill(0)
+      .map((_, index) => {
+        const id = index + 1;
+        const type = financeTypes[index % financeTypes.length];
+        const positive = type === 'recharge' || type === 'reward';
+        const gross = mock.random(1, type === 'reward' ? 520 : 3000);
+
+        return {
+          id,
+          userId: pickUserId(index * 13),
+          type,
+          amount: positive ? gross : -gross,
+          balance: mock.random(0, 20000),
+          status: index % 13 === 0 ? 'pending' : index % 29 === 0 ? 'failed' : 'success',
+          remark: financeRemarks[type],
+          createdAt: daysAgo(mock.random(0, 60)),
+          updatedAt: date,
+        };
+      }),
+  );
+
+  // 会员等级
+  await db.socialVips.bulkPut(
+    socialVipCatalog.map(([level, name, price, benefits], index) => ({
+      id: index + 1,
+      level,
+      name,
+      icon: assetUrl(index + 70),
+      price,
+      duration: 30,
+      benefits,
+      status: index === socialVipCatalog.length - 1 ? 0 : 1,
+      createdAt: date,
+      updatedAt: date,
+    })),
+  );
 }

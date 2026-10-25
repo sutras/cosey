@@ -13,6 +13,7 @@ import { default as posts } from './posts';
 import { default as productCategories } from './product-categories';
 import { default as products } from './products';
 import { default as roles } from './roles';
+import { default as social } from './social';
 import { default as statistics } from './statistics';
 import { default as users } from './users';
 
@@ -30,6 +31,7 @@ const modules = [
   productCategories,
   products,
   roles,
+  social,
   statistics,
   users,
 ];

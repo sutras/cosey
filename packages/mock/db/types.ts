@@ -16,6 +16,14 @@ import type { ConfigGroup } from './models/config-group';
 import type { Config } from './models/config';
 import type { ProductCategory } from './models/product-category';
 import type { Product } from './models/product';
+import type { SocialTopic } from './models/social-topic';
+import type { SocialMoment } from './models/social-moment';
+import type { SocialMedal } from './models/social-medal';
+import type { SocialProp } from './models/social-prop';
+import type { SocialGift } from './models/social-gift';
+import type { SocialGuild } from './models/social-guild';
+import type { SocialFinance } from './models/social-finance';
+import type { SocialVip } from './models/social-vip';
 
 export type DB = Dexie & {
   admins: Admin;
@@ -34,4 +42,12 @@ export type DB = Dexie & {
   configs: Config;
   productCategories: ProductCategory;
   products: Product;
+  socialTopics: SocialTopic;
+  socialMoments: SocialMoment;
+  socialMedals: SocialMedal;
+  socialProps: SocialProp;
+  socialGifts: SocialGift;
+  socialGuilds: SocialGuild;
+  socialFinances: SocialFinance;
+  socialVips: SocialVip;
 };
