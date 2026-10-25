@@ -28,7 +28,7 @@ const isDark = computed(() => appliedColorScheme.value === 'dark');
 
 const buttonRef = useTemplateRef<ButtonInstance>('button');
 
-const onClick = async () => {
+const onClick = () => {
   startViewTransition(buttonRef.value?.$el);
 };
 
@@ -37,7 +37,7 @@ const updateCallback = async () => {
   await nextTick();
 };
 
-const startViewTransition = (el: HTMLElement) => {
+const startViewTransition = (el?: HTMLElement) => {
   const isAppearanceTransition =
     !!document.startViewTransition &&
     !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -46,9 +46,9 @@ const startViewTransition = (el: HTMLElement) => {
     return;
   }
 
-  const rect = el.getBoundingClientRect();
-  const x = rect.left + rect.width / 2;
-  const y = rect.top + rect.height / 2;
+  const rect = el?.getBoundingClientRect();
+  const x = rect ? rect.left + rect.width / 2 : innerWidth / 2;
+  const y = rect ? rect.top + rect.height / 2 : innerHeight / 2;
 
   const endRadius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
 
@@ -57,24 +57,30 @@ const startViewTransition = (el: HTMLElement) => {
   const referR = Math.hypot(innerWidth, innerHeight) / Math.SQRT2;
   const ratioR = (100 * endRadius) / referR;
 
+  const toDark = !isDark.value;
+  const origin = `${ratioX}% ${ratioY}%`;
+
+  // 切亮：新（亮色）快照从点击点扩张；切暗：旧（亮色）快照收缩回点击点
+  const clipPath = toDark
+    ? [`circle(${ratioR}% at ${origin})`, `circle(0% at ${origin})`]
+    : [`circle(0% at ${origin})`, `circle(${ratioR}% at ${origin})`];
+
   const viewTransition = document.startViewTransition(updateCallback);
 
-  viewTransition.ready.then(async () => {
-    const clipPath = [
-      `circle(0% at ${ratioX}% ${ratioY}%)`,
-      `circle(${ratioR}% at ${ratioX}% ${ratioY}%)`,
-    ];
-    document.documentElement.animate(
-      {
-        clipPath: isDark.value ? [...clipPath].reverse() : clipPath,
-      },
+  let animation: Animation | undefined;
+
+  viewTransition.ready.then(() => {
+    animation = document.documentElement.animate(
+      { clipPath },
       {
         duration: 400,
         easing: 'ease-in',
         fill: 'both',
-        pseudoElement: isDark.value ? '::view-transition-old(root)' : '::view-transition-new(root)',
+        pseudoElement: toDark ? '::view-transition-old(root)' : '::view-transition-new(root)',
       },
     );
   });
+
+  viewTransition.finished.catch(() => {}).finally(() => animation?.cancel());
 };
 </script>
