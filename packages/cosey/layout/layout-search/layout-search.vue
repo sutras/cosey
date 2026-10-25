@@ -41,8 +41,12 @@
             @mouseenter="onMouseEnter(index)"
             @click="onSelect(item)"
           >
-            <div :class="bem.e('item-title')">{{ item.title }}</div>
-            <div :class="bem.e('item-path')">{{ item.path }}</div>
+            <Icon v-if="item.icon" size="lg" :name="item.icon" :class="bem.e('item-icon')" />
+            <Icon v-else size="lg" :class="bem.e('item-icon')"><RtiDocument /></Icon>
+            <div :class="bem.e('item-content')">
+              <div :class="bem.e('item-title')">{{ item.title }}</div>
+              <div :class="bem.e('item-path')">{{ item.path }}</div>
+            </div>
           </div>
         </template>
       </el-scrollbar>
@@ -82,7 +86,7 @@ import { useTimeoutFn } from '@vueuse/core';
 import { useLocale } from '../../hooks';
 import { useI18n } from 'vue-i18n';
 import { createBem } from '../../utils';
-import { RtiArrowDown, RtiArrowUp, RtiReturn, RtiSearch } from 'richtext-icons';
+import { RtiArrowDown, RtiArrowUp, RtiDocument, RtiReturn, RtiSearch } from 'richtext-icons';
 
 defineOptions({
   name: 'CoLayoutSearch',
@@ -104,12 +108,18 @@ interface Option {
   title: string;
   path: string;
   name: string;
+  icon?: string;
 }
 
 const menuOptions = computed(() => {
   const result: Option[] = [];
 
-  function recur(items: MenuItem[], parentTitle?: string, parentPath?: string) {
+  function recur(
+    items: MenuItem[],
+    parentTitle?: string,
+    parentPath?: string,
+    parentIcon?: string,
+  ) {
     items.forEach((item) => {
       let title = item.title || '';
       title = te(title) ? _t(title) : title;
@@ -126,9 +136,10 @@ const menuOptions = computed(() => {
           title: mergedTitle,
           path: mergedPath,
           name: item.route.name as string,
+          icon: item.icon || parentIcon,
         });
       } else {
-        recur(item.children, mergedTitle, mergedPath);
+        recur(item.children, mergedTitle, mergedPath, item.icon || parentIcon);
       }
     });
   }
