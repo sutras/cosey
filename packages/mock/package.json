@@ -1,6 +1,6 @@
 {
   "name": "@cosey/mock",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "在浏览器端建立一个后端服务",
   "type": "module",
   "main": "index.ts",
