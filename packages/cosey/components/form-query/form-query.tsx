@@ -1,6 +1,7 @@
 import {
   type FormQueryContext,
   type FormQueryExpose,
+  type FormQueryGroup,
   formQueryProps,
   formQueryContextSymbol,
   defaultMapSizeColNumber,
@@ -39,6 +40,13 @@ import { cloneDeep } from 'lodash-es';
 import { useLocale, useResizeObserver } from '../../hooks';
 import { createBem, isObject } from '../../utils';
 import { RtiSearch } from 'richtext-icons';
+
+/** 一个分组段：`group` 为空的是「未分组」段，字段照原样铺开 */
+interface FormQuerySegment {
+  group?: FormQueryGroup;
+  index: number;
+  items: any[];
+}
 
 export default defineComponent({
   name: 'CoFormQuery',
@@ -157,8 +165,22 @@ export default defineComponent({
     // 组名左置要固定占一列，容器太窄（手机尺寸）就退回顶部
     const isLeftLayout = computed(() => props.groupLayout === 'left' && rowSize.value !== 'xs');
 
-    // 分组 + 非栅格（行内条）时，按钮单独占一行并靠右下；不分组保持「紧跟最后一个字段」
-    const groupedButtons = computed(() => !props.grid && props.groups.some(isObject));
+    // 标题列宽度走 CSS 变量：默认值写在样式里，这里只负责覆盖
+    const groupTitleStyle = computed(() => {
+      if (props.groupTitleWidth == null) {
+        return undefined;
+      }
+
+      const width =
+        typeof props.groupTitleWidth === 'number'
+          ? `${props.groupTitleWidth}px`
+          : props.groupTitleWidth;
+
+      return { '--co-form-query-group-title-width': width };
+    });
+
+    // 有分组时按钮挤进最后一组，不分组时仍「紧跟最后一个字段」
+    const grouped = computed(() => props.groups.some(isObject));
 
     // 插槽里的字段
     const slotChildren = () => {
@@ -270,18 +292,21 @@ export default defineComponent({
      * 按 `groups` 的顺序分段：段内保持书写顺序，未标记或名字没声明的进最后一段。
      * 栅格与行内都分段，行内时每组占一块，组名在上或左。
      */
-    const buildSegments = () => {
+    const buildSegments = (): FormQuerySegment[] => {
       const children = [...schemeNodes(), ...slotChildren()];
       const groups = props.groups.filter(isObject);
 
-      const segments = groups.map((group) => ({
-        name: group.name as string | undefined,
-        label: group.label as string | undefined,
-        items: [] as any[],
+      const segments: FormQuerySegment[] = groups.map((group, index) => ({
+        group,
+        index,
+        items: [],
       }));
 
-      const ungrouped = { name: undefined, label: undefined, items: [] as any[] };
-      const byName = new Map(segments.map((segment) => [segment.name, segment]));
+      // 未分组段没有 `group`，永远不渲染标题
+      const ungrouped: FormQuerySegment = { index: -1, items: [] };
+      const byName = new Map<string | undefined, FormQuerySegment>(
+        segments.map((segment) => [segment.group!.name, segment]),
+      );
 
       children.forEach((child) => {
         const segment = byName.get(readGroup(child)) || ungrouped;
@@ -290,6 +315,21 @@ export default defineComponent({
       });
 
       return [...segments, ungrouped].filter((segment) => segment.items.length > 0);
+    };
+
+    /** 组标题内容：`group-title` 插槽 > 分组自己的 `render` > `label` */
+    const groupTitle = (segment: FormQuerySegment) => {
+      if (!segment.group) {
+        return null;
+      }
+
+      const params = { group: segment.group, index: segment.index };
+
+      if (slots['group-title']) {
+        return slots['group-title'](params);
+      }
+
+      return segment.group.render ? segment.group.render(params) : segment.group.label;
     };
 
     /** 渲染顺序即折叠顺序，`internalIndex` 在分段之后重新编号 */
@@ -306,7 +346,7 @@ export default defineComponent({
       // 否则 flex 会把表单项按内容宽度并排，撑不满容器
       const bodyClass = [bem.e('group-body'), bem.is('block', !props.grid && !innerInline.value)];
 
-      buildSegments().forEach((segment) => {
+      const segments = buildSegments().map((segment) => {
         const items = segment.items.map((child: any) => {
           const current = index;
 
@@ -318,25 +358,51 @@ export default defineComponent({
           };
         });
 
-        const fields = items.map((item) => item.vnode);
+        return {
+          ...segment,
+          fields: items.map((item) => item.vnode),
+          // 整组都被折叠起来时，整块收起，别留一截悬空的组名
+          visible: items.some((item) => !isHiddenIndex(item.index)),
+        };
+      });
 
-        // 没有组名的段（未分组）照原样铺开
-        if (!segment.label) {
+      // 按钮挂在最后一个有可见字段的组里，不再单独占一行；
+      // 一组都不剩（字段全被折叠）时返回 false，让按钮退回独立一行
+      let attachIndex = -1;
+
+      if (grouped.value) {
+        segments.forEach((segment, i) => {
+          if (segment.visible) {
+            attachIndex = i;
+          }
+        });
+      }
+
+      const buttons = attachIndex >= 0 ? ButtonsTemplate(true) : null;
+
+      segments.forEach((segment, i) => {
+        const fields = i === attachIndex && buttons ? [...segment.fields, buttons] : segment.fields;
+        const title = groupTitle(segment);
+
+        // 没有标题的段（未分组，或分组没给 label / render / 插槽）照原样铺开
+        if (title == null || title === '') {
           fields.forEach((field) => nodes.push(field));
 
           return;
         }
 
-        // 整组都被折叠起来时，整块收起，别留一截悬空的组名
-        const hasVisible = items.some((item) => !isHiddenIndex(item.index));
         const left = isLeftLayout.value;
-        const wrapperClass = [bem.e('group'), bem.is('left', left), bem.is('empty', !hasVisible)];
+        const wrapperClass = [
+          bem.e('group'),
+          bem.is('left', left),
+          bem.is('empty', !segment.visible),
+        ];
 
         nodes.push(
           props.grid ? (
             <Col span={24} class={wrapperClass}>
-              {hasVisible ? (
-                <span class={[bem.e('group-title'), bem.is('left', left)]}>{segment.label}</span>
+              {segment.visible ? (
+                <span class={[bem.e('group-title'), bem.is('left', left)]}>{title}</span>
               ) : null}
               <div class={bodyClass} style={bodyStyle}>
                 {fields}
@@ -344,8 +410,8 @@ export default defineComponent({
             </Col>
           ) : (
             <div class={wrapperClass}>
-              {hasVisible ? (
-                <span class={[bem.e('group-title'), bem.is('left', left)]}>{segment.label}</span>
+              {segment.visible ? (
+                <span class={[bem.e('group-title'), bem.is('left', left)]}>{title}</span>
               ) : null}
               <div class={bodyClass}>{fields}</div>
             </div>
@@ -353,7 +419,7 @@ export default defineComponent({
         );
       });
 
-      return nodes;
+      return { nodes, attached: !!buttons };
     };
 
     // model api
@@ -380,14 +446,18 @@ export default defineComponent({
       });
     };
 
-    const ButtonsTemplate = () => {
+    const ButtonsTemplate = (attached: boolean) => {
       if (props.hideButtons || (props.hideReset && props.hideSubmit)) {
         return null;
       }
 
       const content = (
         <div
-          class={[bem.e('buttons'), bem.is('inline', innerInline.value && !groupedButtons.value)]}
+          class={[
+            bem.e('buttons'),
+            bem.is('attached', attached),
+            bem.is('inline', !attached && innerInline.value && !grouped.value),
+          ]}
         >
           {slots.button ? (
             slots.button({ reset, submit, submitting: submitting.value })
@@ -429,8 +499,25 @@ export default defineComponent({
         </div>
       );
 
-      // 分组时按钮单独一行：不用 FormItem，避免被表单的 `width` 约束成窄条
-      if (groupedButtons.value) {
+      // 组内：栅格里的字段自带半 gutter 内边距，按钮也得补上同样的边距，
+      // 右边缘才能和同组字段对齐（不能拿 Col 当壳，它的 `span` 默认就是 24）
+      if (attached) {
+        if (!props.grid) {
+          return content;
+        }
+
+        const padding = `${(mergedRowProps.value.gutter ?? 0) / 2}px`;
+
+        return (
+          <div class={bem.e('buttons-cell')} style={{ paddingInline: padding }}>
+            {content}
+          </div>
+        );
+      }
+
+      // 分组但一组都没挂上（字段全被折叠）：退回单独一行，
+      // 不用 FormItem，免得被表单的 `width` 约束成窄条
+      if (grouped.value) {
         return <div class={bem.e('buttons-row')}>{content}</div>;
       }
 
@@ -469,6 +556,8 @@ export default defineComponent({
     );
 
     return () => {
+      const { nodes, attached } = renderChildren();
+
       return (
         <ElForm
           ref="form"
@@ -479,17 +568,18 @@ export default defineComponent({
             onKeydown: handleKeydown,
             onKeyup: handleKeyup,
           }}
+          style={groupTitleStyle.value}
           class={[bem.b(), bem.m('inline', innerInline.value)]}
         >
           {props.grid ? (
             <Row {...mergedRowProps.value} onSize-change={handleSizeChange}>
-              {renderChildren()}
-              <ButtonsTemplate />
+              {nodes}
+              {attached ? null : ButtonsTemplate(false)}
             </Row>
           ) : (
             <>
-              {renderChildren()}
-              <ButtonsTemplate />
+              {nodes}
+              {attached ? null : ButtonsTemplate(false)}
             </>
           )}
         </ElForm>

@@ -27,12 +27,22 @@ export function createFormQueryScheme<T extends FieldType>(props: FormItemProps<
   return props;
 }
 
+/** 渲染组标题时拿到的上下文 */
+export interface FormQueryGroupTitleParams {
+  /** 分组定义本身 */
+  group: FormQueryGroup;
+  /** 在 `groups` 里的序号 */
+  index: number;
+}
+
 /** 查询表单的分组：字段上标 `group`，这里只负责组名、标题与顺序 */
 export interface FormQueryGroup {
   /** 与字段 `group` 对应 */
   name: string;
   /** 组标题，不传则只分段、不渲染标题 */
   label?: string;
+  /** 自定义组标题内容，优先于 `label`；插槽 `group-title` 又优先于它 */
+  render?: (params: FormQueryGroupTitleParams) => VNodeChild;
 }
 
 /** 组名位置 */
@@ -86,7 +96,7 @@ export const formQueryProps = {
    * 分组：按声明顺序分段，组头独占一行。字段用 `group` 指定所属分组，
    * 没有标记或标记了未声明分组名的字段排在最后一段（不渲染组头）。
    *
-   * 只在栅格模式下生效；`grid=false` 时忽略。
+   * 按钮会排在最后一组里，整组被折叠时才退回独立一行。
    */
   groups: {
     type: Array as PropType<FormQueryGroup[]>,
@@ -94,17 +104,27 @@ export const formQueryProps = {
   },
   /**
    * 组名位置：`top` 独占一行；`left` 在左侧占一列、字段排在右边。
-   * `left` 只在容器够宽（≥992px）时生效，窄屏自动回落成 `top`。
+   * `left` 只在容器宽度 ≥576px 时生效，更窄自动回落成 `top`。
    */
   groupLayout: {
     type: String as PropType<FormQueryGroupLayout>,
     default: 'top',
   },
+  /**
+   * 组名左置时标题列的宽度，统一作用于所有分组，默认 96px。
+   * `top` 布局下标题占满整行，此值无效。
+   */
+  groupTitleWidth: {
+    type: [String, Number] as PropType<string | number>,
+  },
 };
 
 export type FormQueryProps = ExtractPublicPropTypes<typeof formQueryProps>;
 
-export interface FormQuerySlots extends FormSlots {}
+export interface FormQuerySlots extends FormSlots {
+  /** 自定义组标题，优先于 `groups[].render` 与 `groups[].label` */
+  'group-title': (params: FormQueryGroupTitleParams) => VNodeChild;
+}
 
 export const formQuerySlots = Object as SlotsType<FormQuerySlots>;
 

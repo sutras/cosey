@@ -48,11 +48,25 @@ form-query/schemes
 
 行内模式下 `left` 就是「每组一行」：组名一列，字段在右侧接着排、放不下才换行。
 
-用了 `groups` 时，「提交 / 重置」会单独占一行并靠右下（没分组时仍紧跟最后一个字段），避免操作按钮和最后一组挤在一起。
+用了 `groups` 时，「提交 / 重置」排在**最后一组里**、紧跟在最后的字段之后，不再单独占一行：栅格里补到本行空出来的格子，行内里挤在字段同一行的右端；一整组字段都被折叠时才会退回独立一行。
 
 ::: demo
 
 form-query/grouped
+
+:::
+
+### 自定义组标题
+
+`label` 只够写文字。要塞图标、数量这类内容，用 `group-title` 插槽统一改，或者用 `groups[].render` 只改某一组：插槽优先，其次 `render`，最后才是 `label`，三者都没有就只分段、不留标题。
+
+插槽与 `render` 都拿到 `group`（分组定义）和 `index`（在 `groups` 里的序号），返回的内容会放进组名所在的横条里，两侧细线照旧。
+
+组名左置时，标题列的宽度用 `group-title-width` 统一设置（默认 `96px`），标题内容换成什么都不会改变列宽。下面的示例把标题换成一枚 `el-tag`，并把列宽放宽到 `120px`：
+
+::: demo
+
+form-query/group-title
 
 :::
 
@@ -151,8 +165,9 @@ form-query/invalid
 | switch-to-invalid | 校验失败时自动展开，把出错的字段露出来                                                                                                                        | boolean                   | true                                     |
 | schemes           | 声明式字段；与插槽里的 `co-form-item` 等价，各项 `modelValue` 即初值                                                                                          | FormQueryScheme[]         | []                                       |
 | submit-on-enter   | 输入框里按 Enter 直接提交                                                                                                                                     | boolean                   | true                                     |
-| groups            | 按组排布字段，组头独占一行（仅栅格模式生效）                                                                                                                  | FormQueryGroup[]          | []                                       |
+| groups            | 按组排布字段，组头独占一行；提交按钮排在最后一组里                                                                                                            | FormQueryGroup[]          | []                                       |
 | group-layout      | 组名位置：`top` 独占一行，`left` 在左侧占一列（<576px 自动回落 `top`）                                                                                        | `top` \| `left`           | top                                      |
+| group-title-width | 组名左置时标题列的宽度，统一作用于所有分组；`top` 布局下无效                                                                                                  | string \| number          | 96px                                     |
 
 ### FormQueryScheme
 
@@ -165,14 +180,26 @@ type FormQueryScheme = FormItemProps<FieldType> & {
 
 ### FormQueryGroup
 
-| 属性  | 描述                           | 类型   |
-| ----- | ------------------------------ | ------ |
-| name  | 与字段上的 `group` 对应        | string |
-| label | 组标题，不传则只分段、不留标题 | string |
+| 属性   | 描述                                                            | 类型                                              |
+| ------ | --------------------------------------------------------------- | ------------------------------------------------- |
+| name   | 与字段上的 `group` 对应                                         | string                                            |
+| label  | 组标题，不传则只分段、不留标题                                  | string                                            |
+| render | 自定义组标题内容，优先于 `label`；插槽 `group-title` 又优先于它 | (params: FormQueryGroupTitleParams) => VNodeChild |
+
+```ts
+type FormQueryGroupTitleParams = {
+  group: FormQueryGroup;
+  index: number;
+};
+```
 
 ### FormQuerySlots
 
 继承 [FormSlots](./form#formslots)。
+
+| 插槽        | 描述                                              | 参数                                       |
+| ----------- | ------------------------------------------------- | ------------------------------------------ |
+| group-title | 自定义组标题，优先于 `groups[].render` 与 `label` | \{ group: FormQueryGroup; index: number \} |
 
 ### FormQueryEmits
 

@@ -1,6 +1,9 @@
 @use './base/index' as *;
 
 @include b(form-query) {
+  // 组名左置时标题列的宽度，`group-title-width` 会覆盖它
+  --co-form-query-group-title-width: 96px;
+
   // 组：默认「标题一行 + 内容」，标题右侧用一条细线拉到行尾
   @include e(group) {
     display: block;
@@ -11,8 +14,6 @@
       display: flex;
       align-items: stretch;
       gap: css-var(size-sm);
-      margin-block-end: 18px;
-      border-block-end: 1px solid css-var(border-color-lighter);
     }
 
     // 整组都被折叠起来时整个容器收起，别留一块空白
@@ -50,9 +51,7 @@
 
     @include is(left) {
       flex: none;
-      align-items: flex-start;
-      align-items: center;
-      width: 96px;
+      width: var(--co-form-query-group-title-width);
       height: 32px;
       padding-block-start: css-var(size-xxs);
       padding-inline-end: css-var(size-sm);
@@ -88,7 +87,7 @@
     }
   }
 
-  // 分组时的操作区：单独占一行、靠右下，与上面的字段区分开
+  // 分组时的兜底：一整组都被折叠掉，按钮才退回单独一行
   @include e(buttons-row) {
     width: 100%;
     margin-block-start: css-var(size-xs);
@@ -102,6 +101,18 @@
     @include is(inline) {
       justify-content: flex-start;
     }
+
+    // 排在最后一组里：只占自身宽度，靠右吃掉本行的剩余空间
+    @include is(attached) {
+      width: auto;
+      margin-inline-start: auto;
+    }
+  }
+
+  @include e(buttons-cell) {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin-inline-start: auto;
   }
 
   @media (max-width: 768px) {
