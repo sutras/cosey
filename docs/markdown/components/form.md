@@ -214,9 +214,11 @@ form/all-fields
 
 继承 `element-plus` 的 [Form Slots](https://element-plus.org/zh-CN/component/form.html#form-slots) ，并支持以下插槽。
 
-| 插槽   | 描述           | 属性                                                                          |
-| ------ | -------------- | ----------------------------------------------------------------------------- |
-| button | 自定义表单按钮 | { submitting: boolean; submit: () => any \| Promise\<any>; reset: () => any;} |
+| 插槽   | 描述                                        | 属性                                                                          |
+| ------ | ------------------------------------------- | ----------------------------------------------------------------------------- |
+| button | 自定义整个按钮区，优先于 `submit` / `reset` | { submitting: boolean; submit: () => any \| Promise\<any>; reset: () => any;} |
+| submit | 自定义提交按钮                              | { submitting: boolean; submit: () => any \| Promise\<any> }                   |
+| reset  | 自定义重置按钮                              | { reset: () => any }                                                          |
 
 ### FormEmits
 

@@ -174,6 +174,16 @@ export interface TableSlots {
   'before-body-plain'?: (props: Record<string, never>) => any;
   'before-table'?: (props: Record<string, never>) => any;
   'before-table-plain'?: (props: Record<string, never>) => any;
+  /** 自定义查询区的提交按钮，透传给内嵌的 FormQuery */
+  submit?: (props: { submitting: boolean; submit: () => any | Promise<any> }) => any;
+  /** 自定义查询区的重置按钮，透传给内嵌的 FormQuery */
+  reset?: (props: { reset: () => any }) => any;
+  /** 整块替换查询区的按钮区，优先于 `submit` / `reset`，透传给内嵌的 FormQuery */
+  button?: (props: {
+    submitting: boolean;
+    submit: () => any | Promise<any>;
+    reset: () => any;
+  }) => any;
 }
 
 export const elSlotsName = ['default', 'append', 'empty'] as const;

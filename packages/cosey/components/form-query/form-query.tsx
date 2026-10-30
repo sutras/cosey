@@ -446,6 +446,20 @@ export default defineComponent({
       });
     };
 
+    /** 重置按钮的行为：清空后再把 `resetValues` 的返回值写回模型 */
+    const handleReset = () => {
+      reset(() => {
+        if (props.resetValues) {
+          const values = props.resetValues();
+          const model = unref(formModel);
+
+          if (values && model) {
+            Object.assign(model, values);
+          }
+        }
+      });
+    };
+
     const ButtonsTemplate = (attached: boolean) => {
       if (props.hideButtons || (props.hideReset && props.hideSubmit)) {
         return null;
@@ -460,39 +474,31 @@ export default defineComponent({
           ]}
         >
           {slots.button ? (
-            slots.button({ reset, submit, submitting: submitting.value })
+            slots.button({ reset: handleReset, submit, submitting: submitting.value })
           ) : (
             <>
-              {!props.hideSubmit && (
-                <ElButton
-                  type="primary"
-                  {...props.submitProps}
-                  loading={submitting.value}
-                  icon={RtiSearch}
-                  onClick={() => submit()}
-                >
-                  {t(props.submitText)}
-                </ElButton>
-              )}
-              {!props.hideReset && (
-                <ElButton
-                  {...props.resetProps}
-                  onClick={() =>
-                    reset(() => {
-                      if (props.resetValues) {
-                        const values = props.resetValues();
-                        const model = unref(formModel);
-
-                        if (values && model) {
-                          Object.assign(model, values);
-                        }
-                      }
-                    })
-                  }
-                >
-                  {t(props.resetText)}
-                </ElButton>
-              )}
+              {!props.hideSubmit &&
+                (slots.submit ? (
+                  slots.submit({ submit, submitting: submitting.value })
+                ) : (
+                  <ElButton
+                    type="primary"
+                    {...props.submitProps}
+                    loading={submitting.value}
+                    icon={RtiSearch}
+                    onClick={() => submit()}
+                  >
+                    {t(props.submitText)}
+                  </ElButton>
+                ))}
+              {!props.hideReset &&
+                (slots.reset ? (
+                  slots.reset({ reset: handleReset })
+                ) : (
+                  <ElButton {...props.resetProps} onClick={handleReset}>
+                    {t(props.resetText)}
+                  </ElButton>
+                ))}
             </>
           )}
           {showToggle.value && <Toggle v-model={innerCollapsed.value} />}

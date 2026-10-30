@@ -88,9 +88,19 @@ export const formPropsOmit = [
 
 export interface FormSlots {
   default: {};
+  /** 自定义整个按钮区，优先于 `submit` / `reset` */
   button: {
     submitting: boolean;
     submit: () => any | Promise<any>;
+    reset: () => any;
+  };
+  /** 只自定义提交按钮 */
+  submit: {
+    submitting: boolean;
+    submit: () => any | Promise<any>;
+  };
+  /** 只自定义重置按钮 */
+  reset: {
     reset: () => any;
   };
 }

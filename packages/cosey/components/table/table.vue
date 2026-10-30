@@ -7,7 +7,17 @@
       :style="{ ...containerStyle, zIndex }"
     >
       <div v-if="formProps" :class="bem.e('header')">
-        <FormQuery ref="tableQuery" v-bind="formProps" :reset="onReset" :submit="onSubmit" />
+        <FormQuery ref="tableQuery" v-bind="formProps" :reset="onReset" :submit="onSubmit">
+          <template v-if="slots.button" #button="scope">
+            <slot name="button" v-bind="scope" />
+          </template>
+          <template v-if="slots.submit" #submit="scope">
+            <slot name="submit" v-bind="scope" />
+          </template>
+          <template v-if="slots.reset" #reset="scope">
+            <slot name="reset" v-bind="scope" />
+          </template>
+        </FormQuery>
       </div>
 
       <div v-if="$slots['before-body']" :class="bem.e('before-body')">

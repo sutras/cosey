@@ -389,15 +389,18 @@ const defaultTableConfig = {
 
 继承 `element-plus` 的 [Table 插槽](https://element-plus.org/zh-CN/component/table#table-%E6%8F%92%E6%A7%BD) 和以下插槽，并能定义 `TableColumnProps["slots"]` 中同名的插槽。
 
-| 插槽               | 描述                                           | 属性                                              |
-| ------------------ | ---------------------------------------------- | ------------------------------------------------- |
-| toolbar-left       | 自定义工具栏左边的内容                         | -                                                 |
-| toolbar-right      | 自定义工具栏右边的内容                         | -                                                 |
-| before-body        | 自定义主体前面内容（工具栏上面）               | -                                                 |
-| before-body-plain  | 自定义主体前面内容（工具栏上面），没有包裹容器 | -                                                 |
-| before-table       | 自定义表格前面内容（工具栏下面）               | -                                                 |
-| before-table-plain | 自定义表格前面内容（工具栏下面），没有包裹容器 | -                                                 |
-| batch              | 批量操作条的内容                               | { count: number; rows: any[]; clear: () => void } |
+| 插槽               | 描述                                                                      | 属性                                                                          |
+| ------------------ | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| toolbar-left       | 自定义工具栏左边的内容                                                    | -                                                                             |
+| toolbar-right      | 自定义工具栏右边的内容                                                    | -                                                                             |
+| before-body        | 自定义主体前面内容（工具栏上面）                                          | -                                                                             |
+| before-body-plain  | 自定义主体前面内容（工具栏上面），没有包裹容器                            | -                                                                             |
+| before-table       | 自定义表格前面内容（工具栏下面）                                          | -                                                                             |
+| before-table-plain | 自定义表格前面内容（工具栏下面），没有包裹容器                            | -                                                                             |
+| batch              | 批量操作条的内容                                                          | { count: number; rows: any[]; clear: () => void }                             |
+| submit             | 查询区的提交按钮，透传给内嵌的 FormQuery                                  | { submitting: boolean; submit: () => any \| Promise\<any> }                   |
+| reset              | 查询区的重置按钮，透传给内嵌的 FormQuery                                  | { reset: () => any }                                                          |
+| button             | 整块替换查询区的按钮区，优先于 `submit` / `reset`，透传给内嵌的 FormQuery | { submitting: boolean; submit: () => any \| Promise\<any>; reset: () => any } |
 
 ### TableEmits
 

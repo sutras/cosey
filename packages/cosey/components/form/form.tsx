@@ -98,21 +98,30 @@ export default defineComponent({
                           })
                         ) : (
                           <>
-                            {!props.hideSubmit && (
-                              <ElButton
-                                type="primary"
-                                {...props.submitProps}
-                                loading={submitting.value}
-                                onClick={() => submit()}
-                              >
-                                {t(props.submitText)}
-                              </ElButton>
-                            )}
-                            {!props.hideReset && (
-                              <ElButton {...props.resetProps} onClick={() => reset()}>
-                                {t(props.resetText)}
-                              </ElButton>
-                            )}
+                            {!props.hideSubmit &&
+                              (slots.submit ? (
+                                slots.submit({
+                                  submit,
+                                  submitting: submitting.value,
+                                })
+                              ) : (
+                                <ElButton
+                                  type="primary"
+                                  {...props.submitProps}
+                                  loading={submitting.value}
+                                  onClick={() => submit()}
+                                >
+                                  {t(props.submitText)}
+                                </ElButton>
+                              ))}
+                            {!props.hideReset &&
+                              (slots.reset ? (
+                                slots.reset({ reset })
+                              ) : (
+                                <ElButton {...props.resetProps} onClick={() => reset()}>
+                                  {t(props.resetText)}
+                                </ElButton>
+                              ))}
                           </>
                         )}
                       </div>

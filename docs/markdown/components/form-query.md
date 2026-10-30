@@ -36,6 +36,18 @@ form-query/schemes
 
 :::
 
+### 自定义按钮
+
+`submit` / `reset` 插槽只替换对应的那个按钮，折叠按钮照旧；要整块换掉按钮区就用 `button` 插槽，它的优先级更高。
+
+两个插槽都拿到操作函数和状态：`submit` 插槽给 `submit`、`submitting`（按钮自己决定 loading 怎么画），`reset` 插槽给 `reset`（已经带上了 `reset-values` 的处理）。
+
+::: demo
+
+form-query/custom-buttons
+
+:::
+
 ### 分组
 
 字段多的时候按语义分组：`groups` 声明组的名称与顺序，字段上用 `group` 指定所属组，组名默认独占一行（右侧一条细线）。声明式字段和手写 `co-form-item` 都能归组。
@@ -195,7 +207,7 @@ type FormQueryGroupTitleParams = {
 
 ### FormQuerySlots
 
-继承 [FormSlots](./form#formslots)。
+继承 [FormSlots](./form#formslots)（含 `button` / `submit` / `reset`），并有以下额外插槽。
 
 | 插槽        | 描述                                              | 参数                                       |
 | ----------- | ------------------------------------------------- | ------------------------------------------ |
