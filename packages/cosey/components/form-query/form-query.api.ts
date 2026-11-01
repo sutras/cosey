@@ -138,8 +138,9 @@ export type FormQueryEmits = typeof formQueryEmits;
 export interface FormQueryExpose extends Omit<FormExpose, 'reset'> {
   /** 传回调时与 `FormExpose['reset']` 一致；传对象时先重置、再把对象写回模型 */
   reset: (valuesOrCallback?: Record<PropertyKey, any> | (() => void)) => void;
-  /** 模型快照（深拷贝），可直接当请求参数 */
+  /** 模型快照（深拷贝），可直接当请求参数；带 `split` 的字段在这里拆成两个键 */
   getFieldsValue: () => Record<string, any>;
+  /** 传 `split` 的目标键会合成回源字段，其余键照常写入 */
   setFieldsValue: (values: Record<PropertyKey, any>) => void;
   /** 原始模型（响应式对象，改它不会触发查询，配合 `submit()` 使用） */
   getModel: () => Record<string, any>;

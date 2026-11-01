@@ -15,6 +15,7 @@ import {
   FormProps,
   locateInvalidContainer,
   useInvalidResponse,
+  type FormItemSplit,
 } from '../form';
 import { type RowSize, Row, generateAlgorithms } from '../row';
 import { Col } from '../col';
@@ -288,6 +289,38 @@ export default defineComponent({
       return isVNode(vnode) ? (vnode.props as any)?.group : undefined;
     };
 
+    /** 源字段名 → 目标两键 */
+    const splitMap = new Map<string, FormItemSplit>();
+
+    /**
+     * 拆分配置在渲染期从 vnode 上收：插槽里的字段拿不到静态声明，只能这样统一。
+     * 每次渲染重建，没有时序依赖 —— `getFieldsValue` 只会在挂载之后被调用。
+     */
+    const collectSplit = (children: any[]) => {
+      splitMap.clear();
+
+      children.forEach((child) => {
+        if (!isVNode(child)) {
+          return;
+        }
+
+        const { prop, split } = (child.props || {}) as any;
+
+        if (typeof prop === 'string' && Array.isArray(split) && split.length === 2) {
+          splitMap.set(prop, [split[0], split[1]]);
+        }
+      });
+    };
+
+    /** 模型里的源值统一成数组：非数组按「只有一项」处理，空值即空数组 */
+    const toList = (value: any): any[] => {
+      if (Array.isArray(value)) {
+        return value;
+      }
+
+      return value == null ? [] : [value];
+    };
+
     /**
      * 按 `groups` 的顺序分段：段内保持书写顺序，未标记或名字没声明的进最后一段。
      * 栅格与行内都分段，行内时每组占一块，组名在上或左。
@@ -295,6 +328,8 @@ export default defineComponent({
     const buildSegments = (): FormQuerySegment[] => {
       const children = [...schemeNodes(), ...slotChildren()];
       const groups = props.groups.filter(isObject);
+
+      collectSplit(children);
 
       const segments: FormQuerySegment[] = groups.map((group, index) => ({
         group,
@@ -423,12 +458,60 @@ export default defineComponent({
     };
 
     // model api
+    /**
+     * 输出用的模型：拆分的字段去掉源键，换成目标两键。
+     * 空着的一端不写键，免得请求里出现一堆 `key: undefined`。
+     */
     const getFieldsValue = () => {
-      return cloneDeep(unref(formModel));
+      const value = cloneDeep(unref(formModel));
+
+      splitMap.forEach(([start, end], source) => {
+        if (!(source in value)) {
+          return;
+        }
+
+        const [first, second] = toList(value[source]);
+
+        delete value[source];
+
+        if (first !== undefined) {
+          value[start] = first;
+        }
+
+        if (second !== undefined) {
+          value[end] = second;
+        }
+      });
+
+      return value;
     };
 
+    /**
+     * 写入的反向映射：出现任一个目标键就合成回源键，其余键照常写入。
+     * 只给一端时，另一端沿用模型里现有的值。
+     */
     const setFieldsValue = (values: Record<PropertyKey, any>) => {
-      Object.assign(unref(formModel), values);
+      const model = unref(formModel);
+      const rest = { ...values };
+
+      splitMap.forEach(([start, end], source) => {
+        if (!(start in rest) && !(end in rest)) {
+          return;
+        }
+
+        const current = toList(model[source]);
+        const next = [
+          start in rest ? rest[start] : current[0],
+          end in rest ? rest[end] : current[1],
+        ];
+
+        delete rest[start];
+        delete rest[end];
+
+        model[source] = next.some((item) => item !== undefined) ? next : undefined;
+      });
+
+      Object.assign(model, rest);
     };
 
     const getModel = () => unref(formModel);
@@ -451,10 +534,10 @@ export default defineComponent({
       reset(() => {
         if (props.resetValues) {
           const values = props.resetValues();
-          const model = unref(formModel);
 
-          if (values && model) {
-            Object.assign(model, values);
+          if (values) {
+            // 走 `setFieldsValue`，`resetValues` 里给拆分的两个键也能合成回去
+            setFieldsValue(values);
           }
         }
       });

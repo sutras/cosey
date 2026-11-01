@@ -108,6 +108,7 @@ const formItemProps = reactiveOmit(
   'disabled',
   'readonly',
   'group',
+  'split',
 );
 
 const formContext = inject<FormContext | null>(formContextSymbol, null);

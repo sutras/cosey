@@ -36,6 +36,32 @@ form-query/schemes
 
 :::
 
+### 拆分成两个字段
+
+日期范围控件绑定的是数组，接口要的往往是两个独立参数。给字段加 `split`，`getFieldsValue()` 就会把它拆成两个键：
+
+```ts
+{
+  prop: 'createdAt',
+  label: '创建时间',
+  fieldType: 'daterange',
+  split: ['startCreatedAt', 'endCreatedAt'],
+}
+```
+
+- 模型里仍然只存源字段的数组（`model.createdAt`）：控件、校验、重置都走 el-form 原本那一套，`type: 'array'` 之类的规则照旧可用；
+- 只有 `getFieldsValue()` 的输出是拆开的两个键，空着的一端不输出；
+- 反向也通：`setFieldsValue()` / `reset-values` 里给这两个键会合成回源字段，只给一端时另一端沿用模型里现有的值；
+- 插槽写法同样支持，把 `split` 写在 `co-form-item` 上即可。
+
+请求参数一律取 `getFieldsValue()`，别直接拿 `model` —— 它存的是控件值，不是接口形状。
+
+::: demo
+
+form-query/split
+
+:::
+
 ### 自定义按钮
 
 `submit` / `reset` 插槽只替换对应的那个按钮，折叠按钮照旧；要整块换掉按钮区就用 `button` 插槽，它的优先级更高。
@@ -189,6 +215,8 @@ type FormQueryScheme = FormItemProps<FieldType> & {
   slots?: Record<string, unknown>;
 };
 ```
+
+其中 `split` 用于把一个字段拆成两个输出键，见[拆分成两个字段](#拆分成两个字段)。
 
 ### FormQueryGroup
 

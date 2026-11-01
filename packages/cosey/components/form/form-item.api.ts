@@ -7,6 +7,13 @@ import { type VNodeChild, type PropType } from 'vue';
 import { type MapFieldTypeComponentProps, type FieldType } from '../field';
 import { type ColPublicProps } from '../col';
 
+/**
+ * 把一个数组值拆成模型上的两个字段，例如日期范围的 `[start, end]` → `startCreatedAt` / `endCreatedAt`。
+ *
+ * 只在 `co-form-query` 里生效：由它负责在读写模型时做映射，`co-form-item` 自己不碰模型。
+ */
+export type FormItemSplit = readonly [start: string, end: string];
+
 export type FormItemPresetWidth = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type FormItemWidth = number | FormItemPresetWidth | (string & {});
@@ -63,6 +70,13 @@ export const formItemProps = {
   group: {
     type: String,
   },
+  /**
+   * 在 `co-form-query` 里把该字段的数组值拆到这两个键上，见 `FormItemSplit`。
+   * 模型里仍存源字段的数组，只有 `getFieldsValue()` 的输出是拆开的两个键。
+   */
+  split: {
+    type: Array as unknown as PropType<FormItemSplit>,
+  },
   tooltip: {
     type: null as unknown as PropType<VNodeChild>,
   },
@@ -84,6 +98,7 @@ export interface FormItemProps<T extends FieldType> extends Partial<ElFormItemPr
   colProps?: ColPublicProps;
   internalIndex?: number;
   group?: string;
+  split?: FormItemSplit;
   tooltip?: VNodeChild;
   extra?: VNodeChild;
 }
