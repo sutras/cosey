@@ -1,6 +1,6 @@
 import { computed, defineComponent, h } from 'vue';
 import { type TableColumnProps, type TableColumnSlots, tableColumnProps } from './table-column.api';
-import { isFunction, isPlainObject, isString, createBem } from '../../../utils';
+import { isFunction, isPlainObject, isString, createBem, warningOnce } from '../../../utils';
 import { mapRendererColumnProps, renderer } from './renderer';
 import { ElTableColumn, ElTooltip } from 'element-plus';
 import classNames from 'classnames';
@@ -67,6 +67,15 @@ const TableColumn = defineComponent({
       }
 
       obj.className = classNames(cls);
+
+      // `format` 会完全接管单元格：`renderer` 连上面的分支都进不去，`is-tag` / `is-media`
+      // 这些列的样式也不会加。两者同时写是静默失效，开发期直接点名。
+      warningOnce(
+        !(obj.format && obj.renderer && obj.renderer !== 'text'),
+        `[co-table] 列「${obj.label ?? obj.prop}」同时设置了 renderer 与 format，` +
+          'format 会完全覆盖 renderer（列的样式也会丢）。' +
+          '要「值→文案+颜色」用 renderer: { type: "tag", options }。',
+      );
 
       return obj;
     });

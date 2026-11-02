@@ -17,6 +17,7 @@
     "test:upsert": "tsx ./packages/cosey/hooks/useUpsert.test.ts",
     "test:dict": "tsx ./packages/cosey/dict/dict.test.ts",
     "test:week": "tsx ./packages/cosey/components/week-range-picker/week.test.ts",
+    "test:renderer": "tsx ./packages/cosey/components/table/table-column/renderer.test.ts",
     "prettier": "prettier --write \"**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue,css,scss,less,styl,md,html}\"",
     "prettier:check": "prettier --check \"**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue,css,scss,less,styl,md,html}\"",
     "commit": "commit",

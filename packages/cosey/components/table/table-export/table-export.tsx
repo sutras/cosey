@@ -169,7 +169,9 @@ export default defineComponent({
           columns: transformColumns(tree.value),
           noGroup: !formModel.params.includes('grouping'),
           noHead: !formModel.params.includes('head'),
-          transform: exportRenderer,
+          // 把 t 透给导出器：`boolean` 这类默认文案要跟界面语言一致
+          transform: (row, column, cellValue, index) =>
+            exportRenderer(row, column, cellValue, index, t),
         },
       };
     };
