@@ -165,6 +165,7 @@ async function copyResolvedPackageJson(options: { rootDir: string; outDir: strin
   const result = await resolvePackageJson(
     resolve(rootDir, 'package.json'),
     resolve(process.cwd(), 'packages'),
+    outDir,
   );
   await writeFileWithDirs(resolve(outDir, 'package.json'), result);
 }

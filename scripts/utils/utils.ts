@@ -27,7 +27,46 @@ export async function replaceFileContent(
   await writeFileWithDirs(filePath, content);
 }
 
-export async function resolvePackageJson(pkgJsonFile: string, packagesDir: string) {
+/**
+ * 生成 `exports` 映射。
+ *
+ * 显式列出 dist 里带 `index.js` 的入口目录（`cosey/components` 这类），
+ * 深路径（`cosey/locale/lang/zh-cn`、`cosey/utils/number`）交给通配：
+ * 通配会补上 `.js` / `.d.ts`，而目录形式（`cosey/components/table`）不再解析 ——
+ * 这也是加 `exports` 唯一的代价，官方入口清单见 README 与 llms.txt。
+ */
+async function resolveExports(outDir: string) {
+  const entries: Record<string, unknown> = {
+    '.': { types: './index.d.ts', import: './index.js', default: './index.js' },
+    './package.json': './package.json',
+  };
+
+  const dirents = await fsp.readdir(outDir, { withFileTypes: true });
+
+  for (const dirent of dirents) {
+    if (!dirent.isDirectory()) {
+      continue;
+    }
+
+    if (!fs.existsSync(path.resolve(outDir, dirent.name, 'index.js'))) {
+      continue;
+    }
+
+    entries[`./${dirent.name}`] = {
+      types: `./${dirent.name}/index.d.ts`,
+      import: `./${dirent.name}/index.js`,
+      default: `./${dirent.name}/index.js`,
+    };
+  }
+
+  entries['./*.js'] = './*.js';
+  entries['./*.css'] = './*.css';
+  entries['./*'] = { types: './*.d.ts', import: './*.js', default: './*.js' };
+
+  return entries;
+}
+
+export async function resolvePackageJson(pkgJsonFile: string, packagesDir: string, outDir: string) {
   const sourcePkg = JSON.parse(await fsp.readFile(pkgJsonFile, 'utf-8'));
 
   // 收集所有工作区包（packages/*）的名称和版本号
@@ -67,6 +106,8 @@ export async function resolvePackageJson(pkgJsonFile: string, packagesDir: strin
 
   const distPkg = {
     ...sourcePkg,
+    types: './index.d.ts',
+    exports: await resolveExports(outDir),
     main: sourcePkg.main ? sourcePkg.main.replace(/\.tsx?$/, '.js') : undefined,
     module: sourcePkg.module ? sourcePkg.module.replace(/\.tsx?$/, '.js') : undefined,
     dependencies: resolveWorkspaceDeps(sourcePkg.dependencies),
