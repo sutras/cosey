@@ -11,7 +11,10 @@ import pkg from '../../../packages/cosey/package.json' with { type: 'json' };
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: 'Cosey Admin',
-  description: 'A VitePress Site',
+  description:
+    '基于 Vue 3 + Element Plus 的中后台组件库与框架：布局、表格、表单、卡片等开箱即用组件。',
+  // 站点是中文的，默认 en-US 会让爬虫和阅读模式都按英文处理
+  lang: 'zh-CN',
   vite: {
     resolve: {
       alias: {
@@ -34,6 +37,18 @@ export default defineConfig({
     ssr: {
       noExternal: true,
     },
+    build: {
+      rollupOptions: {
+        onwarn(warning, warn) {
+          // svga 的 dist 里用了 eval，属于依赖本身，改不了也影响不到产物，别每条构建都刷一遍
+          if (warning.code === 'EVAL' || warning.message.includes('Use of eval')) {
+            return;
+          }
+
+          warn(warning);
+        },
+      },
+    },
   },
   markdown: {
     config(md) {
@@ -42,7 +57,9 @@ export default defineConfig({
     },
   },
   head: [
-    ['link', { ref: 'icon', href: '/favicon.ico' }],
+    ['link', { rel: 'icon', href: '/favicon.ico' }],
+    // llms.txt v2 的发现方式：告诉 Agent 这份索引覆盖整个站点
+    ['link', { rel: 'describedby', type: 'text/markdown', href: '/llms.txt' }],
     [
       'script',
       {},

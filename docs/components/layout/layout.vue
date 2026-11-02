@@ -1,26 +1,18 @@
 <template>
-  <ClientOnly>
-    <ConfigProvider
-      :theme="{
-        token: {
-          colorPrimary: '#1677ff',
-          colorSuccess: '#52c41a',
-          colorWarning: '#faad14',
-          colorError: '#ff4d4f',
-        },
-      }"
-      #default="{ locale }"
-    >
-      <ElConfigProvider :locale="locale">
-        <CustomLayout />
-      </ElConfigProvider>
-    </ConfigProvider>
-  </ClientOnly>
+  <Layout />
 </template>
 
 <script lang="ts" setup>
-import { ConfigProvider } from 'cosey/components';
-// import coseyZhCn from 'cosey/locale/lang/zh-cn';
+import Layout from 'vitepress/dist/client/theme-default/Layout.vue';
+import 'vitepress/dist/client/theme-default/styles/vars.css';
+import 'vitepress/dist/client/theme-default/styles/base.css';
+import 'vitepress/dist/client/theme-default/styles/icons.css';
+import 'vitepress/dist/client/theme-default/styles/utils.css';
+import 'vitepress/dist/client/theme-default/styles/components/custom-block.css';
+import 'vitepress/dist/client/theme-default/styles/components/vp-code.css';
+import 'vitepress/dist/client/theme-default/styles/components/vp-code-group.css';
+import 'vitepress/dist/client/theme-default/styles/components/vp-sponsor.css';
 
-import CustomLayout from './custom-layout.vue';
+import './styles/vp-doc.scss';
+import './styles/override-vite-press.scss';
 </script>

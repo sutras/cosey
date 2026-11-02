@@ -37,9 +37,13 @@ export function demoContainer(md: MarkdownRenderer) {
 
         const displayComponentName = `examples-${sourceFile.replaceAll('/', '-')}`;
 
+        // 示例覆盖了 echarts / 编辑器 / 播放器等等，大多依赖浏览器 API，
+        // 放 ClientOnly 里跳过 SSR：正文照常预渲染，示例等水合后再显示。
+        // provider 只包示例：布局本身是 VitePress 原生结构，才能原样水合（lean 产物里
+        // 静态内容是空占位，一旦整块重渲染，正文就没了）
         return (
           `<component-demo source="${source}" code="${code}" description="${description}">` +
-          `<template #display><${displayComponentName} /></template>`
+          `<template #display><ClientOnly><component-demo-provider><${displayComponentName} /></component-demo-provider></ClientOnly></template>`
         );
       } else {
         return `</component-demo>\n`;

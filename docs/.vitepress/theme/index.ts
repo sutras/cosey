@@ -11,6 +11,7 @@ import dayjsZhCn from 'dayjs/locale/zh-cn';
 dayjs.locale(dayjsZhCn);
 
 import { App, Component } from 'vue';
+import { ID_INJECTION_KEY } from 'element-plus';
 import Layout from '@/components/layout/layout.vue';
 
 import 'virtual:svg-icons-register';
@@ -64,6 +65,12 @@ function registerVPGlobalComponents(app: App) {
 
 export default {
   async enhanceApp({ app }) {
+    // markdown 里手写的组件（如 `<component-layout-model />`）会参与 SSR，
+    // 里面只要有一个 Element Plus 组件就会触发 useId 的 id 注入检查。
+    // 服务端每渲染一页都新建 app、enhanceApp 会再跑一次，所以计数器天然按页重置，
+    // 和客户端水合时的顺序一致。
+    app.provide(ID_INJECTION_KEY, { prefix: 1024, current: 0 });
+
     registerVPGlobalComponents(app);
 
     launch(app, {
