@@ -3,15 +3,22 @@ import { ElTooltip } from 'element-plus';
 import { RtiChevronDown } from 'richtext-icons';
 import { cardEmits, cardProps, cardSlots } from './card.api';
 import { Icon } from '../icon';
-import { createBem, cssVarName } from '../../utils';
+import { createBem, cssVarName, warningOnce } from '../../utils';
 
 export default defineComponent({
   name: 'CoCard',
   props: cardProps,
   slots: cardSlots,
   emits: cardEmits,
-  setup(props, { slots, emit }) {
+  setup(props, { slots, emit, attrs }) {
     const bem = createBem('card');
+
+    // 老版本的 height / maxHeight 已移除：现在限高交给根元素（`style="max-height: 320px"`，
+    // 或由父级 flex 决定），内容区会自己滚动。留着它们是静默失效，开发期直接点名。
+    warningOnce(
+      !('height' in attrs || 'maxHeight' in attrs || 'max-height' in attrs),
+      '[co-card] height / maxHeight 已移除，改用 style="max-height: 320px" 限高（内容区会内部滚动）',
+    );
 
     const collapsed = useModel(props, 'collapsed');
 
