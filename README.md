@@ -11,6 +11,15 @@
 
 </div>
 
+## 用 AI 助手写 Cosey
+
+组件和 API 通过 npm 分发，AI 助手读不到文档站，所以把索引放在了包外也放了一份给机器看的：
+
+- [llms.txt](https://docs.cosey.wzt.zone/llms.txt)：组件索引 + 常见误用（先读这个，十几 KB）
+- [llms-full.txt](https://docs.cosey.wzt.zone/llms-full.txt)：全部文档与示例源码
+
+入口只有这些，别自己拼深层路径：`cosey`、`cosey/components`、`cosey/hooks`、`cosey/utils`、`cosey/store`、`cosey/locale/lang/*`、`cosey/config/i18n`。
+
 ## 关于 Cosey Admin
 
 Cosey 是一个基于 Vue3、Vite、TypeScript 的后台解决方案，专门为开发中大型项目提供开箱即用的基础框架，让您可以专心于业务逻辑的开发。

@@ -42,3 +42,7 @@ pnpm-lock.yaml
 /stats.html
 
 .workbuddy
+
+# 由 `pnpm docs:llms` 生成（docs:dev / docs:build 前会自动跑）
+/docs/public/llms.txt
+/docs/public/llms-full.txt
