@@ -53,6 +53,7 @@
     min-width: 0;
     padding-block: css-var(padding-xs) css-var(padding-sm);
     padding-inline: var(--co-container-padding);
+    background: css-var(bg-color);
 
     @include is(border) {
       border-block-end: css-var(border-width) css-var(border-style) css-var(border-color-lighter);
