@@ -47,7 +47,9 @@ export const colorSchemeOptions: ColorSchemeOption[] = [
 ];
 
 export function useColorSchemeProvide() {
-  const defaultColorScheme = (persist.get(colorSchemeKey) || 'auto') as ColorScheme;
+  // SSR 上没有 localStorage / matchMedia，一律按默认值渲染，等客户端挂载后再修正
+  const storedColorScheme = isClient() ? persist?.get(colorSchemeKey) : undefined;
+  const defaultColorScheme = (storedColorScheme || 'auto') as ColorScheme;
 
   const colorScheme = ref<ColorScheme>(defaultColorScheme);
   const appliedColorScheme = ref<AppliedColorScheme>('light');
@@ -56,7 +58,9 @@ export function useColorSchemeProvide() {
     return colorSchemeOptions.find((option) => option.value === colorScheme.value)!;
   });
 
-  const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
+  const mediaQueryList = isClient() ? window.matchMedia('(prefers-color-scheme: dark)') : undefined;
+
+  const prefersDark = () => !!mediaQueryList?.matches;
 
   const handleChange = (event: MediaQueryListEvent) => {
     if (colorScheme.value === 'auto') {
@@ -65,23 +69,26 @@ export function useColorSchemeProvide() {
   };
 
   onMounted(() => {
-    mediaQueryList.addEventListener('change', handleChange);
+    mediaQueryList?.addEventListener('change', handleChange);
   });
 
   onBeforeUnmount(() => {
-    mediaQueryList.removeEventListener('change', handleChange);
+    mediaQueryList?.removeEventListener('change', handleChange);
   });
 
   watch(
     colorScheme,
     () => {
       if (colorScheme.value === 'auto') {
-        appliedColorScheme.value = mediaQueryList.matches ? 'dark' : 'light';
+        appliedColorScheme.value = prefersDark() ? 'dark' : 'light';
       } else {
         appliedColorScheme.value = colorScheme.value;
       }
-      persist.set(colorSchemeKey, colorScheme.value);
-      localStorage.setItem(colorSchemeKey, colorScheme.value);
+
+      if (isClient()) {
+        persist.set(colorSchemeKey, colorScheme.value);
+        localStorage.setItem(colorSchemeKey, colorScheme.value);
+      }
     },
     {
       immediate: true,
