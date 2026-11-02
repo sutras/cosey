@@ -1,4 +1,30 @@
-## 0.0.0 (2026-10-24)
+## 0.0.0 (2026-11-02)
+
+## <small>1.5.1 (2026-11-02)</small>
+
+- chore(release): 1.5.1 ([2b377d1](https://github.com/sutras/cosey/commit/2b377d1))
+- fix(card-tabs): keep-alive 重新激活时指示器不再从左侧滑入 ([afdbef4](https://github.com/sutras/cosey/commit/afdbef4))
+- fix(docs): 主题布局改用 VitePress 原生结构，修掉水合后正文消失 ([a959749](https://github.com/sutras/cosey/commit/a959749))
+- fix(hooks): useColorScheme 兼容 SSR ([dda525c](https://github.com/sutras/cosey/commit/dda525c))
+- fix(theme): 修复暗色切回亮色时先白屏再展开 ([b724a88](https://github.com/sutras/cosey/commit/b724a88))
+- feat(build): 发布包补 types 与 exports ([1155b57](https://github.com/sutras/cosey/commit/1155b57))
+- feat(card-tabs): 新增「页签条放在卡片头部」的组合组件 ([04cd367](https://github.com/sutras/cosey/commit/04cd367))
+- feat(card): 传已移除的 height / maxHeight 时开发期提示 ([f318c1c](https://github.com/sutras/cosey/commit/f318c1c))
+- feat(card): 高度交给外层，补页脚、头部插槽与分区样式属性 ([713fac8](https://github.com/sutras/cosey/commit/713fac8))
+- feat(docs): 生成 llms.txt / llms-full.txt，给 AI 助手一份能读的索引 ([d434232](https://github.com/sutras/cosey/commit/d434232))
+- feat(form-query): 分组操作区并入最后一组，组标题可自定义与设宽 ([16ef867](https://github.com/sutras/cosey/commit/16ef867))
+- feat(form-query): 支持把一个字段拆成两个输出键 ([dbe7986](https://github.com/sutras/cosey/commit/dbe7986))
+- feat(form): 新增 submit / reset 按钮插槽，table 三个按钮槽透传到查询区 ([1cfb86f](https://github.com/sutras/cosey/commit/1cfb86f))
+- feat(layout-search): 搜索结果项展示菜单图标 ([73cf387](https://github.com/sutras/cosey/commit/73cf387))
+- feat(mock): 发布新版本 ([3950dea](https://github.com/sutras/cosey/commit/3950dea))
+- feat(social): 新增社交模块（话题/动态/勋章/道具/礼物/公会/财务/会员） ([a52be9e](https://github.com/sutras/cosey/commit/a52be9e))
+- feat(table): renderer 补通用选项、布尔与三种金额 ([2997b6b](https://github.com/sutras/cosey/commit/2997b6b))
+- docs(card-tabs): 新增卡片页签文档与三个示例 ([7413466](https://github.com/sutras/cosey/commit/7413466))
+- docs(card): 示例改成真实业务场景，补页脚与自定义样式说明 ([668f21b](https://github.com/sutras/cosey/commit/668f21b))
+- docs(table): 补 renderer 的三节说明与示例 ([ef39b40](https://github.com/sutras/cosey/commit/ef39b40))
+- style(container): 容器标题区补背景色 ([399d336](https://github.com/sutras/cosey/commit/399d336))
+- refactor(table): 示例表格的操作列改用 actionColumn.actions ([ddbb8dd](https://github.com/sutras/cosey/commit/ddbb8dd)), closes [#action](https://github.com/sutras/cosey/issues/action)
+- build: changelog ([6cf84ee](https://github.com/sutras/cosey/commit/6cf84ee))
 
 ## 1.4.0 (2026-10-24)
 
