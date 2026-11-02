@@ -16,6 +16,7 @@ import {
   defineComponent,
   isVNode,
   nextTick,
+  onActivated,
   onBeforeUnmount,
   onMounted,
   onUpdated,
@@ -81,6 +82,12 @@ export default defineComponent({
         return;
       }
 
+      // keep-alive 停用时子树被移出布局，量到的宽度和偏移都是 0。
+      // 这时候写下去等于把指示器丢回最左边，重新激活时它就会从左往右滑一遍。
+      if (!active.offsetWidth) {
+        return;
+      }
+
       // 下划线只占文字宽度（让开页签内边距），分段选中块要盖满整个页签
       let offset = 0;
       let width = active.offsetWidth;
@@ -127,6 +134,13 @@ export default defineComponent({
     onMounted(scheduleIndicator);
 
     onUpdated(scheduleIndicator);
+
+    onActivated(() => {
+      // 从 keep-alive 里回来时直接落位，别让指示器从左边滑一遍
+      indicatorPlaced = false;
+
+      scheduleIndicator();
+    });
 
     useResizeObserver(navEl, scheduleIndicator);
 
