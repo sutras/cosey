@@ -1,5 +1,5 @@
 <template>
-  <Card :max-height="maxHeight" :collapsible="false">
+  <Card :style="{ maxHeight }" :collapsible="false">
     <template #title>
       <el-checkbox
         v-model="checkAll"

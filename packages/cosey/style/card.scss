@@ -1,12 +1,17 @@
 @use './base/index' as *;
 
 @include b(card) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   background-color: css-var(bg-color);
   border-radius: css-var(border-radius-base);
 
   @include m(medium) {
     @include e(header) {
-      padding: css-var(padding-sm) css-var(padding);
+      --co-card-header-padding-block: #{css-var(padding-sm)};
+
+      padding: var(--co-card-header-padding-block) css-var(padding);
     }
 
     @include e(title) {
@@ -16,11 +21,17 @@
     @include e(body) {
       padding: css-var(padding);
     }
+
+    @include e(footer) {
+      padding: css-var(padding-sm) css-var(padding);
+    }
   }
 
   @include m(small) {
     @include e(header) {
-      padding: css-var(padding-xs) css-var(padding-sm);
+      --co-card-header-padding-block: #{css-var(padding-xs)};
+
+      padding: var(--co-card-header-padding-block) css-var(padding-sm);
     }
 
     @include e(title) {
@@ -29,6 +40,10 @@
 
     @include e(body) {
       padding: css-var(padding-sm);
+    }
+
+    @include e(footer) {
+      padding: css-var(padding-xs) css-var(padding-sm);
     }
   }
 
@@ -41,6 +56,10 @@
     overflow: hidden;
 
     @include e(header) {
+      background-color: css-var(fill-color-light);
+    }
+
+    @include e(footer) {
       background-color: css-var(fill-color-light);
     }
   }
@@ -71,6 +90,10 @@
       cursor: pointer;
       user-select: none;
     }
+  }
+
+  @include e(footer) {
+    border-block-start: css-var(border-width) css-var(border-style) css-var(border-color-lighter);
   }
 
   @include e(heading) {
@@ -105,6 +128,8 @@
   }
 
   @include e(extra) {
+    /* 标题区没有标题、或同排的导航只占内容宽度时，操作区也要落在右边 */
+    margin-inline-start: auto;
     flex: none;
     font-size: css-var(font-size-small);
     color: css-var(text-color-secondary);
@@ -123,6 +148,12 @@
   }
 
   @include e(toggle) {
+    @include is(push) {
+      margin-inline-start: auto;
+    }
+  }
+
+  @include e(toggle) {
     @include is(collapsed) {
       transform: rotate(180deg);
     }
@@ -130,25 +161,23 @@
 
   @include e(body) {
     box-sizing: border-box;
+    flex: 1 1 auto;
     min-width: 0;
+    min-height: 0;
+    overflow: auto;
 
-    @include is(scrollable) {
-      overflow: auto;
-      overscroll-behavior: contain;
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
 
-      &::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-      }
+    &::-webkit-scrollbar-thumb {
+      border-radius: 3px;
+      background-color: css-var(border-color);
+    }
 
-      &::-webkit-scrollbar-thumb {
-        border-radius: 3px;
-        background-color: css-var(border-color);
-      }
-
-      &::-webkit-scrollbar-track {
-        background-color: transparent;
-      }
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
     }
   }
 }

@@ -206,7 +206,7 @@ export default defineComponent({
             <FormItem v-model={formModel.fields} label={t('co.table.selectField')} prop="fields">
               <Card
                 size="small"
-                maxHeight="240px"
+                style={{ maxHeight: '240px' }}
                 collapsible={false}
                 v-slots={{
                   title: () => (

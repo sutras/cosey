@@ -97,7 +97,7 @@ export default defineComponent({
           <FormDialog v-model={visible.value} title="LaTeX 公式" width="760px">
             <Row gutter={8} style="row-gap: 8px">
               <Col sm={8}>
-                <Card title="数学公式" maxHeight="300px" collapsible={false}>
+                <Card title="数学公式" style={{ maxHeight: '300px' }} collapsible={false}>
                   <ElSpace fill>
                     {formulas.map((item) => (
                       <ElButton
