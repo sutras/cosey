@@ -24,6 +24,65 @@ table/basic
 
 :::
 
+### 单元格渲染器
+
+绝大多数列不用写插槽，也不用写 `format`：给 `renderer` 一个类型名即可，组件会按类型挑对应的组件渲染。字符串是简写，需要传属性时改成对象写法：
+
+```ts
+{ prop: 'status', label: '状态', renderer: { type: 'tag', options: statusOptions } }
+```
+
+`renderer` 本身默认就是 `'text'`，所以 `renderer: 'text'` 不用写；对象写法里 `type` 同样可以省，省了按 `text` 处理 —— 只想加个占位或兜底字段时直接写 `{ empty: '—' }` 就行。
+
+同一份 `columns` 里可以混用。下面这张表从左到右依次是 `click`（订单号，点了有回调）、`tag`（状态，颜色由 `options` 决定）、`boolean`（发货要求，真值才染成标签）、`longtext`（收货地址）、`datetime`（付款时间）、`switch`（到货通知，切换即调用 `api`）。`media` / `date` 见[基础使用](#基础使用)。
+
+::: demo
+
+table/renderer
+
+:::
+
+几个值得先知道的点：
+
+- `tag` 的 `options` 直接吃后台常见的那份 `[{ label, value, tag }]`，值比较对 `'1'` 与 `1` 是宽松的；
+- `boolean` 的判定不是 `Boolean(value)`，`0` / `'0'` / `false` 都算假 —— 后端把枚举回成字符串时也不会把「关闭」显示成「开启」；
+- `longtext` 默认 3 行截断且可展开，单元格里不需要额外的全文出口；
+- `switch` 的 `api` 抛错时开关会弹回原位、不留下假的选中态。
+
+### 空值与兜底
+
+所有渲染器都支持 `empty` 与 `fallback` 两个通用选项：前者是空值时的占位，后者按顺序从当前行取第一个非空字段。
+
+`fallback` 里不用把 `prop` 再写一遍 —— 单元格的值本来就是按 `prop` 取的，只有它为空时才顺着 `fallback` 往下找，所以那里只列备用路径。
+
+示例里同样是「备注」的两列，没配置的那列空值就是一片空白，配了 `empty` 的显示破折号；最后一列的 `prop` 是 `contact.mobile`，为空时退到 `mobile`，两者都空才显示占位文案。
+
+::: demo
+
+table/renderer-fallback
+
+:::
+
+### 金额
+
+金额类有三个类型，区别只在「值本身是什么单位」：
+
+| 类型   | 值的单位 | 显示                  |
+| ------ | -------- | --------------------- |
+| `usd`  | 美元     | `$1,280.00`           |
+| `cny`  | 人民币元 | `¥1,280.00`           |
+| `cent` | 美分     | 除以 100 后按美元显示 |
+
+千分位和币种符号交给 `Intl`：人民币默认 `zh-CN`（`¥`），美元默认 `en-US`（`$`），要统一成同一种语言就传 `props.locale`。小数位默认 2 位，用 `props.precision` 改。
+
+两个边界：`0` 会正常显示成 `¥0.00`，不会被当成空值；非数字的值原样输出，不会渲染出 `NaN`。
+
+::: demo
+
+table/renderer-money
+
+:::
+
 ### 操作按钮的声明
 
 操作列上的按钮可以直接用 `actions` 声明，不必再开一个插槽手写 `<co-table-action>`——底层渲染的就是它，所以 `TableActionItemProps` 的字段（`label` / `icon` / `type` / `popconfirm` / `dropdown` …）全都照旧。
@@ -505,9 +564,18 @@ type TableColumnPropsSlots =
 }
 ```
 
+所有类型都支持下面两个通用选项，可以写在任意一种对象写法里：
+
+| 参数     | 描述                                                                        | 类型     | 默认值 |
+| -------- | --------------------------------------------------------------------------- | -------- | ------ |
+| empty    | 空值（`null` / `undefined` / `''` / `[]`）时的占位，`0` 与 `false` 不算空   | string   | -      |
+| fallback | 兜底字段，主字段为空时按顺序从当前行取第一个非空值，路径写法同 `lodash.get` | string[] | -      |
+
+对象写法里的 `type` 可以省，省了按 `text` 处理，所以只配置通用选项时写 `{ empty: '—' }` 即可；`fallback` 也不必重复 `prop`，那里只列备用字段。
+
 #### text
 
-原样输出文本。
+原样输出文本，也是 `renderer` 的默认值（不写就是它）。
 
 #### date
 
@@ -516,6 +584,30 @@ type TableColumnPropsSlots =
 #### datetime
 
 格式化为 `YYYY-MM-DD HH:mm:ss`。
+
+#### usd
+
+按美元显示，带 `$` 和千分位。值本身是美元，非数字原样输出。
+
+| 参数  | 描述             | 类型                                    |
+| ----- | ---------------- | --------------------------------------- |
+| props | 小数位与符号语言 | { precision?: number; locale?: string } |
+
+#### cny
+
+按人民币元显示，带 `¥` 和千分位。
+
+| 参数  | 描述             | 类型                                    |
+| ----- | ---------------- | --------------------------------------- |
+| props | 小数位与符号语言 | { precision?: number; locale?: string } |
+
+#### cent
+
+值是美分：除以 100 后按美元显示，其余与 `usd` 一致。后端金额用整数分存储时用这个，避免前端各处自己除。
+
+| 参数  | 描述             | 类型                                    |
+| ----- | ---------------- | --------------------------------------- |
+| props | 小数位与符号语言 | { precision?: number; locale?: string } |
 
 #### media
 
@@ -535,12 +627,26 @@ type TableColumnPropsSlots =
 
 #### tag
 
-使用 [ElTag](https://element-plus.org/zh-CN/component/tag) 组件渲染。
+使用 [ElTag](https://element-plus.org/zh-CN/component/tag) 组件渲染。值可以是单个，也可以是数组（每一项一个标签）。
 
-| 参数  | 描述                                    | 类型                                                                      |
-| ----- | --------------------------------------- | ------------------------------------------------------------------------- |
-| path  | 使用 `lodash` 的 `get` 函数获取嵌套数据 | string \| string[]                                                        |
-| props | 自定义组件的 `props`                    | [ElTagProps](https://element-plus.org/zh-CN/component/tag#tag-attributes) |
+| 参数    | 描述                                     | 类型                                                                                        |
+| ------- | ---------------------------------------- | ------------------------------------------------------------------------------------------- |
+| options | 值 → 文案 + 颜色的映射，未命中时回落原值 | { label: string \| number; value: string \| number \| boolean; tag?: TagProps\['type'\] }[] |
+| path    | 每一项是对象时，从这个路径取文案         | string \| string[]                                                                          |
+| props   | 自定义组件的 `props`                     | [ElTagProps](https://element-plus.org/zh-CN/component/tag#tag-attributes)                   |
+
+#### boolean
+
+把值渲染成「是 / 否」文案，也可以顺手染成标签。
+
+| 参数      | 描述                             | 类型                                                                               |
+| --------- | -------------------------------- | ---------------------------------------------------------------------------------- |
+| trueText  | 真值文案，默认取 `co.common.yes` | string                                                                             |
+| falseText | 假值文案，默认取 `co.common.no`  | string                                                                             |
+| trueTag   | 真值的标签颜色，传了才渲染成标签 | [ElTagProps](https://element-plus.org/zh-CN/component/tag#tag-attributes)\['type'] |
+| falseTag  | 假值的标签颜色，传了才渲染成标签 | [ElTagProps](https://element-plus.org/zh-CN/component/tag#tag-attributes)\['type'] |
+
+真值判定为 `true` / `1` / `'1'`，其余都算假。
 
 #### longtext
 
