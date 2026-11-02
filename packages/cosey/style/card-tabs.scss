@@ -1,0 +1,178 @@
+@use './base/index' as *;
+
+@include b(card-tabs) {
+  @include e(header) {
+    display: flex;
+    flex: 1;
+    /* 撑满标题区的内容盒，页签才能跟着长高、和标题同一个垂直中心 */
+    align-self: stretch;
+    align-items: center;
+    gap: css-var(padding);
+    min-width: 0;
+
+    /* 标题按内容宽度排，导航紧跟其后；剩余空间留给右侧操作区 */
+    .co-card__heading {
+      flex: 0 1 auto;
+    }
+  }
+
+  @include e(nav) {
+    display: flex;
+    flex: 1;
+    /* 高度交给标题区的内容盒：页签和标题在同一个盒子里居中，文字才对得齐；
+       负外边距会等量减少高度贡献，没有标题时会把 __header 一起塌成 0 */
+    align-self: stretch;
+    min-width: 0;
+  }
+
+  @include e(nav-scroll) {
+    position: relative;
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  /* 激活下划线：所有页签共用一条，位置由 JS 用 transform 推到激活页签下方 */
+  @include e(ink) {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-start: 0;
+    height: 2px;
+    border-radius: 1px;
+    background-color: css-var(color-primary);
+    pointer-events: none;
+    transition:
+      transform css-var(transition-duration) ease,
+      width css-var(transition-duration) ease;
+  }
+
+  /* 分段样式的选中块：垫在页签下面，跟着激活项滑动 */
+  @include e(thumb) {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: 0;
+    border-radius: css-var(border-radius-small);
+    background-color: css-var(bg-color);
+    pointer-events: none;
+    transition:
+      transform css-var(transition-duration) ease,
+      width css-var(transition-duration) ease;
+  }
+
+  @include e(item) {
+    display: flex;
+    flex: none;
+    align-items: center;
+    /* 有内边距，导航才有实高：没有标题/操作区时靠它把头部撑起来 */
+    padding-block: css-var(padding-xs);
+    padding-inline: css-var(padding-sm);
+    font-size: css-var(font-size-base);
+    color: css-var(text-color-regular);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: color css-var(transition-duration-fast);
+
+    &:hover {
+      color: css-var(color-primary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid css-var(color-primary-light-5);
+      outline-offset: -2px;
+    }
+
+    @include is(active) {
+      color: css-var(color-primary);
+    }
+
+    @include is(disabled) {
+      color: css-var(text-color-disabled);
+      cursor: not-allowed;
+
+      &:hover {
+        color: css-var(text-color-disabled);
+      }
+    }
+  }
+
+  @include e(panel) {
+    min-width: 0;
+  }
+
+  @include m(card) {
+    @include e(nav) {
+      /* 顶部留白挂在页签上而不是卡片头部：标题和操作区才能整块居中。
+         底部多让 1px：页签自己的下边框盖住标题区那条分隔线，不会叠成两条 */
+      align-self: flex-end;
+      margin-block: css-var(padding-xxs) calc(-1 * #{css-var(border-width)});
+    }
+
+    /* 页签之间留一点缝，紧挨着会显得挤 */
+    @include e(nav-scroll) {
+      gap: 2px;
+    }
+
+    @include e(item) {
+      /* 头部 46 = 顶部间隔 4 + 页签 42（减 1px 重叠、加 1px 分隔线）：页签吃掉头部多出来的高度，
+         间隔才不会被撑大。底部垫 4px，文字和标题落在同一条中心线上 */
+      height: 42px;
+      padding-block: 0 css-var(padding-xxs);
+      padding-inline: css-var(padding-sm);
+      background-color: css-var(fill-color-lighter);
+      border: css-var(border-width) css-var(border-style) css-var(border-color);
+      border-block-end-color: css-var(border-color-lighter);
+      border-start-start-radius: css-var(border-radius-base);
+      border-start-end-radius: css-var(border-radius-base);
+
+      @include is(active) {
+        background-color: css-var(bg-color);
+        /* 把下边框改成底色，和内容区连成一片 */
+        border-block-end-color: css-var(bg-color);
+      }
+    }
+  }
+
+  @include m(segment) {
+    @include e(nav) {
+      flex: none;
+      align-self: center;
+      padding: 2px;
+      margin-block: 0;
+      background-color: css-var(fill-color-light);
+      border-radius: css-var(border-radius-base);
+    }
+
+    @include e(item) {
+      /* 抬到选中块上面，白底由 `__thumb` 提供，这样它能滑过去 */
+      position: relative;
+      z-index: 1;
+      padding-block: css-var(padding-xxs);
+      padding-inline: css-var(padding-sm);
+      border-radius: css-var(border-radius-small);
+    }
+  }
+}
+
+/* 页签本身就占高度，卡片式页签的头部不留内边距：标题与操作区整块居中，
+   顶部那点间隔归页签自己（见上方 `__nav` 的 margin-block-start） */
+.co-card.co-card-tabs--card > .co-card__header {
+  --co-card-header-padding-block: 0;
+
+  min-height: 46px;
+  padding-block: 0;
+}
+
+/* 下划线与分段样式：上下不留内边距，高度由页签撑起来，最少 46px */
+.co-card.co-card-tabs--line > .co-card__header,
+.co-card.co-card-tabs--segment > .co-card__header {
+  min-height: 46px;
+  padding-block: 0;
+}

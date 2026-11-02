@@ -4,6 +4,7 @@ export * from './async';
 export * from './audio-card';
 export * from './audio-viewer';
 export * from './card';
+export * from './card-tabs';
 export * from './check-updates';
 export * from './chart';
 export * from './close';

@@ -2,6 +2,7 @@ import { CoAsync } from './async';
 import { AudioCard } from './audio-card';
 import { AudioViewer } from './audio-viewer';
 import { Card } from './card';
+import { CardTabPanel, CardTabs } from './card-tabs';
 import { CheckUpdates } from './check-updates';
 import { CoChart } from './chart';
 import { Close } from './close';
@@ -74,6 +75,8 @@ declare module 'vue' {
     CoAudioCard: typeof AudioCard;
     CoAudioViewer: typeof AudioViewer;
     CoCard: typeof Card;
+    CoCardTabs: typeof CardTabs;
+    CoCardTabPanel: typeof CardTabPanel;
     CoCheckUpdates: typeof CheckUpdates;
     CoChart: typeof CoChart;
     CoClose: typeof Close;
@@ -155,6 +158,8 @@ export const registerGlobalComponents = {
       AudioCard,
       AudioViewer,
       Card,
+      CardTabPanel,
+      CardTabs,
       CheckUpdates,
       CoChart,
       Close,
